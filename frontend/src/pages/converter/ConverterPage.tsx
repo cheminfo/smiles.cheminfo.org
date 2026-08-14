@@ -57,7 +57,15 @@ function AboutPanel() {
         <a href="/docs" target="_blank" rel="noreferrer">
           API
         </a>{' '}
-        uses for scripts.
+        uses for scripts — a JavaScript port of{' '}
+        <a
+          href="https://github.com/Actelion/openchemlib"
+          target="_blank"
+          rel="noreferrer"
+        >
+          the Java library
+        </a>{' '}
+        written by Thomas Sander.
       </p>
       <p>
         A <b>canonical</b> SMILES is the one string a toolkit picks out of the
@@ -79,6 +87,21 @@ function AboutPanel() {
           rel="noreferrer"
         >
           10.1021/ci00057a005
+        </a>
+      </p>
+      <p className="muted">
+        Sander, T.; Freyss, J.; von Korff, M.; Reich, J. R.; Rufener, C.{' '}
+        <i>
+          OSIRIS, an entirely in-house developed drug discovery informatics
+          system.
+        </i>{' '}
+        J. Chem. Inf. Model. <b>2009</b>, 49, 232–246.{' '}
+        <a
+          href="https://doi.org/10.1021/ci800305f"
+          target="_blank"
+          rel="noreferrer"
+        >
+          10.1021/ci800305f
         </a>
       </p>
     </Card>

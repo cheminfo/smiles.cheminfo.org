@@ -9,6 +9,15 @@ hand out as a link.
 are all done in the page by [openchemlib](https://github.com/cheminfo/openchemlib-js) —
 nothing is uploaded. A REST API does the same thing for scripts.
 
+The chemistry comes from [openchemlib](https://github.com/Actelion/openchemlib),
+the Java library written by Thomas Sander, of which
+[openchemlib-js](https://github.com/cheminfo/openchemlib-js) is the JavaScript
+port.
+
+> Sander, T.; Freyss, J.; von Korff, M.; Reich, J. R.; Rufener, C. _OSIRIS, an
+> entirely in-house developed drug discovery informatics system._ J. Chem. Inf.
+> Model. **2009**, 49, 232–246. <https://doi.org/10.1021/ci800305f>
+
 ## Pages
 
 | Page               | What it is for                                                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -17,7 +26,7 @@ nothing is uploaded. A REST API does the same thing for scripts.
 | **Lists & search** | A whole list in, a whole list out — SMILES, SMARTS, molfiles, idCodes or an **SDF**, in either direction. A line that cannot be read keeps its place with the reason beside it. Reading the list also indexes it, so the same table answers a query — by substructure, by SMARTS, exactly, without stereochemistry, or by similarity — with the matched atoms painted. Downloads what is on screen as SMILES, CSV or SDF, hits included. |
 | **Tutorial**       | Eighteen steps from a single atom to a mapped reaction, each one a working structure you can take apart, with a hoverable definition on every piece of jargon.                                                                                                                                                                                                                                                                           |
 | **Exercises**      | 110 graded questions in three sets: _Molecule → SMILES_, _SMILES → Molecule_, and _Write a SMARTS_. Marked on the molecule, never on the string, so any correct spelling is accepted.                                                                                                                                                                                                                                                    |
-| **Cheatsheet**     | The whole of SMILES and SMARTS on one printable page — 140 constructs, each with a drawn example.                                                                                                                                                                                                                                                                                                                                        |
+| **Cheatsheet**     | The whole of SMILES and SMARTS on one printable page — 134 constructs, each with a drawn example.                                                                                                                                                                                                                                                                                                                                        |
 | **Specification**  | The OpenSMILES specification itself, mirrored here word for word with a table of contents down the left — the original is served with a certificate no browser accepts.                                                                                                                                                                                                                                                                  |
 
 ## What it replaces

@@ -1,6 +1,8 @@
 import type { Molecule } from 'openchemlib';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { SvgRenderer } from 'react-ocl';
+
+import { annotateRings } from '../../../chemistry/rings.ts';
 
 interface StructureViewProps {
   molecule: Molecule;
@@ -21,6 +23,12 @@ interface StructureViewProps {
    * @default '#a5d8ff'
    */
   atomHighlightColor?: string;
+  /**
+   * Number the rings: every ring atom carries the rings it belongs to above
+   * it, and every ring bond is painted.
+   * @default false
+   */
+  showRings?: boolean;
   /** Caption drawn inside the picture by openchemlib. */
   label?: string;
   /**
@@ -48,13 +56,22 @@ const StructureView = memo(function StructureView(props: StructureViewProps) {
     height = 200,
     atomHighlight,
     atomHighlightColor = '#a5d8ff',
+    showRings = false,
     label,
     autoCrop = true,
   } = props;
 
+  // The numbers are custom labels written on the molecule, so they are added
+  // to a copy of it — this one is drawn instead, and the one the page holds
+  // stays as it was parsed.
+  const rings = useMemo(
+    () => (showRings ? annotateRings(molecule) : null),
+    [molecule, showRings],
+  );
+
   return (
     <SvgRenderer
-      molecule={molecule}
+      molecule={rings?.molecule ?? molecule}
       width={width}
       height={height}
       autoCrop={autoCrop}
@@ -62,6 +79,10 @@ const StructureView = memo(function StructureView(props: StructureViewProps) {
       atomHighlight={atomHighlight}
       atomHighlightColor={atomHighlightColor}
       atomHighlightOpacity={0.7}
+      bondHighlight={rings?.ringBonds}
+      bondHighlightColor="#ffd8a8"
+      bondHighlightOpacity={0.3}
+      noCarbonLabelWithCustomLabel={showRings}
       label={label}
       suppressChiralText={false}
     />

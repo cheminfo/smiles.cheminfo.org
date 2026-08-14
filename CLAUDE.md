@@ -222,6 +222,16 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
   once rather than once per render — and every atom is an element that can be
   highlighted, hovered and printed. The canvas editor is for drawing, not for
   showing.
+- **The rings are named on the drawing, not beside it.** `chemistry/rings.ts`
+  writes each atom's rings on it as an openchemlib custom label — a leading `]`
+  is openchemlib's own way of saying "above the atom rather than instead of it",
+  and `noCarbonLabelWithCustomLabel` keeps the carbon a plain vertex — so a ring
+  fusion reads `12` and a ring closure digit in the SMILES has something to
+  point at. The labels are written on a **copy**: they live on the molecule
+  itself, and the converter hands the same parsed one to several panels. The
+  ring bonds are painted as well, because a bond between two ring atoms is not
+  always a ring bond — biphenyl's middle one is the case the numbers alone
+  cannot tell.
 - The canvas editor is uncontrolled and owns its drawing: it is **remounted with
   a `key`** to replace what it holds, never driven by a prop. On the converter
   only a structure that came from somewhere else bumps the revision — rebuilding

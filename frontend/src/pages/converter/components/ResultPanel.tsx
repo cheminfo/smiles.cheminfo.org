@@ -1,10 +1,10 @@
-import { Callout, Card, H5, Tag } from '@blueprintjs/core';
+import { Button, Callout, Card, H5, Tag, Tooltip } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { MF } from 'react-mf';
 
 import type { Structure } from '../../../../../chemistry/types.ts';
 import StructureView from '../../../components/StructureView.tsx';
-import { structure } from '../../../state/converter.ts';
+import { preferences, structure } from '../../../state/converter.ts';
 import { isHidden } from '../../../state/shareConfig.ts';
 
 import NotationRow from './NotationRow.tsx';
@@ -66,15 +66,36 @@ export default function ResultPanel() {
     <Card className="result-card">
       <div className="card-header">
         <H5>What it is</H5>
-        {value.isQuery ? (
-          <Tag minimal intent="warning" icon="search-template">
-            a query, not a molecule
-          </Tag>
-        ) : null}
+        <div className="draw-header-actions">
+          {value.isQuery ? (
+            <Tag minimal intent="warning" icon="search-template">
+              a query, not a molecule
+            </Tag>
+          ) : null}
+          <Tooltip
+            content="Number the rings openchemlib found, on the atoms that are in them. An atom in two rings names both."
+            hoverOpenDelay={150}
+          >
+            <Button
+              size="small"
+              icon="circle"
+              text="Rings"
+              active={preferences.showRings.value}
+              onClick={() => {
+                preferences.showRings.value = !preferences.showRings.peek();
+              }}
+            />
+          </Tooltip>
+        </div>
       </div>
 
       <div className="result-depiction">
-        <StructureView molecule={molecule} width={320} height={220} />
+        <StructureView
+          molecule={molecule}
+          width={320}
+          height={220}
+          showRings={preferences.showRings.value}
+        />
         <dl className="result-facts">
           {/* A query fragment has no implicit hydrogens on any atom, so a
               formula and a mass computed from it are both fiction — *CC would
