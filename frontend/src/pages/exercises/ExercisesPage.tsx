@@ -9,6 +9,7 @@ import AnswerPanel from './components/AnswerPanel.tsx';
 import ExerciseList from './components/ExerciseList.tsx';
 import HintsPanel from './components/HintsPanel.tsx';
 import QuestionPanel from './components/QuestionPanel.tsx';
+import SelfCheckPanel from './components/SelfCheckPanel.tsx';
 
 /**
  * The exercises: the list on the left, the question in the middle, what to do
@@ -42,6 +43,7 @@ export default function ExercisesPage() {
           </div>
           <div className="panel-stack">
             <AnswerPanel exercise={exercise} />
+            {isHidden('check') ? null : <SelfCheckPanel exercise={exercise} />}
             {isHidden('hints') ? null : <HintsPanel exercise={exercise} />}
           </div>
         </>

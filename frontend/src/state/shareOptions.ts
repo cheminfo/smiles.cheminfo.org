@@ -120,6 +120,12 @@ const EXERCISES: ShareFeature[] = [
     description: 'The hint ladder, revealed one rung at a time.',
   },
   {
+    key: 'check',
+    label: 'The running check',
+    description:
+      'Whether the draft reads as a structure, and whether its atoms add up. It never says the answer is right.',
+  },
+  {
     key: 'answers',
     label: 'Give up and see the answer',
     description:

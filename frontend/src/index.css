@@ -939,6 +939,32 @@ textarea.notation-input {
   margin-bottom: 4px;
 }
 
+.self-check {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.self-check-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+}
+
+.self-check-row.is-off {
+  color: #935610;
+}
+
+.self-check .verdict-formula {
+  margin: 0 0 0 20px;
+}
+
+.self-check-hint {
+  margin: 4px 0 0;
+  color: #5f6b7c;
+}
+
 .hint-list {
   margin: 8px 0 0;
   padding-left: 20px;

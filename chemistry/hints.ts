@@ -77,6 +77,20 @@ export function formulaDifference(
 }
 
 /**
+ * A structure's formula, counted the way {@link formulaDifference} counts it.
+ *
+ * openchemlib writes one of its own, but a formula that is going to be compared
+ * with a difference has to be counted by whatever produced that difference, or
+ * a structure carrying explicit hydrogens reads as one formula in the sentence
+ * and another in the arithmetic under it.
+ * @param molecule - The structure. It is not modified.
+ * @returns The formula, in Hill order.
+ */
+export function formulaOf(molecule: Molecule): string {
+  return writeFormula(elementCounts(molecule));
+}
+
+/**
  * Whether two structures are tautomers of one another.
  *
  * A student who moved a hydrogen and a double bond has drawn a real molecule

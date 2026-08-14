@@ -13,6 +13,7 @@ const HIDE_KEYS = [
   'list',
   'sets',
   'hints',
+  'check',
   'answers',
   'clear',
 ] as const;

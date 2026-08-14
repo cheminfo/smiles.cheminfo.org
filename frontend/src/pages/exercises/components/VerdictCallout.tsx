@@ -1,12 +1,9 @@
 import { Callout, Icon } from '@blueprintjs/core';
-import { MF } from 'react-mf';
 
-import type {
-  ElementCount,
-  FormulaDifference,
-} from '../../../../../chemistry/hints.ts';
 import { NotationCaret } from '../../../components/NotationError.tsx';
 import type { Exercise, Verdict } from '../../../exercises/types.ts';
+
+import FormulaDifferenceLine from './FormulaDifferenceLine.tsx';
 
 /**
  * What the marking says, and what to do about it.
@@ -49,62 +46,14 @@ export default function VerdictCallout(props: {
       {verdict.error && kind !== 'draw' ? (
         <NotationCaret input={answer} position={verdict.error.position} />
       ) : null}
-      {verdict.formula ? <FormulaHint formula={verdict.formula} /> : null}
+      {verdict.formula ? (
+        <FormulaDifferenceLine formula={verdict.formula} />
+      ) : null}
       {verdict.hint ? (
         <p className="verdict-hint">
           <Icon icon="lightbulb" size={12} /> {verdict.hint}
         </p>
       ) : null}
     </Callout>
-  );
-}
-
-/**
- * Which atoms are missing and which are in excess.
- * @param props - The difference between the two formulas.
- * @returns One line of chemistry.
- */
-function FormulaHint(props: { formula: FormulaDifference }) {
-  const { given, missing, extra } = props.formula;
-
-  return (
-    <p className="verdict-formula">
-      Your structure is <MF mf={given} />
-      {missing.length > 0 ? (
-        <>
-          {' — short of '}
-          <ElementList elements={missing} />
-        </>
-      ) : null}
-      {extra.length > 0 ? (
-        <>
-          {missing.length > 0 ? ', and carrying ' : ' — carrying '}
-          <ElementList elements={extra} />
-          {' too many'}
-        </>
-      ) : null}
-      .
-    </p>
-  );
-}
-
-/**
- * `1 C and 3 O` — each element on its own, because the same atoms written as
- * one formula would read as a molecule that is not there.
- * @param props - The elements and how many of each.
- * @returns The list, joined the way it would be said.
- */
-function ElementList(props: { elements: ElementCount[] }) {
-  const { elements } = props;
-
-  return (
-    <>
-      {elements.map(({ element, count }, index) => (
-        <span key={element}>
-          {index === 0 ? '' : index === elements.length - 1 ? ' and ' : ', '}
-          {count} <MF mf={element} />
-        </span>
-      ))}
-    </>
   );
 }
