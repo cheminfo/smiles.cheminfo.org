@@ -118,3 +118,68 @@ test('a query is described like a molecule', () => {
   expect(annotation.ringCount).toBe(1);
   expect(annotation.ringBonds).toStrictEqual([0, 1, 2, 3, 4, 5]);
 });
+
+test('a macrocycle is numbered, not merely painted', () => {
+  // openchemlib's ring set stops at seven atoms, so cyclododecane used to come
+  // back with twelve painted bonds and no number on any of them.
+  const annotation = annotateRings(readStructure('C1CCCCCCCCCCC1').molecule);
+
+  expect(annotation.ringCount).toBe(1);
+  expect(annotation.ringBonds).toHaveLength(12);
+  expect(labels(annotation.molecule)).toStrictEqual(
+    Array.from({ length: 12 }, () => '1'),
+  );
+});
+
+test('a small ring and a macrocycle are two rings, numbered apart', () => {
+  const annotation = annotateRings(
+    readStructure('c1ccccc1.C1CCCCCCCCCCC1').molecule,
+  );
+
+  expect(annotation.ringCount).toBe(2);
+  const found = labels(annotation.molecule);
+  expect(found.filter((one) => one === '1')).toHaveLength(6);
+  expect(found.filter((one) => one === '2')).toHaveLength(12);
+});
+
+test.each([
+  ['C1CCCCCC1', 1, 7],
+  ['C1CCCCCCC1', 1, 8],
+  ['c1ccc2ccccc2c1', 2, 11],
+])('%s has %i ring(s) over %i ring bonds', (smiles, rings, bonds) => {
+  const annotation = annotateRings(readStructure(smiles).molecule);
+  expect(annotation.ringCount).toBe(rings);
+  expect(annotation.ringBonds).toHaveLength(bonds);
+});
+
+test('every atom of a painted ring bond carries a ring number', () => {
+  // The two halves have to agree: a bond painted as a ring bond with no ring
+  // to belong to is exactly what the macrocycle bug looked like.
+  for (const smiles of [
+    'c1ccccc1',
+    'C1CCCCCCCCCCC1',
+    'c1ccc2ccccc2c1',
+    'Cn1cnc2c1c(=O)n(C)c(=O)n2C',
+    'C1CC2CC1C=C2',
+  ]) {
+    const annotation = annotateRings(readStructure(smiles).molecule);
+    const found = labels(annotation.molecule);
+    if (annotation.ringBonds.length > 0) {
+      expect(annotation.ringCount, smiles).toBeGreaterThan(0);
+    }
+    for (const bond of annotation.ringBonds) {
+      for (const end of [0, 1] as const) {
+        const atom = annotation.molecule.getBondAtom(end, bond);
+        expect(found[atom], `${smiles} atom ${atom}`).not.toBe('');
+      }
+    }
+  }
+});
+
+test('an acyclic molecule has no rings and nothing painted', () => {
+  const annotation = annotateRings(readStructure('CCO').molecule);
+
+  expect(annotation.ringCount).toBe(0);
+  expect(annotation.ringBonds).toStrictEqual([]);
+  expect(labels(annotation.molecule)).toStrictEqual(['', '', '']);
+});

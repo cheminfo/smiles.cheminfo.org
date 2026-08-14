@@ -13,11 +13,30 @@ const PAGES: Page[] = [
   'specification',
 ];
 
-test('every page the router can open has a share dialog to offer', () => {
-  for (const page of PAGES) {
+test.each([
+  ['converter', ['kinds', 'editor', 'formats', 'examples', 'about']],
+  ['lists', ['load', 'options', 'export', 'about']],
+  ['exercises', ['sets', 'hints', 'check', 'answers', 'clear']],
+  ['tutorial', []],
+  ['reference', []],
+  ['specification', ['list']],
+] as Array<[Page, string[]]>)(
+  'the %s page offers exactly the controls a link can switch off',
+  (page, keys) => {
     const options = shareOptionsOf(page);
     expect(options.title, page).not.toBe('');
-    expect(Array.isArray(options.features), page).toBe(true);
+    // The exact list, not merely that there is one: a page whose features
+    // silently emptied would still be an array.
+    expect(
+      options.features.map((feature) => feature.key),
+      page,
+    ).toStrictEqual(keys);
+  },
+);
+
+test('every page the router can open has a share dialog to offer', () => {
+  for (const page of PAGES) {
+    expect(shareOptionsOf(page).title, page).not.toBe('');
   }
 });
 

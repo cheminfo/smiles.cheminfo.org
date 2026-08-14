@@ -50,17 +50,17 @@ N[C@@H](Cc1ccc(O)cc1)C(=O)O L-tyrosine
 N[C@@H](Cc1ccccc1)C(=O)O L-phenylalanine
 N[C@@H](Cc1c[nH]c2ccccc12)C(=O)O L-tryptophan
 NCC(=O)O glycine
-C[C@@H](N)C(=O)O L-alanine
-CC(C)[C@@H](N)C(=O)O L-valine
-CC(C)C[C@@H](N)C(=O)O L-leucine
-OC[C@@H](N)C(=O)O L-serine
-SC[C@@H](N)C(=O)O L-cysteine
-OC(=O)CC[C@@H](N)C(=O)O L-glutamic acid
-NC(=O)CC[C@@H](N)C(=O)O L-glutamine
-NCCCC[C@@H](N)C(=O)O L-lysine
+C[C@H](N)C(=O)O L-alanine
+CC(C)[C@H](N)C(=O)O L-valine
+CC(C)C[C@H](N)C(=O)O L-leucine
+OC[C@H](N)C(=O)O L-serine
+SC[C@H](N)C(=O)O L-cysteine
+OC(=O)CC[C@H](N)C(=O)O L-glutamic acid
+NC(=O)CC[C@H](N)C(=O)O L-glutamine
+NCCCC[C@H](N)C(=O)O L-lysine
 OC[C@H]1O[C@@H](O)[C@H](O)[C@@H](O)[C@@H]1O beta-D-glucopyranose
 OC[C@H]1O[C@](O)(CO)[C@@H](O)[C@@H]1O beta-D-fructofuranose
-OC[C@H]1O[C@@H](O[C@]2(CO)O[C@H](CO)[C@@H](O)[C@@H]2O)[C@H](O)[C@@H](O)[C@@H]1O sucrose
+OC[C@H]1O[C@H](O[C@]2(CO)O[C@H](CO)[C@@H](O)[C@@H]2O)[C@H](O)[C@@H](O)[C@@H]1O sucrose
 O=C1C=CC(=O)C=C1 1,4-benzoquinone
 CC1=CC(=O)C=CC1=O 2-methyl-1,4-benzoquinone
 CCCCCCCCCCCCCCCC(=O)O palmitic acid

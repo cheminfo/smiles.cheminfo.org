@@ -1,3 +1,4 @@
+import Papa from 'papaparse';
 import { create } from 'sdf-creator';
 
 import { writeMolecule } from '../../../../chemistry/describe.ts';
@@ -83,16 +84,22 @@ function toCsv(rows: readonly ShownRow[]): string {
   // chemist who came in with a CSV of eight columns leaves with those eight
   // columns and the structures written every way.
   const fields = fieldNames(rows);
-  const lines = [
-    ['line', 'input', 'name', 'smiles', 'kekule', 'idCode', 'mf', 'mw', 'error']
-      .concat(fields)
-      .map(escapeCsv)
-      .join(','),
+  const columns = [
+    'line',
+    'input',
+    'name',
+    'smiles',
+    'kekule',
+    'idCode',
+    'mf',
+    'mw',
+    'error',
+    ...fields,
   ];
 
-  for (const { row } of rows) {
+  const data = rows.map(({ row }) => {
     const molecule = row.molecule;
-    const cells: Array<string | number> = [
+    return [
       row.line,
       row.input,
       row.label ?? '',
@@ -102,11 +109,15 @@ function toCsv(rows: readonly ShownRow[]): string {
       row.mf ?? '',
       row.mw === undefined ? '' : row.mw.toFixed(4),
       row.error ?? '',
+      ...fields.map((field) => row.fields?.[field] ?? ''),
     ];
-    for (const field of fields) cells.push(row.fields?.[field] ?? '');
-    lines.push(cells.map(escapeCsv).join(','));
-  }
-  return `${lines.join('\n')}\n`;
+  });
+
+  // papaparse reads the CSV that comes in, so it writes the one that goes out:
+  // the quoting rules are the same rules, and a name holding a comma, a quote
+  // or a newline is somebody else's solved problem. The newline is pinned
+  // because papaparse writes CRLF by default and this file has always been LF.
+  return `${Papa.unparse({ fields: columns, data }, { newline: '\n' })}\n`;
 }
 
 /**
@@ -126,11 +137,6 @@ function fieldNames(rows: readonly ShownRow[]): string[] {
     }
   }
   return names;
-}
-
-function escapeCsv(value: string | number): string {
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 function toRecords(rows: readonly ShownRow[]): Array<Record<string, string>> {

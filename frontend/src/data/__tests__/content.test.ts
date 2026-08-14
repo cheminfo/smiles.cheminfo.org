@@ -16,6 +16,7 @@ import {
 import { EXERCISES_BY_ID, EXERCISE_SETS } from '../exercises.ts';
 import { GLOSSARY } from '../glossary.ts';
 import { REFERENCE_SECTIONS, referenceSectionsFor } from '../reference.ts';
+import { LIBRARY_SAMPLE } from '../samples/library.ts';
 import { TUTORIAL_LEVELS, TUTORIAL_STEPS } from '../tutorial.ts';
 
 import { parsesNotation } from './parsing.ts';
@@ -27,7 +28,24 @@ import { parsesNotation } from './parsing.ts';
  * removed, and the list is deliberately short and explicit: anything else that
  * stops parsing is a defect this suite must catch.
  */
-const UNPARSEABLE_BY_DESIGN = new Set(['C[$(aaO);$(aaaN)]']);
+const UNPARSEABLE_BY_DESIGN = new Set([
+  // Atom primitives openchemlib does not implement: the aromatic and aliphatic
+  // wildcards, the aromatic-hydrogen count, ring size, and ring connectivity.
+  '[a]',
+  '[A]',
+  '[nh1]',
+  '[r6]',
+  '[cx3]',
+  // Negated ring membership.
+  '[!C;!R0]',
+  // A recursive SMARTS followed by another one, or by an alternation.
+  'C[$(aaO);$(aaaN)]',
+  '[$([OX2H]),$([OX1-])]',
+  '[CX3](=O)[OX1H0-,OX2H1]',
+  '[$([NX3](=O)=O),$([NX3+](=O)[O-])]',
+  '[!H0;#7,#8,#9]',
+  '[!$(*#*)&!D1]-!@[!$(*#*)&!D1]',
+]);
 
 test('every tutorial step carries a structure that parses', () => {
   expect(TUTORIAL_STEPS.length).toBeGreaterThanOrEqual(14);
@@ -242,5 +260,67 @@ test('every SMARTS exercise has at least one hint that names a working answer', 
       validate(exercise, quoted ?? '').passed,
       `${exercise.id}: ${quoted}`,
     ).toBe(true);
+  }
+});
+
+/**
+ * Named structures pinned against a reference written independently of the
+ * shipped one — a different atom order, so a copied typo cannot agree with
+ * itself. Every entry here was wrong at some point: eight amino acids shipped
+ * as the D enantiomer under an L label, sucrose as its beta anomer, and three
+ * exercises whose title named a different molecule from their structure.
+ */
+const NAMED_REFERENCES: Array<[string, string, string]> = [
+  ['L-alanine', 'C[C@H](N)C(=O)O', 'N[C@@H](C)C(=O)O'],
+  ['L-valine', 'CC(C)[C@H](N)C(=O)O', 'N[C@@H](C(C)C)C(=O)O'],
+  ['L-leucine', 'CC(C)C[C@H](N)C(=O)O', 'N[C@@H](CC(C)C)C(=O)O'],
+  ['L-serine', 'OC[C@H](N)C(=O)O', 'N[C@@H](CO)C(=O)O'],
+  ['L-cysteine', 'SC[C@H](N)C(=O)O', 'N[C@@H](CS)C(=O)O'],
+  ['L-glutamic acid', 'OC(=O)CC[C@H](N)C(=O)O', 'N[C@@H](CCC(=O)O)C(=O)O'],
+  ['L-glutamine', 'NC(=O)CC[C@H](N)C(=O)O', 'N[C@@H](CCC(N)=O)C(=O)O'],
+  ['L-lysine', 'NCCCC[C@H](N)C(=O)O', 'N[C@@H](CCCCN)C(=O)O'],
+  ['L-tyrosine', 'N[C@@H](Cc1ccc(O)cc1)C(=O)O', 'OC(=O)[C@@H](N)Cc1ccc(O)cc1'],
+  [
+    'sucrose',
+    'OC[C@H]1O[C@H](O[C@]2(CO)O[C@H](CO)[C@@H](O)[C@@H]2O)[C@H](O)[C@@H](O)[C@@H]1O',
+    'C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@]2([C@H]([C@@H]([C@H](O2)CO)O)O)CO)O)O)O)O',
+  ],
+];
+
+test.each(NAMED_REFERENCES)(
+  'the sample library ships the right %s',
+  (name, shipped, reference) => {
+    expect(Molecule.fromSmiles(shipped).getIDCode(), name).toBe(
+      Molecule.fromSmiles(reference).getIDCode(),
+    );
+    // …and the library really is the string that was checked.
+    expect(LIBRARY_SAMPLE, name).toContain(`${shipped} ${name}`);
+  },
+);
+
+test.each([
+  ['d12', 'CCC/C(C)=C/C(O)=O'],
+  ['d23', 'c1ccc2cnncc2c1'],
+  ['d25', 'C(CCCCC(=O)Cl)CCCC(=O)Cl'],
+  ['d38', 'C1CC2CC1C=C2'],
+])('exercise %s draws the molecule its title names', (id, reference) => {
+  const exercise = EXERCISES_BY_ID.get(id);
+  expect(exercise, id).toBeDefined();
+  expect(exercise?.kind).toBe('draw');
+  expect(
+    Molecule.fromSmiles(
+      exercise?.kind === 'draw' ? exercise.smiles : '',
+    ).getIDCode(),
+    `${id} ${exercise?.title}`,
+  ).toBe(Molecule.fromSmiles(reference).getIDCode());
+});
+
+test('an exercise whose title says trans specifies the geometry', () => {
+  // Without it a student who correctly draws the trans isomer is marked wrong,
+  // because the target carries no configuration to match.
+  for (const exercise of EXERCISES_BY_ID.values()) {
+    if (exercise.kind === 'smarts') continue;
+    if (!/\b(?:cis|trans|\(E\)|\(Z\))/i.test(exercise.title)) continue;
+    expect(exercise.smiles, exercise.title).toMatch(/[/\\]/);
   }
 });

@@ -8,11 +8,24 @@ import { SDF_SAMPLE } from '../samples/sdf.ts';
 
 import { atomsOf } from './parsing.ts';
 
+/** How many structures each shipped sample holds. */
+const SAMPLE_SIZES: Record<string, number> = {
+  'Five structures': 5,
+  'A hundred structures': 100,
+  'A spreadsheet export': 10,
+  'An inventory as an SDF': 4,
+};
+
 test('every sample reads, and every structure in it parses', () => {
   expect(LIST_SAMPLES).toHaveLength(4);
+  expect(LIST_SAMPLES.map((sample) => sample.name).toSorted()).toStrictEqual(
+    Object.keys(SAMPLE_SIZES).toSorted(),
+  );
   for (const sample of LIST_SAMPLES) {
     const { entries } = parseList(sample.text);
-    expect(entries.length).toBeGreaterThan(0);
+    // The exact count, so a sample that lost half its lines is a failure
+    // rather than a smaller pass.
+    expect(entries, sample.name).toHaveLength(SAMPLE_SIZES[sample.name] ?? 0);
     for (const entry of entries) {
       // The name is in the assertion so a failure says which line of which
       // sample stopped reading, rather than only that a count was zero.

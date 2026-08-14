@@ -4,6 +4,7 @@ import { expect, onTestFinished, test } from 'vitest';
 
 import type { BuildAppOptions } from '../app.ts';
 import { buildApp } from '../app.ts';
+import { config } from '../config.ts';
 import type { FastifyTyped } from '../types.ts';
 
 const FRONTEND = join(import.meta.dirname, 'data/frontend');
@@ -162,13 +163,17 @@ test('a list over the ceiling is refused rather than half converted', async () =
   });
   expect(response.statusCode).toBe(200);
 
+  // One past the ceiling, read from the config rather than written down, so
+  // moving the limit moves the test with it.
   const tooMany = await app.inject({
     method: 'POST',
     url: '/v1/batch',
-    payload: { input: 'CCO\n'.repeat(10_001) },
+    payload: { input: 'CCO\n'.repeat(config.maxBatch + 1) },
   });
   expect(tooMany.statusCode).toBe(400);
-  expect(tooMany.json<{ message: string }>().message).toContain('10000');
+  expect(tooMany.json<{ message: string }>().message).toContain(
+    String(config.maxBatch),
+  );
 });
 
 test('the documentation is served at /docs', async () => {
@@ -231,4 +236,77 @@ test('a static asset is served as itself', async () => {
   });
   expect(response.statusCode).toBe(200);
   expect(response.body).toContain('the frontend');
+});
+
+test('the SDF route refuses a list over the ceiling too', async () => {
+  const app = await testApp();
+  const response = await app.inject({
+    method: 'POST',
+    url: '/v1/sdf',
+    payload: { input: 'CCO\n'.repeat(config.maxBatch + 1) },
+  });
+
+  expect(response.statusCode).toBe(400);
+  expect(response.json<{ message: string }>().message).toContain(
+    String(config.maxBatch),
+  );
+});
+
+test('a CSV keeps its other columns through the conversion', async () => {
+  const app = await testApp();
+  const response = await app.inject({
+    method: 'POST',
+    url: '/v1/batch',
+    payload: { input: 'ID,Name,SMILES,CAS\n1,ethanol,CCO,64-17-5' },
+  });
+
+  expect(response.statusCode).toBe(200);
+  const body = response.json<{
+    count: number;
+    entries: Array<Record<string, unknown>>;
+  }>();
+  expect(body.count).toBe(1);
+  expect(body.entries[0]).toStrictEqual({
+    line: 2,
+    input: 'CCO',
+    label: 'ethanol',
+    fields: { ID: '1', CAS: '64-17-5' },
+    output: 'CCO',
+    mf: 'C2H6O',
+    mw: 46.06864,
+  });
+});
+
+test('a CSV becomes an SDF that still carries its columns', async () => {
+  const app = await testApp();
+  const response = await app.inject({
+    method: 'POST',
+    url: '/v1/sdf',
+    payload: { input: 'ID,Name,SMILES,CAS\n1,ethanol,CCO,64-17-5' },
+  });
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body).toContain('>  <ID>');
+  expect(response.body).toContain('64-17-5');
+  expect(response.body).toContain('>  <CAS>');
+  expect(response.body).toContain('>  <Name>');
+});
+
+test('a record with no name carries no Name field at all', async () => {
+  const app = await testApp();
+  const response = await app.inject({
+    method: 'POST',
+    url: '/v1/sdf',
+    payload: { input: 'CCO\nc1ccccc1' },
+  });
+
+  expect(response.statusCode).toBe(200);
+  expect(
+    response.body.split('$$$$').filter((part) => part.trim()),
+  ).toHaveLength(2);
+  // An unnamed structure gets no empty field: sdf-creator writes only the ones
+  // that hold something, which is what keeps a nameless list readable.
+  expect(response.body).not.toContain('>  <Name>');
+  expect(response.body).toContain('>  <SMILES>');
+  expect(response.body).toContain('>  <Molecular Formula>');
 });

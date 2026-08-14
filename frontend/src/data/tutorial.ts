@@ -86,7 +86,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     level: 'beginner',
     title: 'Rings close with a digit',
     description:
-      'To make a ring, put the same digit on the two atoms that must be bonded. In C1CCCCC1 the first and the last carbon both carry the [[ring bond number]] 1, so a [[ring closure]] bond joins them into cyclohexane. The digit is only a label — it says nothing about the ring size, which you get by counting the atoms between the two labels. Change one C into O and you get an ether ring: C1CCOC1 is tetrahydrofuran.',
+      'To make a ring, put the same digit on the two atoms that must be bonded. In C1CCCCC1 the first and the last carbon both carry the [[ring bond number]] 1, so a [[ring closure]] bond joins them into cyclohexane. The digit is only a label — it says nothing about the ring size, which you get by counting the atoms between the two labels. Change one C into O and you get an ether ring: C1CCCCO1 is tetrahydropyran, and taking one carbon out as well gives the five-membered C1CCOC1, tetrahydrofuran.',
     smiles: 'C1CCCCC1',
   },
   {

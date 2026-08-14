@@ -71,3 +71,55 @@ test('the whole list is shown until a query has run', async () => {
 
   expect(shownRows(rows, null)).toHaveLength(5);
 });
+
+test('a long list is read in chunks and reports its progress', async () => {
+  const text = 'CCO ethanol\n'.repeat(5000);
+  const steps: Array<[number, number]> = [];
+
+  const { rows, read } = await readList(text, {
+    onStep: (done, total) => steps.push([done, total]),
+  });
+
+  expect(rows).toHaveLength(5000);
+  expect(read).toBe(5000);
+
+  // Progress only ever moves forwards, and the last word is always the whole
+  // list — a bar that stops at 4800 of 5000 reads as a list that did not finish.
+  expect(steps.length).toBeGreaterThan(1);
+  for (let index = 1; index < steps.length; index++) {
+    expect(steps[index]?.[0]).toBeGreaterThanOrEqual(
+      steps[index - 1]?.[0] ?? 0,
+    );
+  }
+  expect(steps.at(-1)).toStrictEqual([5000, 5000]);
+});
+
+test('a long list hands the main thread back as it goes', async () => {
+  const text = 'CCO ethanol\n'.repeat(5000);
+
+  let ticks = 0;
+  const timer = setInterval(() => ticks++, 5);
+  try {
+    await readList(text);
+  } finally {
+    clearInterval(timer);
+  }
+
+  // Read in one synchronous pass the timer would never have fired.
+  expect(ticks).toBeGreaterThan(0);
+});
+
+test('an aborted read stops early rather than running to the end', async () => {
+  const text = 'CCO ethanol\n'.repeat(5000);
+  const controller = new AbortController();
+
+  const { rows } = await readList(text, {
+    signal: controller.signal,
+    onStep: (done) => {
+      if (done > 0) controller.abort();
+    },
+  });
+
+  expect(rows.length).toBeLessThan(5000);
+  expect(rows.length).toBeGreaterThan(0);
+});

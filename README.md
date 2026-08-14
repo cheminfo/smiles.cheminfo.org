@@ -1,7 +1,7 @@
 # smiles.cheminfo.org
 
 Draw a structure and read its SMILES. Write a SMILES and see the structure.
-Do it to ten thousand at a time, search them by substructure or SMARTS, learn
+Do it to a hundred thousand at a time, search them by substructure or SMARTS, learn
 the notation from a tutorial, and practise it on graded exercises a teacher can
 hand out as a link.
 
@@ -22,9 +22,9 @@ port.
 
 | Page               | What it is for                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Converter**      | One structure, both directions at once. Drawing and notation are the same thing said twice, so editing either updates the other on every stroke and every keystroke. Shows the canonical SMILES, the Kekulé form, the SMARTS reading, the idCode and the molfile, with the formula and both masses.                                                                                                                                      |
+| **Converter**      | One structure, both directions at once. Drawing and notation are the same thing said twice, so editing either updates the other on every stroke and every keystroke. Shows the canonical SMILES, the Kekulé form, the SMARTS reading, the idCode and the molfile, with the formula and both masses. Three tabs: a molecule, a SMARTS query, and a reaction.                                                                              |
 | **Lists & search** | A whole list in, a whole list out — SMILES, SMARTS, molfiles, idCodes or an **SDF**, in either direction. A line that cannot be read keeps its place with the reason beside it. Reading the list also indexes it, so the same table answers a query — by substructure, by SMARTS, exactly, without stereochemistry, or by similarity — with the matched atoms painted. Downloads what is on screen as SMILES, CSV or SDF, hits included. |
-| **Tutorial**       | Eighteen steps from a single atom to a mapped reaction, each one a working structure you can take apart, with a hoverable definition on every piece of jargon.                                                                                                                                                                                                                                                                           |
+| **Tutorial**       | Eighteen steps from a single atom to a stereochemically complete natural product, each one a working structure you can take apart, with a hoverable definition on every piece of jargon.                                                                                                                                                                                                                                                 |
 | **Exercises**      | 110 graded questions in three sets: _Molecule → SMILES_, _SMILES → Molecule_, and _Write a SMARTS_. Marked on the molecule, never on the string, so any correct spelling is accepted.                                                                                                                                                                                                                                                    |
 | **Cheatsheet**     | The whole of SMILES and SMARTS on one printable page — 134 constructs, each with a drawn example.                                                                                                                                                                                                                                                                                                                                        |
 | **Specification**  | The OpenSMILES specification itself, mirrored here word for word with a table of contents down the left — the original is served with a certificate no browser accepts.                                                                                                                                                                                                                                                                  |
@@ -50,6 +50,7 @@ smiles.cheminfo.org/exercises?exercises=w2,w15
 smiles.cheminfo.org/?smiles=CC(%3DO)Oc1ccccc1C(%3DO)O
 smiles.cheminfo.org/lists?source=https://example.org/my-set.smi&q=c1ccccc1
 smiles.cheminfo.org/tutorial?step=12
+smiles.cheminfo.org/?kind=reaction&smiles=CC(=O)Cl.OCC%3E%3ECC(=O)OCC.Cl
 ```
 
 - `embed=1` drops the header, so only the activity shows through the frame.
@@ -57,7 +58,10 @@ smiles.cheminfo.org/tutorial?step=12
   the link carries — that is how you preset a search nobody can widen.
 - `exercises=` hands out exactly the questions you name, in the order you name
   them. An id nobody knows is skipped rather than fatal, so an old link opens on
-  what is left of it.
+  what is left of it. `exercise=` names the one that is open.
+- `kind=` picks the converter's tab — `molecule`, `query` or `reaction`. It is
+  left out when the notation says which it is, so a plain `?smiles=` link still
+  opens on the right one.
 - What a student has done is kept in their browser under `smiles:exercises:v1`.
   A course hosting its own service implements two calls and plugs itself in;
   see `setProgressStore` in `frontend/src/state/exerciseProgress.ts`.

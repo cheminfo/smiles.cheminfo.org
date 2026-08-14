@@ -1,3 +1,4 @@
+import Papa from 'papaparse';
 import { expect, test } from 'vitest';
 
 import { readList } from '../../../chemistry/structureList.ts';
@@ -139,4 +140,20 @@ test('a list nothing could be read from writes an empty file, not a broken one',
   expect(exportList(rows, 'sdf').content).toBe('');
   // The header is still written, so the file says what its columns are.
   expect(exportList(rows, 'csv').content.trimEnd().split('\n')).toHaveLength(2);
+});
+
+test('a name holding a comma, a quote or a newline survives the CSV', () => {
+  // Hand-rolled escaping is where a CSV writer goes wrong; papaparse writes
+  // what papaparse reads, so this round trips.
+  const awkward = 'benzoic acid, "pure"\nlot 3';
+  const file = exportList(
+    [{ row: { line: 1, input: 'CCO', label: awkward } }],
+    'csv',
+  );
+
+  const parsed = Papa.parse<string[]>(file.content.trimEnd(), {
+    header: false,
+  });
+  expect(parsed.errors).toStrictEqual([]);
+  expect(parsed.data[1]?.[2]).toBe(awkward);
 });

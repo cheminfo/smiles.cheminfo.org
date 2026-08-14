@@ -643,7 +643,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
           'A single directional bond can serve two adjacent double bonds in a conjugated chain, so the symbols alternate naturally. Every double bond whose flanking bonds both carry a direction is defined; the rest are unspecified.',
         exampleSmiles: 'F/C=C/C=C/F',
         exampleNote:
-          '(2E,4E)-1,6-difluorohexa-2,4-diene — both double bonds are E',
+          '(1E,3E)-1,4-difluorobuta-1,3-diene — both double bonds are E',
       },
       {
         syntax: 'C/C=CC',

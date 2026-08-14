@@ -103,21 +103,6 @@ export function splitList(text: string): ListEntry[] {
 }
 
 /**
- * The structures of a list, without their names — what a search index or a
- * count needs.
- * @param text - The list, as pasted or read from a file.
- * @returns The structures, in order.
- */
-export function listStructures(text: string): string[] {
-  const entries = splitList(text);
-  const structures = new Array<string>(entries.length);
-  for (let index = 0; index < entries.length; index++) {
-    structures[index] = entries[index]?.structure ?? '';
-  }
-  return structures;
-}
-
-/**
  * What every column is called: the header row where there is one, and the
  * position where there is not, so a field always has a name to be kept under.
  * @param rows - Every row of the list.

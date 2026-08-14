@@ -79,9 +79,16 @@ export function looksLikeSmarts(text: string): boolean {
     const atom = match.groups?.atom ?? '';
     // #6 (atomic number), X3 / D2 / R1 / r5 / v4 / h1 / x2 (counts), and the
     // a / A wildcards. A digit is required after the letter, so [Xe] and [Rn]
-    // stay elements.
-    if (/#\d|[DXRrvhx]\d|^\*|[aA](?![a-z])/.test(atom)) return true;
+    // stay elements. The wildcard is anchored to the start of the atom, after
+    // an optional isotope: unanchored it matches the `a` of `[Na+]`, and every
+    // bracketed element holding a lowercase a — Na, Ca, Ba, La, Ta — is then
+    // read as a query rather than as the atom it is.
+    if (/#\d|[DXRrvhx]\d|^\*|^\d*[aA](?![a-z])/.test(atom)) return true;
   }
+  // Outside a bracket the wildcard has to stand on its own: a letter on either
+  // side and it is part of a word, not a pattern. Widening this to any `a` or
+  // `A` reads the header `CAS` as the three-atom SMARTS `C`,`A`,`S`, and a
+  // spreadsheet's header row stops being recognised as one.
   return /(?:^|[^A-Za-z])[aA](?![a-z])/.test(
     text.replaceAll(/\[[^\]]*\]/g, ''),
   );
@@ -138,10 +145,19 @@ function parseSmiles(input: string, smartsMode: 'smiles' | 'smarts'): Molecule {
  * @returns The molecule.
  */
 function parseIdCode(input: string): Molecule {
-  const [idCode, coordinates] = input.split(' ');
-  const molecule = decodeIdCode(idCode ?? '', coordinates);
+  const [idCode = '', coordinates] = input.split(' ');
+  const molecule = decodeIdCode(idCode, coordinates);
   if (molecule.getAllAtoms() === 0) {
     throw new Error('This idCode holds no atoms.');
+  }
+  // The decoder reads the string as packed bits and does not check them, so a
+  // typo decodes rather than failing: `ZZZ` comes back as thirty-seven
+  // disconnected carbons. A real idCode is what the encoder would have
+  // written, so encoding it again is the check — and it is the difference
+  // between a mistyped SMILES being reported and it silently becoming a
+  // molecule nobody meant.
+  if (molecule.getIDCode() !== idCode) {
+    throw new Error('This is not an idCode.');
   }
   return molecule;
 }

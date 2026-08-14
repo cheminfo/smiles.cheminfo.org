@@ -17,7 +17,6 @@ function integer(name: string, fallback: number, minimum = 1): number {
 export const config = {
   /** Derived from the project creation date, 2026-08-14. */
   port: integer('PORT', 10_814),
-  host: env.HOST ?? '0.0.0.0',
   trustProxy: parseTrustProxy(env.TRUST_PROXY),
   /**
    * The analytics provider's `<script>` tag, put into every page the service
@@ -25,7 +24,7 @@ export const config = {
    */
   trackingScript: env.TRACKING_SCRIPT,
   /** How many structures one call may convert. */
-  maxBatch: integer('MAX_BATCH', 10_000),
+  maxBatch: integer('MAX_BATCH', 100_000),
   /** Largest request body the service accepts, in bytes. */
-  maxBodyBytes: integer('MAX_BODY_BYTES', 8 * 1024 * 1024),
+  maxBodyBytes: integer('MAX_BODY_BYTES', 250 * 1024 * 1024),
 };

@@ -1,3 +1,4 @@
+import { atomSorter } from 'atom-sorter';
 import type { Molecule } from 'openchemlib';
 import { CanonizerUtil } from 'openchemlib';
 
@@ -138,38 +139,30 @@ function elementCounts(molecule: Molecule): Map<string, number> {
 }
 
 /**
- * A set of element counts written the way a chemist writes one: carbon,
- * hydrogen, then the rest in alphabetical order.
- * @param counts - How many of each element.
- * @returns The formula, empty when there is nothing to write.
- */
-/**
  * A set of element counts as a list, in the order a formula would put them.
  * @param counts - How many of each element.
  * @returns One entry per element.
  */
 function listElements(counts: Map<string, number>): ElementCount[] {
   return [...counts.keys()]
-    .toSorted(hillOrder)
+    .toSorted(atomSorter)
     .map((element) => ({ element, count: counts.get(element) ?? 0 }));
 }
 
+/**
+ * A set of element counts written the way a chemist writes one: carbon,
+ * hydrogen, then the rest in alphabetical order.
+ * @param counts - How many of each element.
+ * @returns The formula, empty when there is nothing to write.
+ */
 function writeFormula(counts: Map<string, number>): string {
-  const elements = [...counts.keys()].toSorted(hillOrder);
+  const elements = [...counts.keys()].toSorted(atomSorter);
   let formula = '';
   for (const element of elements) {
     const count = counts.get(element) ?? 0;
     formula += count === 1 ? element : `${element}${count}`;
   }
   return formula;
-}
-
-function hillOrder(one: string, other: string): number {
-  return hillRank(one) - hillRank(other) || one.localeCompare(other);
-}
-
-function hillRank(element: string): number {
-  return element === 'C' ? 0 : element === 'H' ? 1 : 2;
 }
 
 /**

@@ -1,7 +1,12 @@
 import { Molecule } from 'openchemlib';
 import { expect, test } from 'vitest';
 
-import { describeMolecule, identity, writeMolecule } from '../describe.ts';
+import {
+  constitution,
+  describeMolecule,
+  identity,
+  writeMolecule,
+} from '../describe.ts';
 import { readStructure } from '../parse.ts';
 
 test('describes aspirin every way at once', () => {
@@ -81,4 +86,27 @@ test('identity separates enantiomers', () => {
 test('identity falls back to the idCode for a query', () => {
   const query = readStructure('[CX3](=O)[OX2H1]').molecule;
   expect(identity(query)).toBe(query.getIDCode());
+});
+
+test('constitution sets the stereochemistry aside', () => {
+  const l = Molecule.fromSmiles('C[C@H](N)C(=O)O');
+  const d = Molecule.fromSmiles('C[C@@H](N)C(=O)O');
+
+  // Two enantiomers are different answers but the same skeleton, which is what
+  // lets a page say "right constitution, wrong configuration".
+  expect(identity(l)).not.toBe(identity(d));
+  expect(constitution(l)).toBe(constitution(d));
+  expect(constitution(l)).toBe(identity(Molecule.fromSmiles('CC(N)C(=O)O')));
+});
+
+test('constitution does not touch the molecule it was given', () => {
+  const molecule = Molecule.fromSmiles('C[C@H](N)C(=O)O');
+  const before = molecule.getIDCode();
+  constitution(molecule);
+  expect(molecule.getIDCode()).toBe(before);
+});
+
+test('constitution of a molecule with no stereochemistry is its identity', () => {
+  const molecule = Molecule.fromSmiles('CCO');
+  expect(constitution(molecule)).toBe(identity(molecule));
 });

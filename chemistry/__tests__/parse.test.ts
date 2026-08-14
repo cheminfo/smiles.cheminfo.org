@@ -43,6 +43,31 @@ test.each([
   ['[Xe]', false],
   ['[Rn]', false],
   ['CC(=O)Oc1ccccc1C(=O)O', false],
+  // The wildcards, inside a bracket and out, singly and in a row.
+  ['[*]', true],
+  ['a', true],
+  ['A', true],
+  // A wildcard has to stand alone out here: widen this and the header `CAS`
+  // becomes the three-atom SMARTS C,A,S and a spreadsheet loses its header.
+  ['CAS', false],
+  ['aaa', false],
+  // Two-letter element symbols the primitives must not be mistaken for: the
+  // digit lookahead is what keeps `[Dy]`, `[V]` and `[Hf]` elements.
+  ['[Dy]', false],
+  ['[V]', false],
+  ['[Hf]', false],
+  ['[nH]', false],
+  ['[Na+]', false],
+  // Every bracketed element holding a lowercase `a`: unanchored, the wildcard
+  // test matched the `a` of `Na` and read sodium acetate as a query.
+  ['[Ca+2]', false],
+  ['[Ba]', false],
+  ['[La]', false],
+  ['[Ta]', false],
+  ['CC(=O)[O-].[Na+]', false],
+  // …while a real wildcard in a bracket, isotope and charge and all, still is.
+  ['[a+]', true],
+  ['[13a]', true],
 ])('looksLikeSmarts(%s) is %s', (input, expected) => {
   expect(looksLikeSmarts(input)).toBe(expected);
 });
@@ -91,4 +116,22 @@ test('an empty string is refused', () => {
 
 test('a broken SMILES is refused', () => {
   expect(() => readStructure('C1CC')).toThrow(/dangling ring closure/i);
+});
+
+test('a typo is reported, never decoded into a phantom molecule', () => {
+  // The idCode decoder reads packed bits and does not check them, so `ZZZ`
+  // used to come back as thirty-seven disconnected carbons rather than as the
+  // mistyped SMILES it is.
+  for (const typo of ['ZZZ', 'XYZ', 'QQQ']) {
+    expect(() => readStructure(typo), typo).toThrow(/unknown element label/i);
+  }
+});
+
+test('a real idCode still reads, with or without its coordinates', () => {
+  const molecule = readStructure('CCO').molecule;
+  const { idCode, coordinates } = molecule.getIDCodeAndCoordinates();
+
+  expect(readStructure(idCode).molecule.getIDCode()).toBe(idCode);
+  expect(readStructure(`${idCode} ${coordinates}`).format).toBe('idcode');
+  expect(readStructure(idCode, 'idcode').molecule.getAllAtoms()).toBe(3);
 });

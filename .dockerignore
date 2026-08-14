@@ -5,6 +5,9 @@
 compose*.yaml
 **/coverage
 **/dist
-node_modules
-frontend/playwright-report
-frontend/test-results
+# Not a bare `node_modules`: that anchors to the root only, and the workspace
+# copies would then be layered over what `npm ci` installs inside the image —
+# a macOS build of a native package landing in a linux container.
+**/node_modules
+**/playwright-report
+**/test-results

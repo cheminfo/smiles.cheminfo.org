@@ -1,15 +1,9 @@
 import { Type } from '@sinclair/typebox';
 import { create } from 'sdf-creator';
 
-import {
-  describeMolecule,
-  writeMolecule,
-} from '../../../chemistry/describe.ts';
-import { structureErrorMessage } from '../../../chemistry/errorMessage.ts';
-import { parseStructure } from '../../../chemistry/parse.ts';
 import { splitList } from '../../../chemistry/splitList.ts';
-import type { InputFormat } from '../../../chemistry/types.ts';
 import { config } from '../config.ts';
+import { buildRecords, convertLines } from '../convertLines.ts';
 import { errorSchema, inputFormatSchema } from '../schemas/structure.ts';
 import type { FastifyTyped } from '../types.ts';
 
@@ -80,7 +74,7 @@ export default async function batchRoutes(fastify: FastifyTyped) {
         },
       },
     },
-    (request, reply) => {
+    async (request, reply) => {
       const { input, from = 'auto', to = 'smiles' } = request.body;
       const lines = splitList(input);
       if (lines.length > config.maxBatch) {
@@ -90,32 +84,7 @@ export default async function batchRoutes(fastify: FastifyTyped) {
         return undefined;
       }
 
-      let failed = 0;
-      const entries = lines.map((entry) => {
-        // Whatever the file said about the molecule is handed back with it,
-        // so a caller who sent a CSV of eight columns still has the eight.
-        const read = {
-          line: entry.line,
-          input: entry.structure,
-          ...(entry.label === undefined ? {} : { label: entry.label }),
-          ...(entry.fields === undefined ? {} : { fields: entry.fields }),
-        };
-        try {
-          const molecule = parseStructure(entry.structure, from);
-          const formula = molecule.getMolecularFormula();
-          return {
-            ...read,
-            output: writeMolecule(molecule, to),
-            mf: formula.formula,
-            mw: formula.relativeWeight,
-          };
-        } catch (error) {
-          failed++;
-          return { ...read, error: structureErrorMessage(error) };
-        }
-      });
-
-      return { count: entries.length, failed, entries };
+      return convertLines(lines, from, to);
     },
   );
 
@@ -137,7 +106,7 @@ export default async function batchRoutes(fastify: FastifyTyped) {
         },
       },
     },
-    (request, reply) => {
+    async (request, reply) => {
       const { input, from = 'auto' } = request.body;
       const lines = splitList(input);
       if (lines.length > config.maxBatch) {
@@ -147,33 +116,9 @@ export default async function batchRoutes(fastify: FastifyTyped) {
         return undefined;
       }
 
-      const { sdf } = create(buildRecords(lines, from));
+      const { sdf } = create(await buildRecords(lines, from));
       void reply.type('chemical/x-mdl-sdfile; charset=utf-8').send(sdf);
       return undefined;
     },
   );
-}
-
-function buildRecords(
-  lines: ReturnType<typeof splitList>,
-  from: InputFormat,
-): Array<Record<string, string>> {
-  const records: Array<Record<string, string>> = [];
-  for (const entry of lines) {
-    try {
-      const structure = describeMolecule(parseStructure(entry.structure, from));
-      records.push({
-        ...entry.fields,
-        molfile: structure.molfile,
-        Name: entry.label ?? '',
-        SMILES: structure.smiles,
-        'Molecular Formula': structure.mf,
-        'Molecular Weight': structure.mw.toFixed(4),
-      });
-    } catch {
-      // A line nobody can read is not a record; /v1/batch is where a caller
-      // finds out which ones those were.
-    }
-  }
-  return records;
 }

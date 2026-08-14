@@ -65,12 +65,21 @@ changelog:
 
 - `toSmiles()` is deprecated; `toIsomericSmiles()` is the one to call, and
   `{ kekulizedOutput: true }` is what makes the Kekulé form.
-- SMARTS support is partial. `[r3]` (ring size) is rejected outright; `[!C]`
-  loses its negation; a recursive SMARTS followed by another is refused. The
-  cheatsheet documents the notation, not the toolkit, so an example the toolkit
-  cannot parse shows its string instead of a drawing — and
-  `frontend/src/data/__tests__/content.test.ts` pins the short list of those,
-  so a gap that closes upstream stops being excused.
+- SMARTS support is partial. The wildcards `[a]` and `[A]`, the ring-size and
+  ring-connectivity primitives `[r6]` / `[cx3]`, the aromatic hydrogen count
+  `[nh1]`, a negated ring membership `!R0`, and a recursive SMARTS followed by
+  another one or by an alternation are all refused; `[!C]` parses but loses its
+  negation. The cheatsheet documents the notation, not the toolkit, so an
+  example the toolkit cannot parse shows its string instead of a drawing — and
+  `UNPARSEABLE_BY_DESIGN` in `frontend/src/data/__tests__/content.test.ts` names
+  every one of them, so a gap that closes upstream stops being excused.
+- **The idCode decoder does not validate.** It reads the string as packed bits,
+  so a mistyped SMILES like `ZZZ` decodes into thirty-seven disconnected
+  carbons rather than failing. `parse.ts#parseIdCode` therefore encodes the
+  molecule again and refuses anything that does not come back byte for byte —
+  without that, the `auto` fallback turns every typo into a plausible-looking
+  molecule, and it silently turned ten unparseable cheatsheet SMARTS into
+  drawings of unrelated structures.
 - `isFragmentInMolecule()` answers yes or no and builds no mapping;
   `findFragmentInMolecule({ countMode: 'overlapping' })` is what fills
   `getMatchList()`, which is what paints the matched atoms on a hit.
@@ -140,7 +149,7 @@ still opens.
 ## Lists
 
 **Converting a list and searching one are the same page, because they are the
-same list.** `chemistry/structureList.ts#readList` parses the text once and
+same list.** `frontend/src/chemistry/structureList.ts#readList` parses the text once and
 builds the `MoleculesDB` screening index as it fills the rows, so the table a
 conversion produced is the table a query narrows — and what a query left is what
 every download holds. Splitting them cost a second full parse of the same
@@ -264,9 +273,11 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
 - A long list is read in chunks with a yield between them. Ten thousand
   structures is several seconds of parsing, and a page that stops answering the
   mouse for several seconds looks broken.
-- **No silent caps.** The lists page draws the first 200 rows and says so, and
-  says the rest are still converted and still in every download. A query that
-  stopped at its ceiling says that too.
+- **No silent caps.** Nothing about the lists page is capped for display —
+  `react-window` draws only what is on screen, so every row of a hundred
+  thousand is reachable. What _is_ bounded says so: a query that stopped at its
+  `limit` carries "stopped at the limit", and the heading counts what the
+  filter left against the whole list.
 - Every molecular formula on screen goes through `react-mf`, never a raw string.
 - Organise by page under `src/pages/<page>/`; keep every file under 250 lines.
 - The cheatsheet is meant to be printed: chrome carries `no-print`, sections do

@@ -1,4 +1,6 @@
 cff-version: 1.2.0
+message: 'If you use this software, please cite it as below.'
+type: software
 title: 'SMILES — structure ⇄ notation conversion, search and exercises'
 abstract: "A web application and service for the SMILES chemical line notation. It converts between drawn structures and SMILES in both directions, one at a time or ten thousand at a time, reads and writes SDF, searches a user-supplied set of structures by substructure or SMARTS, and teaches the notation through a guided tutorial, a printable cheatsheet and graded exercises that a teacher can hand out as a link. All chemistry runs in the browser on openchemlib, so no structure ever leaves the visitor's machine."
 repository-artifact: https://smiles.cheminfo.org
@@ -56,4 +58,3 @@ references:
         given-names: 'Craig A.'
     year: 2016
     url: 'http://opensmiles.org/opensmiles.html'
-doi:

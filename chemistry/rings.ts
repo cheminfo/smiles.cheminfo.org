@@ -35,14 +35,30 @@ export function annotateRings(molecule: Molecule): RingAnnotation {
   const copy = molecule.getCompactCopy();
   copy.ensureHelperArrays(Molecule.cHelperRings);
   const ringSet = copy.getRingSet();
-  const ringCount = ringSet.getSize();
+  const smallRings = ringSet.getSize();
+
+  const members: string[][] = Array.from(
+    { length: copy.getAllAtoms() },
+    () => [],
+  );
+  for (let atom = 0; atom < copy.getAllAtoms(); atom++) {
+    for (let ring = 0; ring < smallRings; ring++) {
+      if (ringSet.isAtomMember(ring, atom)) {
+        members[atom]?.push(String(ring + 1));
+      }
+    }
+  }
+
+  // openchemlib's ring set holds the *small* rings — seven atoms at most — so
+  // a macrocycle is in no ring of it at all. Left there, cyclododecane paints
+  // twelve ring bonds and numbers none of them, which reads as a bug rather
+  // than as a limit. Every ring atom the set missed is gathered into its own
+  // ring instead, so what is painted is what is numbered.
+  const ringCount = numberLargeRings(copy, members, smallRings);
   const separator = ringCount > 9 ? ',' : '';
 
   for (let atom = 0; atom < copy.getAllAtoms(); atom++) {
-    const rings: string[] = [];
-    for (let ring = 0; ring < ringCount; ring++) {
-      if (ringSet.isAtomMember(ring, atom)) rings.push(String(ring + 1));
-    }
+    const rings = members[atom] ?? [];
     if (rings.length > 0) {
       copy.setAtomCustomLabel(atom, `]${rings.join(separator)}`);
     }
@@ -54,4 +70,51 @@ export function annotateRings(molecule: Molecule): RingAnnotation {
   }
 
   return { molecule: copy, ringBonds, ringCount };
+}
+
+/**
+ * Give every ring atom the small ring set missed a number of its own.
+ *
+ * Such atoms are walked through their ring bonds: one connected run of them is
+ * one macrocycle, which is what a chemist would call it.
+ * @param molecule - The copy being annotated.
+ * @param members - Which rings each atom is in, added to in place.
+ * @param smallRings - How many rings the ring set already numbered.
+ * @returns The total number of rings, large ones included.
+ */
+function numberLargeRings(
+  molecule: Molecule,
+  members: string[][],
+  smallRings: number,
+): number {
+  let ringCount = smallRings;
+
+  for (let start = 0; start < molecule.getAllAtoms(); start++) {
+    if (!molecule.isRingAtom(start) || (members[start]?.length ?? 0) > 0) {
+      continue;
+    }
+
+    ringCount++;
+    const label = String(ringCount);
+    const queue = [start];
+    members[start]?.push(label);
+
+    while (queue.length > 0) {
+      const atom = queue.pop() as number;
+      for (let index = 0; index < molecule.getConnAtoms(atom); index++) {
+        const next = molecule.getConnAtom(atom, index);
+        if (
+          !molecule.isRingBond(molecule.getConnBond(atom, index)) ||
+          !molecule.isRingAtom(next) ||
+          (members[next]?.length ?? 0) > 0
+        ) {
+          continue;
+        }
+        members[next]?.push(label);
+        queue.push(next);
+      }
+    }
+  }
+
+  return ringCount;
 }

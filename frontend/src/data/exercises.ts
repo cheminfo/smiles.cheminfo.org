@@ -394,7 +394,7 @@ const SMILES_TO_MOLECULE: Exercise[] = [
     id: 'd12',
     kind: 'draw',
     title: 'Trans-3-Methyl-2-hexenoic acid',
-    smiles: 'CCCC(C)=CC(O)=O',
+    smiles: 'CCC/C(C)=C/C(O)=O',
   },
   {
     id: 'd13',
@@ -459,7 +459,7 @@ const SMILES_TO_MOLECULE: Exercise[] = [
   {
     id: 'd23',
     kind: 'draw',
-    title: 'Poly(methyl acrylate)',
+    title: 'Phthalazine',
     smiles: 'c(cc1)cc2c1cnnc2',
   },
   {
@@ -472,7 +472,7 @@ const SMILES_TO_MOLECULE: Exercise[] = [
     id: 'd25',
     kind: 'draw',
     title: 'Sebacoyl chloride',
-    smiles: 'O=C(CCCCCCCC(Cl)=O)CCl',
+    smiles: 'O=C(CCCCCCCCC(Cl)=O)Cl',
   },
   {
     id: 'd26',
@@ -550,7 +550,7 @@ const SMILES_TO_MOLECULE: Exercise[] = [
     id: 'd38',
     kind: 'draw',
     title: 'Norbornene',
-    smiles: 'C(C1)C2CC1=CC2',
+    smiles: 'C1CC2CC1C=C2',
   },
   {
     id: 'd39',
@@ -864,14 +864,14 @@ export const EXERCISE_SETS: ExerciseSet[] = [
     id: 'smiles-to-molecule',
     title: 'SMILES → Molecule',
     description:
-      'A SMILES is given; draw the structure it describes. The drawing is checked as soon as it holds a whole molecule.',
+      'A SMILES is given; draw the structure it describes, then hand it in. Any drawing of the right molecule is accepted, however it is laid out.',
     exercises: sortByDifficulty(SMILES_TO_MOLECULE),
   },
   {
     id: 'patterns',
     title: 'Write a SMARTS',
     description:
-      'Write a pattern that matches the molecules on one side and leaves out the ones on the other. Every test case is checked as you type.',
+      'Write a pattern that matches the molecules on one side and leaves out the ones on the other. Hand it in and every test case is run against it.',
     exercises: sortByDifficulty(PATTERNS),
   },
 ];
