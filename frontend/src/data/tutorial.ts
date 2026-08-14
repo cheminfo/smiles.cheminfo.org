@@ -167,23 +167,16 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     level: 'advanced',
-    title: 'Atom classes label atoms for software',
-    description:
-      'A colon and a number at the end of a bracket give the atom an [[atom class]], often called an atom map number. It changes nothing chemically — [CH3:1]C(=O)[OH:2] is ordinary acetic acid — but it lets a program point at a specific atom. Reaction tools use classes to say which reactant atom becomes which product atom; query tools use them to tag the parts of a hit they care about. Structure comparison ignores classes entirely, so a labelled and an unlabelled acetic acid are the same molecule.',
-    smiles: '[CH3:1]C(=O)[OH:2]',
-  },
-  {
-    level: 'advanced',
-    title: 'Reaction SMILES',
-    description:
-      'Two > signs turn a SMILES into a [[reaction SMILES]]: reactants > agents > products, with both > always present. CC(=O)Cl.OCC>>CC(=O)OCC.Cl is acetyl chloride plus ethanol giving ethyl acetate and hydrogen chloride; the middle field is empty because there is no catalyst to declare. Each field is an ordinary SMILES, so its [[component]]s are separated by dots as usual — CC(=O)O.OCC>[H+]>CC(=O)OCC.O puts the acid catalyst where it belongs. Add [[atom class]]es on both sides and you get a fully mapped reaction.',
-    smiles: 'CC(=O)Cl.OCC>>CC(=O)OCC.Cl',
-  },
-  {
-    level: 'advanced',
     title: 'A real drug, end to end',
     description:
       'Everything you have seen fits together in one string. Read CC(=O)Oc1ccccc1C(=O)O from the left: a methyl, a carbonyl carbon carrying its [[double bond]] oxygen in a [[branch]], an ester oxygen, then a benzene ring opened with c1, and finally — on the ring atom that closes the ring — a carboxylic acid. That is aspirin, acetylsalicylic acid, and the two substituents come out ortho because the opening and closing ring atoms are neighbours. Rewrite it starting from the acid, OC(=O)c1ccccc1OC(C)=O, and confirm you drew the same molecule.',
     smiles: 'CC(=O)Oc1ccccc1C(=O)O',
+  },
+  {
+    level: 'advanced',
+    title: 'A natural product, in three dimensions',
+    description:
+      "One last string, and this time the molecule has a shape. CN1[C@H]2CC[C@@H]1[C@H]([C@H](C2)OC(=O)c3ccccc3)C(=O)OC is cocaine: an N-methyl nitrogen opens [[ring bond number]] 1, the atom after it opens ring 2, and the two rings that close on them share the nitrogen and the two carbons beside it — the bridged tropane skeleton — with a benzoate ester hanging in a [[branch]] and a methyl ester at the end. Four ring atoms are [[stereocenter]]s and each carries its own [[chirality tag]]; every tag is read on its own, looking from that atom's first neighbour in writing order, so a run of @ and @@ says nothing by itself about which substituents end up on the same face. Delete all four tags: the string still parses, the formula is unchanged, and the depiction loses its wedges — what is left stands for every stereoisomer at once, only one of which is the natural alkaloid. Put them back one at a time and watch the shape come back.",
+    smiles: 'CN1[C@H]2CC[C@@H]1[C@H]([C@H](C2)OC(=O)c3ccccc3)C(=O)OC',
   },
 ];
