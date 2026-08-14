@@ -4,6 +4,9 @@ import {
   FormGroup,
   H5,
   HTMLSelect,
+  Menu,
+  MenuItem,
+  PopoverNext,
   ProgressBar,
   Tag,
   TextArea,
@@ -15,6 +18,7 @@ import type {
   InputFormat,
   OutputFormat,
 } from '../../../../../chemistry/types.ts';
+import { LIST_SAMPLES, PLAIN_SAMPLE } from '../../../data/samples/index.ts';
 import {
   clearList,
   convertList,
@@ -41,13 +45,6 @@ const TO: Array<{ value: OutputFormat; label: string }> = [
   { value: 'molfile', label: 'Molfile' },
   { value: 'molfileV3', label: 'Molfile V3000' },
 ];
-
-/** The list that arrives when nothing has been pasted yet. */
-const SAMPLE = `CCO ethanol
-c1ccccc1 benzene
-CC(=O)Oc1ccccc1C(=O)O aspirin
-Cn1cnc2c1c(=O)n(C)c(=O)n2C caffeine
-OC(=O)c1ccccc1 benzoic acid`;
 
 /**
  * Put a file in the box, saying so when it cannot be read.
@@ -88,12 +85,29 @@ export default function ListInputPanel() {
             text="Open a file"
             onClick={() => fileRef.current?.click()}
           />
-          <Button
-            size="small"
-            icon="lightbulb"
-            text="Sample"
-            onClick={() => (view.input.value = SAMPLE)}
-          />
+          <PopoverNext
+            placement="bottom-end"
+            content={
+              <Menu className="example-menu">
+                {LIST_SAMPLES.map((sample) => (
+                  <MenuItem
+                    key={sample.name}
+                    text={sample.name}
+                    label={sample.label}
+                    title={sample.note}
+                    onClick={() => (view.input.value = sample.text)}
+                  />
+                ))}
+              </Menu>
+            }
+          >
+            <Button
+              size="small"
+              icon="lightbulb"
+              text="Sample"
+              endIcon="caret-down"
+            />
+          </PopoverNext>
           <Button size="small" icon="eraser" text="Clear" onClick={clearList} />
         </div>
       </div>
@@ -115,7 +129,7 @@ export default function ListInputPanel() {
         className="list-input"
         value={view.input.value}
         onChange={(event) => (view.input.value = event.currentTarget.value)}
-        placeholder={SAMPLE}
+        placeholder={PLAIN_SAMPLE}
         fill
         spellCheck={false}
         autoCapitalize="off"

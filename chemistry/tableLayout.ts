@@ -39,9 +39,12 @@ const STRUCTURE_CHARS = /^[A-Za-z0-9@+\-[\]()=#$%*\\/.:~&,;!]+$/;
 
 /**
  * A cell a header is written with: a word, possibly several, and none of the
- * punctuation a structure needs.
+ * punctuation a structure needs. Parentheses and commas are in it because a
+ * spreadsheet writes the unit next to the quantity — `Purity (%)`, `MW,
+ * g/mol` — and a cell holding a structure has already been ruled out by
+ * `isStructureCell` before this is asked.
  */
-const HEADER_CHARS = /^[A-Za-z][A-Za-z0-9 _./%-]*$/;
+const HEADER_CHARS = /^[A-Za-z][A-Za-z0-9 _.,/%()-]*$/;
 
 /**
  * Work out which column holds the structures, which one names them, and

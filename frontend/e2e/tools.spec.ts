@@ -47,6 +47,42 @@ test('a CSV is read without being told which column holds the SMILES', async ({
   );
 });
 
+test('the SDF sample is drawn with its name and every field it carries', async ({
+  page,
+}) => {
+  await page.goto('/lists');
+
+  await page.getByRole('button', { name: 'Sample' }).click();
+  await page.getByRole('menuitem', { name: 'An inventory as an SDF' }).click();
+  await page.getByRole('button', { name: 'Convert', exact: true }).click();
+
+  await expect(
+    page.getByRole('heading', { name: '4 structures' }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      'Read as an SDF — the name and every other field of a record are kept.',
+    ),
+  ).toBeVisible();
+
+  // The record's Name field is its label, and the four other fields are shown
+  // beside the molecule rather than dropped on the way in.
+  await expect(page.getByText('Aspirin', { exact: true })).toBeVisible();
+  await expect(page.locator('.list-row-fields').first()).toHaveText(
+    'CAS 50-78-2Batch B-1042Supplier Acme Fine ChemicalsPurity (%) 99.4',
+  );
+  // The molfile was read, so the row shows the SMILES it converts to.
+  await expect(
+    page.getByText('CC(Oc1ccccc1C(O)=O)=O', { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator('.list-row svg').first()).toBeVisible();
+
+  // A field the file carried is a field the filter box searches.
+  await page.getByPlaceholder('Filter by name or field').fill('Batch:B-1044');
+  await expect(page.locator('.list-row')).toHaveCount(1);
+  await expect(page.getByText('Paracetamol', { exact: true })).toBeVisible();
+});
+
 test('the filter box narrows the table by what the file said', async ({
   page,
 }) => {
@@ -99,6 +135,7 @@ test('a query narrows the converted list, with the match painted', async ({
   await page.goto('/lists');
 
   await page.getByRole('button', { name: 'Sample' }).click();
+  await page.getByRole('menuitem', { name: 'Five structures' }).click();
   await page.getByRole('button', { name: 'Convert', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: '5 structures' }),
@@ -132,6 +169,7 @@ test('a SMARTS query finds the carboxylic acids and nothing else', async ({
   await page.goto('/lists');
 
   await page.getByRole('button', { name: 'Sample' }).click();
+  await page.getByRole('menuitem', { name: 'Five structures' }).click();
   await page
     .getByPlaceholder('c1ccccc1  or  [CX3](=O)[OX2H1]')
     .fill('[CX3](=O)[OX2H1]');
