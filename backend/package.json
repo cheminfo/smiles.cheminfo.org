@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/node": "^26.2.0",
     "@types/papaparse": "^5.5.2",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-istanbul": "^4.1.10",
     "@zakodium/tsconfig": "^1.0.5",
     "vitest": "^4.1.10"
   },

@@ -1,24 +1,38 @@
 import { join } from 'node:path';
 
-import { expect, test } from 'vitest';
+import { expect, onTestFinished, test } from 'vitest';
 
+import type { BuildAppOptions } from '../app.ts';
 import { buildApp } from '../app.ts';
+import type { FastifyTyped } from '../types.ts';
 
 const FRONTEND = join(import.meta.dirname, 'data/frontend');
 
+/**
+ * A server for the length of one test, closed however the test ends. Closing
+ * it in the test body instead leaves an instance behind whenever an assertion
+ * throws, and the run then ends on a handle nobody released.
+ * @param options - What to build it with.
+ * @returns The instance, ready to be injected into.
+ */
+async function testApp(options: BuildAppOptions = {}): Promise<FastifyTyped> {
+  const app = await buildApp(options);
+  onTestFinished(() => app.close());
+  return app;
+}
+
 test('health answers with the toolkit version', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const response = await app.inject({ method: 'GET', url: '/v1/health' });
 
   expect(response.statusCode).toBe(200);
   const body = response.json<{ status: string; openchemlib: string }>();
   expect(body.status).toBe('ok');
   expect(body.openchemlib).toMatch(/^\d+\.\d+\.\d+$/);
-  await app.close();
 });
 
 test('converts a SMILES every way at once', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const response = await app.inject({
     method: 'GET',
     url: '/v1/convert',
@@ -35,11 +49,10 @@ test('converts a SMILES every way at once', async () => {
     isQuery: false,
     readAs: 'smiles',
   });
-  await app.close();
 });
 
 test('a SMARTS is read as one and says so', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const response = await app.inject({
     method: 'GET',
     url: '/v1/convert',
@@ -48,11 +61,10 @@ test('a SMARTS is read as one and says so', async () => {
 
   expect(response.statusCode).toBe(200);
   expect(response.json()).toMatchObject({ isQuery: true, readAs: 'smarts' });
-  await app.close();
 });
 
 test('a broken SMILES answers 400 with the character it stopped on', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const response = await app.inject({
     method: 'GET',
     url: '/v1/convert',
@@ -64,11 +76,10 @@ test('a broken SMILES answers 400 with the character it stopped on', async () =>
     message: 'Dangling ring closure: 1',
     position: 4,
   });
-  await app.close();
 });
 
 test('POST /v1/convert takes a molfile, which no query string would', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const converted = await app.inject({
     method: 'GET',
     url: '/v1/convert',
@@ -84,11 +95,10 @@ test('POST /v1/convert takes a molfile, which no query string would', async () =
 
   expect(response.statusCode).toBe(200);
   expect(response.json()).toMatchObject({ mf: 'C2H6O', readAs: 'molfile' });
-  await app.close();
 });
 
 test('a list is converted line by line, failures in place', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const response = await app.inject({
     method: 'POST',
     url: '/v1/batch',
@@ -121,11 +131,10 @@ test('a list is converted line by line, failures in place', async () => {
     label: 'nonsense',
     error: 'Unknown element label found.',
   });
-  await app.close();
 });
 
 test('a list becomes an SDF with one record per structure', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const response = await app.inject({
     method: 'POST',
     url: '/v1/sdf',
@@ -142,11 +151,10 @@ test('a list becomes an SDF with one record per structure', async () => {
   expect(response.body).toContain('ethanol');
   expect(response.body).toContain('>  <Molecular Formula>');
   expect(response.body).toContain('C6H6');
-  await app.close();
 });
 
 test('a list over the ceiling is refused rather than half converted', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const response = await app.inject({
     method: 'POST',
     url: '/v1/batch',
@@ -161,30 +169,27 @@ test('a list over the ceiling is refused rather than half converted', async () =
   });
   expect(tooMany.statusCode).toBe(400);
   expect(tooMany.json<{ message: string }>().message).toContain('10000');
-  await app.close();
 });
 
 test('the documentation is served at /docs', async () => {
-  const app = await buildApp();
+  const app = await testApp();
   const docs = await app.inject({ method: 'GET', url: '/docs/' });
   expect(docs.statusCode).toBe(200);
 
   const legacy = await app.inject({ method: 'GET', url: '/documentation' });
   expect(legacy.statusCode).toBe(302);
   expect(legacy.headers.location).toBe('/docs');
-  await app.close();
 });
 
 test('without a build, the root shows the API documentation', async () => {
-  const app = await buildApp({ frontendRoot: '/nowhere-at-all' });
+  const app = await testApp({ frontendRoot: '/nowhere-at-all' });
   const response = await app.inject({ method: 'GET', url: '/' });
   expect(response.statusCode).toBe(302);
   expect(response.headers.location).toBe('/docs');
-  await app.close();
 });
 
 test('every address the frontend routes itself answers with its index', async () => {
-  const app = await buildApp({ frontendRoot: FRONTEND });
+  const app = await testApp({ frontendRoot: FRONTEND });
 
   for (const url of ['/', '/index.html', '/exercises', '/tutorial?step=3']) {
     // eslint-disable-next-line no-await-in-loop -- one server, one assertion at a time; parallel injects would interleave the log
@@ -193,12 +198,11 @@ test('every address the frontend routes itself answers with its index', async ()
     expect(response.headers['content-type']).toBe('text/html; charset=utf-8');
     expect(response.body).toContain('<div id="root">');
   }
-  await app.close();
 });
 
 test('the tracking snippet reaches every page, not only the root', async () => {
   const snippet = '<script defer src="https://example.org/s.js"></script>';
-  const app = await buildApp({
+  const app = await testApp({
     frontendRoot: FRONTEND,
     trackingScript: snippet,
   });
@@ -211,23 +215,20 @@ test('the tracking snippet reaches every page, not only the root', async () => {
       response.body.indexOf('</head>'),
     );
   }
-  await app.close();
 });
 
 test('an unknown /v1 route is still a 404', async () => {
-  const app = await buildApp({ frontendRoot: FRONTEND });
+  const app = await testApp({ frontendRoot: FRONTEND });
   const response = await app.inject({ method: 'GET', url: '/v1/nothing' });
   expect(response.statusCode).toBe(404);
-  await app.close();
 });
 
 test('a static asset is served as itself', async () => {
-  const app = await buildApp({ frontendRoot: FRONTEND });
+  const app = await testApp({ frontendRoot: FRONTEND });
   const response = await app.inject({
     method: 'GET',
     url: '/assets/app.js',
   });
   expect(response.statusCode).toBe(200);
   expect(response.body).toContain('the frontend');
-  await app.close();
 });

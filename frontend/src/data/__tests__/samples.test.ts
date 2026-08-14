@@ -1,24 +1,12 @@
 import { expect, test } from 'vitest';
 
-import { readStructure } from '../../../../chemistry/parse.ts';
 import { parseList } from '../../../../chemistry/splitList.ts';
 import { LIST_SAMPLES } from '../samples/index.ts';
 import { INVENTORY_SAMPLE } from '../samples/inventory.ts';
 import { LIBRARY_SAMPLE } from '../samples/library.ts';
 import { SDF_SAMPLE } from '../samples/sdf.ts';
 
-/**
- * How many atoms a sample's structure reads as, zero when it does not read.
- * @param structure - One entry's structure, in whatever the sample wrote.
- * @returns The atom count.
- */
-function atomsOf(structure: string): number {
-  try {
-    return readStructure(structure, 'auto').molecule.getAllAtoms();
-  } catch {
-    return 0;
-  }
-}
+import { atomsOf } from './parsing.ts';
 
 test('every sample reads, and every structure in it parses', () => {
   expect(LIST_SAMPLES).toHaveLength(4);
@@ -29,8 +17,7 @@ test('every sample reads, and every structure in it parses', () => {
       // The name is in the assertion so a failure says which line of which
       // sample stopped reading, rather than only that a count was zero.
       const where = `${sample.name} line ${entry.line}`;
-      const atoms = atomsOf(entry.structure);
-      expect(`${where}: ${atoms} atoms`).not.toBe(`${where}: 0 atoms`);
+      expect(atomsOf(entry.structure), where).toBeGreaterThan(0);
     }
   }
 });

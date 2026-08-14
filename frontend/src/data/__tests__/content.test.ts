@@ -18,6 +18,8 @@ import { GLOSSARY } from '../glossary.ts';
 import { REFERENCE_SECTIONS, referenceSectionsFor } from '../reference.ts';
 import { TUTORIAL_LEVELS, TUTORIAL_STEPS } from '../tutorial.ts';
 
+import { parsesNotation } from './parsing.ts';
+
 /**
  * A notation the specification allows and openchemlib does not implement.
  * These are documented on purpose — the cheatsheet says what SMILES is, not
@@ -27,27 +29,11 @@ import { TUTORIAL_LEVELS, TUTORIAL_STEPS } from '../tutorial.ts';
  */
 const UNPARSEABLE_BY_DESIGN = new Set(['C[$(aaO);$(aaaN)]']);
 
-function parses(notation: string): boolean {
-  try {
-    return readStructure(notation).molecule.getAllAtoms() > 0;
-  } catch {
-    return false;
-  }
-}
-
 test('every tutorial step carries a structure that parses', () => {
   expect(TUTORIAL_STEPS.length).toBeGreaterThanOrEqual(14);
   for (const step of TUTORIAL_STEPS) {
     const notation = step.smiles;
-    const ok = notation.includes('>')
-      ? notation
-          .split('>')
-          .filter(Boolean)
-          .every((side) =>
-            side.split('.').every((component) => parses(component)),
-          )
-      : parses(notation);
-    expect(ok, `${step.title}: ${notation}`).toBe(true);
+    expect(parsesNotation(notation), `${step.title}: ${notation}`).toBe(true);
   }
 });
 
@@ -74,15 +60,7 @@ test('every glossary example parses', () => {
     expect(entry.examples.length, `${term} has no example`).toBeGreaterThan(0);
     for (const example of entry.examples) {
       const notation = example.smiles;
-      const ok = notation.includes('>')
-        ? notation
-            .split('>')
-            .filter(Boolean)
-            .every((side) =>
-              side.split('.').every((component) => parses(component)),
-            )
-        : parses(notation);
-      expect(ok, `${term}: ${notation}`).toBe(true);
+      expect(parsesNotation(notation), `${term}: ${notation}`).toBe(true);
     }
   }
 });
@@ -99,15 +77,9 @@ test('every cheatsheet example parses, or is one of the known gaps', () => {
     for (const entry of section.entries) {
       const notation = entry.exampleSmiles;
       if (!notation || UNPARSEABLE_BY_DESIGN.has(notation)) continue;
-      const ok = notation.includes('>')
-        ? notation
-            .split('>')
-            .filter(Boolean)
-            .every((side) =>
-              side.split('.').every((component) => parses(component)),
-            )
-        : parses(notation);
-      if (!ok) unexpected.push(`${section.id} / ${entry.syntax}: ${notation}`);
+      if (!parsesNotation(notation)) {
+        unexpected.push(`${section.id} / ${entry.syntax}: ${notation}`);
+      }
     }
   }
   expect(unexpected).toStrictEqual([]);
@@ -146,13 +118,13 @@ test('the known toolkit gaps are still gaps', () => {
   // If openchemlib gains one of these, the entry stops needing an exemption —
   // and this test is what says so rather than the exemption quietly rotting.
   for (const notation of UNPARSEABLE_BY_DESIGN) {
-    expect(parses(notation), `${notation} now parses`).toBe(false);
+    expect(parsesNotation(notation), `${notation} now parses`).toBe(false);
   }
 });
 
 test('every example molecule parses and is named consistently', () => {
   for (const example of EXAMPLE_MOLECULES) {
-    expect(parses(example.notation), example.name).toBe(true);
+    expect(parsesNotation(example.notation), example.name).toBe(true);
   }
 });
 

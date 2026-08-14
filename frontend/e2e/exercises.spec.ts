@@ -1,45 +1,91 @@
 import { expect, test } from '@playwright/test';
 
+import {
+  SMARTS_PLACEHOLDER,
+  WRITE_EXERCISE,
+  WRITE_PLACEHOLDER,
+  expectRight,
+  submitAnswer,
+} from './helpers.ts';
+
 test('a right SMILES is accepted once it is submitted', async ({ page }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
   await expect(
     page.getByRole('heading', { name: 'Malonic acid' }),
   ).toBeVisible();
-  await page.getByPlaceholder('CC(=O)O').fill('OC(=O)CC(=O)O');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'OC(=O)CC(=O)O');
 
-  await expect(page.locator('.answer-card').getByText('Right.')).toBeVisible();
+  await expectRight(page);
   await expect(page.getByText('First attempt.')).toBeVisible();
 });
 
 test('nothing is marked before it is submitted', async ({ page }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
   // A right answer half typed is a wrong one, and saying so is exactly what
   // submitting is here to prevent.
-  await page.getByPlaceholder('CC(=O)O').fill('OC(=O)C');
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('OC(=O)C');
   await expect(page.locator('.answer-card .bp6-callout')).toHaveCount(0);
   await expect(
     page.getByText('Nothing is marked until you submit it.'),
   ).toBeVisible();
 });
 
+test('the running check reads the draft as it is typed, and never marks it', async ({
+  page,
+}) => {
+  await page.goto(WRITE_EXERCISE);
+
+  const check = page.locator('.self-check');
+  await expect(
+    check.getByText('Start writing and this says whether it reads', {
+      exact: false,
+    }),
+  ).toBeVisible();
+
+  // A draft that does not read says so, and where, before anything is handed in.
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('C1CC');
+  await expect(check.getByText('Dangling ring closure: 1')).toBeVisible();
+
+  // One that reads but is short of atoms says which ones.
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('CCO');
+  await expect(check.getByText('The atoms do not add up yet.')).toBeVisible();
+  await expect(check.locator('.verdict-formula')).toContainText('short of');
+
+  // The right atoms, however they are joined: the arithmetic is all this can
+  // speak to, so it says so and stops. Every isomer of the answer gets here.
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('OC(=O)CC(=O)O');
+  await expect(
+    check.getByText('The atoms add up', { exact: false }),
+  ).toBeVisible();
+  await expect(
+    check.getByText('submit it to find out', { exact: false }),
+  ).toBeVisible();
+  // Nothing above was the mark: the answer card is still empty.
+  await expect(page.locator('.answer-card .bp6-callout')).toHaveCount(0);
+});
+
+test('a link can switch the running check off', async ({ page }) => {
+  await page.goto(`${WRITE_EXERCISE}&hide=check`);
+
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('CCO');
+  await expect(page.locator('.self-check')).toHaveCount(0);
+});
+
 test('another correct spelling of the same molecule is also accepted', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
-  await page.getByPlaceholder('CC(=O)O').fill('C(C(=O)O)C(=O)O');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
-  await expect(page.locator('.answer-card').getByText('Right.')).toBeVisible();
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'C(C(=O)O)C(=O)O');
+  await expectRight(page);
 });
 
 test('a wrong molecule is refused with a reason', async ({ page }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
-  await page.getByPlaceholder('CC(=O)O').fill('CCO');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'CCO');
   await expect(
     page.getByText('That SMILES reads as a different molecule.'),
   ).toBeVisible();
@@ -48,50 +94,54 @@ test('a wrong molecule is refused with a reason', async ({ page }) => {
 test('a SMILES that will not parse is pointed at, with the rule that was broken', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
-  await page.getByPlaceholder('CC(=O)O').fill('C1CC');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'C1CC');
 
-  await expect(page.getByText('Dangling ring closure: 1')).toBeVisible();
+  // Scoped to the mark: the running check says the same things about the same
+  // draft, so an unscoped selector matches both cards rather than this one.
+  const verdict = page.locator('.answer-card');
+  await expect(verdict.getByText('Dangling ring closure: 1')).toBeVisible();
   // The input repeated under the message, with a caret under the character.
-  await expect(page.locator('.notation-caret')).toContainText('C1CC');
+  await expect(verdict.locator('.notation-caret')).toContainText('C1CC');
   await expect(
-    page.getByText('A ring was opened and never closed', { exact: false }),
+    verdict.getByText('A ring was opened and never closed', { exact: false }),
   ).toBeVisible();
 });
 
 test('a wrong molecule says which atoms are missing and which are in excess', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
   // Ethanol where malonic acid was asked for: a carbon and three oxygens short,
   // and two hydrogens too many.
-  await page.getByPlaceholder('CC(=O)O').fill('CCO');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'CCO');
 
-  const formula = page.locator('.verdict-formula');
+  const verdict = page.locator('.answer-card');
+  const formula = verdict.locator('.verdict-formula');
   await expect(formula).toContainText('short of');
   await expect(formula).toContainText('too many');
   await expect(
-    page.getByText('The atoms themselves do not add up yet', { exact: false }),
+    verdict.getByText('The atoms themselves do not add up yet', {
+      exact: false,
+    }),
   ).toBeVisible();
 });
 
 test('the attempts are counted, and editing drops the mark', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
-  await page.getByPlaceholder('CC(=O)O').fill('CCO');
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('CCO');
   // Enter hands it in, like the button does.
-  await page.getByPlaceholder('CC(=O)O').press('Enter');
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).press('Enter');
   await expect(
     page.locator('.answer-card').getByText('1 attempt', { exact: true }),
   ).toBeVisible();
 
-  await page.getByPlaceholder('CC(=O)O').fill('CCCO');
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('CCCO');
   await expect(
     page.getByText('That SMILES reads as a different molecule.'),
   ).toHaveCount(0);
@@ -104,39 +154,39 @@ test('the attempts are counted, and editing drops the mark', async ({
     page.locator('.answer-card').getByText('2 attempts', { exact: true }),
   ).toBeVisible();
 
-  await page.getByPlaceholder('CC(=O)O').fill('OC(=O)CC(=O)O');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'OC(=O)CC(=O)O');
   await expect(page.getByText('3rd attempt.')).toBeVisible();
 });
 
 test('what was answered, and what it cost, survives a reload', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
-  await page.getByPlaceholder('CC(=O)O').fill('CCO');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
-  await page.getByPlaceholder('CC(=O)O').fill('OC(=O)CC(=O)O');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
-  await expect(page.locator('.answer-card').getByText('Right.')).toBeVisible();
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'CCO');
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'OC(=O)CC(=O)O');
+  await expectRight(page);
 
   await page.reload();
-  await expect(page.getByPlaceholder('CC(=O)O')).toHaveValue('OC(=O)CC(=O)O');
-  await expect(page.locator('.answer-card').getByText('Right.')).toBeVisible();
+  await expect(page.getByPlaceholder(WRITE_PLACEHOLDER)).toHaveValue(
+    'OC(=O)CC(=O)O',
+  );
+  await expectRight(page);
   await expect(
     page.locator('.answer-card').getByText('2 attempts', { exact: true }),
   ).toBeVisible();
 });
 
 test('a draft left mid-edit comes back unmarked', async ({ page }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
-  await page.getByPlaceholder('CC(=O)O').fill('OC(=O)CC(=O)O');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
-  await page.getByPlaceholder('CC(=O)O').fill('OC(=O)CC(=O)OCC');
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'OC(=O)CC(=O)O');
+  await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('OC(=O)CC(=O)OCC');
 
   await page.reload();
-  await expect(page.getByPlaceholder('CC(=O)O')).toHaveValue('OC(=O)CC(=O)OCC');
+  await expect(page.getByPlaceholder(WRITE_PLACEHOLDER)).toHaveValue(
+    'OC(=O)CC(=O)OCC',
+  );
   await expect(page.locator('.answer-card .bp6-callout')).toHaveCount(0);
 });
 
@@ -145,8 +195,7 @@ test('resetting forgets the answer, the attempts and the hints', async ({
 }) => {
   await page.goto('/exercises?set=patterns&exercise=s1');
 
-  await page.getByPlaceholder('[CX3](=O)[OX2H1]').fill('C=O');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
+  await submitAnswer(page, SMARTS_PLACEHOLDER, 'C=O');
   await page.getByRole('button', { name: 'Reveal a hint (1 of 3)' }).click();
   await expect(
     page.locator('.answer-card').getByText('1 attempt', { exact: true }),
@@ -156,7 +205,7 @@ test('resetting forgets the answer, the attempts and the hints', async ({
   ).toBeVisible();
 
   await page.getByRole('button', { name: 'Reset' }).click();
-  await expect(page.getByPlaceholder('[CX3](=O)[OX2H1]')).toHaveValue('');
+  await expect(page.getByPlaceholder(SMARTS_PLACEHOLDER)).toHaveValue('');
   await expect(
     page.locator('.answer-card').getByText('1 attempt', { exact: true }),
   ).toHaveCount(0);
@@ -173,11 +222,11 @@ test('a SMARTS exercise lights its test cases up once submitted', async ({
   await expect(page.getByText('Must match', { exact: true })).toBeVisible();
   await expect(page.getByText('Must not match', { exact: true })).toBeVisible();
 
-  await page.getByPlaceholder('[CX3](=O)[OX2H1]').fill('[CX3](=O)[OX2H1]');
+  await page.getByPlaceholder(SMARTS_PLACEHOLDER).fill('[CX3](=O)[OX2H1]');
   await expect(page.locator('.case-cell--pass')).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Submit answer' }).click();
-  await expect(page.locator('.answer-card').getByText('Right.')).toBeVisible();
+  await expectRight(page);
   await expect(page.locator('.case-cell--fail')).toHaveCount(0);
   await expect(page.locator('.case-cell--pass')).toHaveCount(6);
 });
@@ -187,8 +236,7 @@ test('an over-matching SMARTS is refused and shows which case broke', async ({
 }) => {
   await page.goto('/exercises?set=patterns&exercise=s2');
 
-  await page.getByPlaceholder('[CX3](=O)[OX2H1]').fill('C=O');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
+  await submitAnswer(page, SMARTS_PLACEHOLDER, 'C=O');
   await expect(page.locator('.case-cell--fail').first()).toBeVisible();
 });
 
@@ -205,7 +253,7 @@ test('hints come one at a time', async ({ page }) => {
 test('the cheatsheet opens beside the question, holding the notation it is about', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
   const button = page
     .locator('.question-card')
@@ -238,7 +286,7 @@ test('the cheatsheet opens beside the question, holding the notation it is about
 test('the answer can be given up on, and says it is only one of many', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+  await page.goto(WRITE_EXERCISE);
 
   await page.getByRole('button', { name: 'Give up' }).click();
   await expect(
@@ -249,17 +297,14 @@ test('the answer can be given up on, and says it is only one of many', async ({
 test('a framed link drops the header and the parts it switches off', async ({
   page,
 }) => {
-  await page.goto(
-    '/exercises?set=molecule-to-smiles&exercise=w4&embed=1&hide=list,hints,answers',
-  );
+  await page.goto(`${WRITE_EXERCISE}&embed=1&hide=list,hints,answers`);
 
   await expect(page.locator('.page-header')).toHaveCount(0);
   await expect(page.locator('.exercise-list-card')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Give up' })).toHaveCount(0);
   // The activity itself still works.
-  await page.getByPlaceholder('CC(=O)O').fill('OC(=O)CC(=O)O');
-  await page.getByRole('button', { name: 'Submit answer' }).click();
-  await expect(page.locator('.answer-card').getByText('Right.')).toBeVisible();
+  await submitAnswer(page, WRITE_PLACEHOLDER, 'OC(=O)CC(=O)O');
+  await expectRight(page);
 });
 
 test('the other sets are one click away', async ({ page }) => {
@@ -281,7 +326,7 @@ test('the other sets are one click away', async ({ page }) => {
     .locator('.set-picker')
     .getByText('Write a SMARTS', { exact: false })
     .click();
-  await expect(page.getByPlaceholder('[CX3](=O)[OX2H1]')).toBeVisible();
+  await expect(page.getByPlaceholder(SMARTS_PLACEHOLDER)).toBeVisible();
 });
 
 test('a link naming exercises hands out exactly those', async ({ page }) => {

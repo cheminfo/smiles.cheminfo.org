@@ -2,19 +2,14 @@ import { readFile } from 'node:fs/promises';
 
 import { expect, test } from '@playwright/test';
 
+import { convertList, convertLoaded, pickSample } from './helpers.ts';
+
 test('a list is converted line by line, failures kept in place', async ({
   page,
 }) => {
   await page.goto('/lists');
 
-  await page
-    .locator('textarea.list-input')
-    .fill('CCO ethanol\nc1ccccc1 benzene\nQQQ nonsense');
-  await page.getByRole('button', { name: 'Convert', exact: true }).click();
-
-  await expect(
-    page.getByRole('heading', { name: '3 structures' }),
-  ).toBeVisible();
+  await convertList(page, 'CCO ethanol\nc1ccccc1 benzene\nQQQ nonsense', 3);
   await expect(page.getByText('1 could not be read')).toBeVisible();
   await expect(page.getByText('ethanol', { exact: true })).toBeVisible();
   await expect(page.locator('.list-row--failed')).toHaveCount(1);
@@ -25,16 +20,11 @@ test('a CSV is read without being told which column holds the SMILES', async ({
 }) => {
   await page.goto('/lists');
 
-  await page
-    .locator('textarea.list-input')
-    .fill(
-      'ID,Name,CAS,SMILES\n1,ethanol,64-17-5,CCO\n2,benzene,71-43-2,c1ccccc1',
-    );
-  await page.getByRole('button', { name: 'Convert', exact: true }).click();
-
-  await expect(
-    page.getByRole('heading', { name: '2 structures' }),
-  ).toBeVisible();
+  await convertList(
+    page,
+    'ID,Name,CAS,SMILES\n1,ethanol,64-17-5,CCO\n2,benzene,71-43-2,c1ccccc1',
+    2,
+  );
   await expect(
     page.getByText(
       'Read as a comma-separated table with a header, structures from “SMILES”, names from “Name”, 2 other columns kept as fields.',
@@ -52,13 +42,8 @@ test('the SDF sample is drawn with its name and every field it carries', async (
 }) => {
   await page.goto('/lists');
 
-  await page.getByRole('button', { name: 'Sample' }).click();
-  await page.getByRole('menuitem', { name: 'An inventory as an SDF' }).click();
-  await page.getByRole('button', { name: 'Convert', exact: true }).click();
-
-  await expect(
-    page.getByRole('heading', { name: '4 structures' }),
-  ).toBeVisible();
+  await pickSample(page, 'An inventory as an SDF');
+  await convertLoaded(page, 4);
   await expect(
     page.getByText(
       'Read as an SDF — the name and every other field of a record are kept.',
@@ -88,15 +73,11 @@ test('the filter box narrows the table by what the file said', async ({
 }) => {
   await page.goto('/lists');
 
-  await page
-    .locator('textarea.list-input')
-    .fill(
-      'Name,SMILES,Batch\nethanol,CCO,B3\nbenzene,c1ccccc1,B4\nethylamine,CCN,B3',
-    );
-  await page.getByRole('button', { name: 'Convert', exact: true }).click();
-  await expect(
-    page.getByRole('heading', { name: '3 structures' }),
-  ).toBeVisible();
+  await convertList(
+    page,
+    'Name,SMILES,Batch\nethanol,CCO,B3\nbenzene,c1ccccc1,B4\nethylamine,CCN,B3',
+    3,
+  );
 
   await page.getByPlaceholder('Filter by name or field').fill('Batch:B3');
   await expect(page.getByRole('heading', { name: '2 of 3' })).toBeVisible();
@@ -110,13 +91,7 @@ test('the filter box narrows the table by what the file said', async ({
 test('a list can be written out as SMILES, CSV or an SDF', async ({ page }) => {
   await page.goto('/lists');
 
-  await page
-    .locator('textarea.list-input')
-    .fill('CCO ethanol\nc1ccccc1 benzene');
-  await page.getByRole('button', { name: 'Convert', exact: true }).click();
-  await expect(
-    page.getByRole('heading', { name: '2 structures' }),
-  ).toBeVisible();
+  await convertList(page, 'CCO ethanol\nc1ccccc1 benzene', 2);
 
   const download = await Promise.race([
     page.waitForEvent('download'),
@@ -134,12 +109,8 @@ test('a query narrows the converted list, with the match painted', async ({
 }) => {
   await page.goto('/lists');
 
-  await page.getByRole('button', { name: 'Sample' }).click();
-  await page.getByRole('menuitem', { name: 'Five structures' }).click();
-  await page.getByRole('button', { name: 'Convert', exact: true }).click();
-  await expect(
-    page.getByRole('heading', { name: '5 structures' }),
-  ).toBeVisible();
+  await pickSample(page, 'Five structures');
+  await convertLoaded(page, 5);
 
   await page
     .getByPlaceholder('c1ccccc1  or  [CX3](=O)[OX2H1]')
@@ -168,8 +139,7 @@ test('a SMARTS query finds the carboxylic acids and nothing else', async ({
 }) => {
   await page.goto('/lists');
 
-  await page.getByRole('button', { name: 'Sample' }).click();
-  await page.getByRole('menuitem', { name: 'Five structures' }).click();
+  await pickSample(page, 'Five structures');
   await page
     .getByPlaceholder('c1ccccc1  or  [CX3](=O)[OX2H1]')
     .fill('[CX3](=O)[OX2H1]');
@@ -284,13 +254,7 @@ test('an SDF pasted into the list page is read as its records', async ({
   await page.goto('/lists');
 
   // Round trip: the SDF this page writes is the SDF it reads.
-  await page
-    .locator('textarea.list-input')
-    .fill('CCO ethanol\nc1ccccc1 benzene');
-  await page.getByRole('button', { name: 'Convert', exact: true }).click();
-  await expect(
-    page.getByRole('heading', { name: '2 structures' }),
-  ).toBeVisible();
+  await convertList(page, 'CCO ethanol\nc1ccccc1 benzene', 2);
 
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'SDF' }).click();
@@ -299,11 +263,7 @@ test('an SDF pasted into the list page is read as its records', async ({
 
   const text = await readFile(sdf as string, 'utf8');
   await page.locator('textarea.list-input').fill(text);
-  await page.getByRole('button', { name: 'Convert', exact: true }).click();
-
-  await expect(
-    page.getByRole('heading', { name: '2 structures' }),
-  ).toBeVisible();
+  await convertLoaded(page, 2);
   await expect(page.getByText('ethanol', { exact: true })).toBeVisible();
   await expect(page.getByText('benzene', { exact: true })).toBeVisible();
 });
