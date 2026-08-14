@@ -1,5 +1,6 @@
-import { Card, H5, Tag } from '@blueprintjs/core';
+import { Button, Card, H5, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { useState } from 'react';
 import { MF } from 'react-mf';
 
 import { readInput } from '../../../chemistry/readInput.ts';
@@ -7,6 +8,8 @@ import CopyButton from '../../../components/CopyButton.tsx';
 import GlossaryText from '../../../components/GlossaryText.tsx';
 import SmilesThumb from '../../../components/SmilesThumb.tsx';
 import StructureView from '../../../components/StructureView.tsx';
+import ReferenceDialog from '../../../components/reference/ReferenceDialog.tsx';
+import type { Notation } from '../../../data/reference.ts';
 import type { Exercise } from '../../../exercises/types.ts';
 import { levelOf } from '../../../exercises/validate.ts';
 import { view } from '../../../state/exercises.ts';
@@ -24,24 +27,49 @@ export default function QuestionPanel(props: { exercise: Exercise }) {
   useSignals();
   const { exercise } = props;
   const level = levelOf(exercise);
+  const [cheatsheet, setCheatsheet] = useState(false);
+  // A question about a query is a question about both notations, because a
+  // SMARTS is a SMILES with more said about its atoms. A question about a
+  // molecule is not helped by a column of recursive SMARTS.
+  const notations: Notation[] =
+    exercise.kind === 'smarts' ? ['smiles', 'smarts'] : ['smiles'];
 
   return (
     <Card className="question-card">
       <div className="card-header">
         <H5>{exercise.title}</H5>
-        <Tag
-          minimal
-          intent={
-            level === 'beginner'
-              ? 'success'
-              : level === 'intermediate'
-                ? 'warning'
-                : 'danger'
-          }
-        >
-          {level}
-        </Tag>
+        <div className="card-header-actions">
+          <Tag
+            minimal
+            intent={
+              level === 'beginner'
+                ? 'success'
+                : level === 'intermediate'
+                  ? 'warning'
+                  : 'danger'
+            }
+          >
+            {level}
+          </Tag>
+          <Button
+            size="small"
+            icon="th"
+            text="Cheatsheet"
+            title={
+              notations.length === 1
+                ? 'The SMILES notation, without leaving the question'
+                : 'The SMILES and SMARTS notation, without leaving the question'
+            }
+            onClick={() => setCheatsheet(true)}
+          />
+        </div>
       </div>
+      {cheatsheet ? (
+        <ReferenceDialog
+          notations={notations}
+          onClose={() => setCheatsheet(false)}
+        />
+      ) : null}
 
       {exercise.description ? (
         <p>

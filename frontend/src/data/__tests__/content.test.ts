@@ -15,7 +15,7 @@ import {
 } from '../examples.ts';
 import { EXERCISES_BY_ID, EXERCISE_SETS } from '../exercises.ts';
 import { GLOSSARY } from '../glossary.ts';
-import { REFERENCE_SECTIONS } from '../reference.ts';
+import { REFERENCE_SECTIONS, referenceSectionsFor } from '../reference.ts';
 import { TUTORIAL_LEVELS, TUTORIAL_STEPS } from '../tutorial.ts';
 
 /**
@@ -123,6 +123,23 @@ test('every cheatsheet section carries an address of its own', () => {
   }
   expect(ids).toContain('smiles-atoms');
   expect(ids).toContain('smarts-logic');
+});
+
+test('the sheet narrowed to a notation keeps every section of it', () => {
+  // The dialog an exercise opens shows what the question is about, and reads
+  // that off the ids — so a section named unlike its neighbours would be shown
+  // to nobody rather than shown twice.
+  const smiles = referenceSectionsFor(['smiles']);
+  const both = referenceSectionsFor(['smiles', 'smarts']);
+  expect(both).toStrictEqual(REFERENCE_SECTIONS);
+  expect(smiles.length).toBeLessThan(both.length);
+  for (const section of smiles) {
+    expect(section.id.startsWith('smiles-'), section.id).toBe(true);
+  }
+  expect(smiles.map((section) => section.id)).toContain('smiles-rings');
+  expect(
+    referenceSectionsFor(['smarts']).map((section) => section.id),
+  ).toContain('smarts-logic');
 });
 
 test('the known toolkit gaps are still gaps', () => {

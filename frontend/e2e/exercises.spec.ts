@@ -202,6 +202,39 @@ test('hints come one at a time', async ({ page }) => {
   await expect(page.locator('.hint-list li')).toHaveCount(2);
 });
 
+test('the cheatsheet opens beside the question, holding the notation it is about', async ({
+  page,
+}) => {
+  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+
+  const button = page
+    .locator('.question-card')
+    .getByRole('button', { name: 'Cheatsheet' });
+  await button.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('SMILES — Atoms')).toBeVisible();
+  // A molecule to write out is no place for recursive SMARTS.
+  await expect(dialog.getByText('SMARTS — Logical operators')).toHaveCount(0);
+  await dialog.getByRole('button', { name: 'Close the sheet' }).click();
+  await expect(dialog).toHaveCount(0);
+
+  // The question is still there, and so is what was typed into it.
+  await expect(
+    page.getByText('Write the SMILES of this molecule.'),
+  ).toBeVisible();
+
+  await page.goto('/exercises?set=patterns&exercise=s1');
+  await page
+    .locator('.question-card')
+    .getByRole('button', { name: 'Cheatsheet' })
+    .click();
+  const queryDialog = page.getByRole('dialog');
+  await expect(queryDialog.getByText('SMILES — Atoms')).toBeVisible();
+  await expect(
+    queryDialog.getByText('SMARTS — Logical operators'),
+  ).toBeVisible();
+});
+
 test('the answer can be given up on, and says it is only one of many', async ({
   page,
 }) => {

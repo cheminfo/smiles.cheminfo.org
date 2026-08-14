@@ -115,6 +115,13 @@ code {
   margin: 0;
 }
 
+.card-header-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
 .field-row {
   display: flex;
   align-items: flex-end;
@@ -792,6 +799,51 @@ textarea.notation-input {
 .syntax-card-example code {
   font-size: 12px;
   overflow-wrap: anywhere;
+}
+
+/* The same sheet, read beside a question rather than printed: the contents
+   stay in view on the left while the sections scroll on the right. */
+.cheatsheet-dialog {
+  width: 1040px;
+  max-width: 96vw;
+  height: 82vh;
+}
+
+.cheatsheet-dialog-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  overflow: hidden;
+  padding: 12px 16px;
+}
+
+.cheatsheet-dialog-contents {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-content: start;
+  overflow-y: auto;
+  padding-right: 4px;
+  border-right: 1px solid #d3d8de;
+}
+
+.cheatsheet-dialog-contents .reference-contents-group {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.cheatsheet-dialog-contents .reference-contents-group > span {
+  margin-bottom: 2px;
+}
+
+.cheatsheet-dialog-sections {
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.cheatsheet-dialog-sections .reference-section {
+  scroll-margin-top: 0;
 }
 
 /* ── Exercises ───────────────────────────────────────────────────────────── */

@@ -1461,3 +1461,25 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     ],
   },
 ];
+
+/** Which notation a section documents, read off its id rather than declared. */
+export type Notation = 'smiles' | 'smarts';
+
+/**
+ * The part of the sheet a page — or an exercise — needs.
+ *
+ * A student writing the SMILES of a drawn molecule is not helped by a column
+ * of recursive SMARTS, and a student writing a query needs both notations,
+ * because a SMARTS is a SMILES with more said about the atoms. Which notation
+ * a section belongs to is read off its id, so a section added to the sheet
+ * lands in the right place by being named like its neighbours.
+ * @param notations - The notations to keep.
+ * @returns Their sections, in sheet order.
+ */
+export function referenceSectionsFor(
+  notations: Notation[],
+): ReferenceSection[] {
+  return REFERENCE_SECTIONS.filter((section) =>
+    notations.some((notation) => section.id.startsWith(`${notation}-`)),
+  );
+}
