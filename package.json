@@ -1,0 +1,48 @@
+{
+  "name": "smiles",
+  "version": "0.0.0",
+  "description": "Structure \u21c4 SMILES conversion, search and exercises",
+  "type": "module",
+  "private": true,
+  "homepage": "https://github.com/cheminfo/smiles.cheminfo.org#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheminfo/smiles.cheminfo.org.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cheminfo/smiles.cheminfo.org/issues"
+  },
+  "license": "MIT",
+  "author": "Luc Patiny",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "build-frontend": "npm run build -w frontend",
+    "check-types": "npm run check-types -w backend && npm run check-types -w frontend",
+    "dev": "lsof -ti:10814,10815 | xargs kill -9 2>/dev/null; concurrently --kill-others --kill-others-on-fail \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "eslint": "eslint .",
+    "eslint-fix": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettier-write": "prettier --write .",
+    "test": "npm run test-only && npm run check-types && npm run eslint && npm run prettier",
+    "test-e2e": "npm run test-e2e -w frontend",
+    "test-only": "npm run test-only -w backend && npm run test-only -w frontend"
+  },
+  "overrides": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.4",
+    "eslint": "^9.39.5",
+    "eslint-config-zakodium": "^20.1.0",
+    "prettier": "^3.9.6",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "volta": {
+    "node": "24.14.0"
+  }
+}

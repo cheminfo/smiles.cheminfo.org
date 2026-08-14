@@ -1,0 +1,59 @@
+cff-version: 1.2.0
+title: 'SMILES — structure ⇄ notation conversion, search and exercises'
+abstract: "A web application and service for the SMILES chemical line notation. It converts between drawn structures and SMILES in both directions, one at a time or ten thousand at a time, reads and writes SDF, searches a user-supplied set of structures by substructure or SMARTS, and teaches the notation through a guided tutorial, a printable cheatsheet and graded exercises that a teacher can hand out as a link. All chemistry runs in the browser on openchemlib, so no structure ever leaves the visitor's machine."
+repository-artifact: https://smiles.cheminfo.org
+repository-code: https://github.com/cheminfo/smiles.cheminfo.org
+authors:
+  - family-names: 'Patiny'
+    given-names: 'Luc'
+    affiliation: 'Ecole Polytechnique Fédérale de Lausanne (EPFL), Switzerland'
+    orcid: 'https://orcid.org/0000-0002-4943-2643'
+  - family-names: 'Zasso'
+    given-names: 'Michaël'
+    affiliation: 'Zakodium Sàrl, Switzerland'
+    orcid: 'https://orcid.org/0000-0001-5295-2159'
+license: MIT
+keywords:
+  - SMILES
+  - SMARTS
+  - Chemical line notation
+  - Substructure search
+  - Web service
+  - Chemistry education
+references:
+  - type: article
+    title: 'SMILES, a chemical language and information system. 1. Introduction to methodology and encoding rules'
+    authors:
+      - family-names: 'Weininger'
+        given-names: 'David'
+    journal: 'Journal of Chemical Information and Computer Sciences'
+    volume: 28
+    issue: 1
+    start: 31
+    end: 36
+    year: 1988
+    doi: 10.1021/ci00057a005
+  - type: article
+    title: 'SMILES. 2. Algorithm for generation of unique SMILES notation'
+    authors:
+      - family-names: 'Weininger'
+        given-names: 'David'
+      - family-names: 'Weininger'
+        given-names: 'Arthur'
+      - family-names: 'Weininger'
+        given-names: 'Joseph L.'
+    journal: 'Journal of Chemical Information and Computer Sciences'
+    volume: 29
+    issue: 2
+    start: 97
+    end: 101
+    year: 1989
+    doi: 10.1021/ci00062a008
+  - type: standard
+    title: 'OpenSMILES specification, version 1.0'
+    authors:
+      - family-names: 'James'
+        given-names: 'Craig A.'
+    year: 2016
+    url: 'http://opensmiles.org/opensmiles.html'
+doi:

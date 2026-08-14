@@ -1,0 +1,10 @@
+{
+  "extends": "@zakodium/tsconfig/jsx",
+  "compilerOptions": {
+    "noEmit": true,
+    "noUncheckedIndexedAccess": true,
+    // The chemistry lives above this workspace, shared with the backend.
+    "rootDir": ".."
+  },
+  "include": ["src", "vite*.ts", "../chemistry"]
+}
