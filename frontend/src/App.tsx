@@ -1,7 +1,8 @@
-import { Button } from '@blueprintjs/core';
+import { Icon } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
 
+import { BrandMark, Wordmark } from './components/Brand.tsx';
 import ShareDialog from './components/share/ShareDialog.tsx';
 import ConverterPage from './pages/converter/ConverterPage.tsx';
 import ExercisesPage from './pages/exercises/ExercisesPage.tsx';
@@ -32,10 +33,12 @@ export default function App() {
   const page = route.page.value;
 
   return (
-    <div className="page">
+    <>
       {isEmbedded() ? null : <Header page={page} />}
-      <CurrentPage page={page} />
-    </div>
+      <div className="page">
+        <CurrentPage page={page} />
+      </div>
+    </>
   );
 }
 
@@ -61,38 +64,47 @@ function Header(props: { page: Page }) {
   const [isSharing, setSharing] = useState(false);
 
   return (
-    <header className="page-header no-print">
-      <h1>
-        SMILES
-        <span className="page-header-subtitle">
-          a molecule, written on one line
-        </span>
-      </h1>
-      <nav className="page-nav">
-        {TABS.map((tab) => (
-          <button
-            key={tab.page}
-            type="button"
-            className={
-              tab.page === props.page ? 'page-tab page-tab--active' : 'page-tab'
-            }
-            onClick={() => navigate(tab.page)}
-          >
-            {tab.label}
-          </button>
-        ))}
-        <a href="/docs">API</a>
-        <Button
-          size="small"
-          icon="share"
-          text="Share"
-          title="Share a link to this page, or frame it in your own site"
-          onClick={() => setSharing(true)}
-        />
-      </nav>
+    <>
+      <header className="app-header no-print">
+        <div className="app-header__inner">
+          <a href="/" className="brand" title="smiles.cheminfo.org">
+            <BrandMark />
+            <Wordmark />
+          </a>
+          <nav className="page-nav">
+            {TABS.map((tab) => (
+              <button
+                key={tab.page}
+                type="button"
+                className={
+                  tab.page === props.page
+                    ? 'nav-link nav-link--active'
+                    : 'nav-link'
+                }
+                onClick={() => navigate(tab.page)}
+              >
+                {tab.label}
+              </button>
+            ))}
+            <a className="nav-link" href="/docs">
+              API
+            </a>
+            <button
+              type="button"
+              className="nav-link"
+              title="Share a link to this page, or frame it in your own site"
+              onClick={() => setSharing(true)}
+            >
+              <Icon icon="share" size={14} />
+              Share
+            </button>
+          </nav>
+        </div>
+      </header>
+      <p className="app-tagline no-print">a molecule, written on one line</p>
       {isSharing ? (
         <ShareDialog isOpen onClose={() => setSharing(false)} />
       ) : null}
-    </header>
+    </>
   );
 }
