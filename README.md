@@ -111,11 +111,31 @@ contract — read it before changing anything.
 ```sh
 cp .env.example .env
 # uncomment one COMPOSE_FILE line: port-published, Traefik, or Cloudflare Tunnel
-docker compose up -d
+docker compose up -d          # the released image
+docker compose up -d --build  # or build this checkout instead
 ```
 
-Set `TRACKING_SCRIPT` to your analytics provider's snippet to have it injected
-into every page served; unset, nothing is loaded and nothing is measured.
+| Variable                       | What it does                                                                                                                                |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `COMPOSE_FILE`                 | Which of the three deployments runs. Unset, `compose.yaml` publishes `PORT` on the host.                                                    |
+| `IMAGE_NAME` / `IMAGE_TAG`     | The image the compose files run, and the tag of it.                                                                                         |
+| `PORT`                         | The port the backend listens on, `10814` by default.                                                                                        |
+| `TRUST_PROXY`                  | Whose `X-Forwarded-For` is believed. Unset, none is — set it only when something proxies this service.                                      |
+| `TRACKING_SCRIPT`              | The analytics provider's snippet, placed at the end of the `<head>` of every page served. Unset, nothing is loaded and nothing is measured. |
+| `MAX_BATCH` / `MAX_BODY_BYTES` | The largest conversion one call may ask for, and the largest body accepted.                                                                 |
+| `TUNNEL_TOKEN`                 | The Cloudflare Tunnel token, read by `compose.cloudflared.yaml` alone.                                                                      |
+
+**Give each build a tag of its own.** `docker compose build` tags what it builds
+with exactly `IMAGE_NAME:IMAGE_TAG`, so leaving that pair at `:latest` has every
+build take the name off the one before it — and a deployment that goes wrong
+then has nothing left to go back to. Name the build after itself and the
+previous image is still there to return to:
+
+```sh
+IMAGE_TAG=$(date -u +%Y%m%dT%H%M%SZ)-$(git rev-parse --short HEAD)
+docker compose build && IMAGE_TAG=$IMAGE_TAG docker compose up -d
+# went wrong: put the tag that worked back in .env and up -d again
+```
 
 ## The notation
 

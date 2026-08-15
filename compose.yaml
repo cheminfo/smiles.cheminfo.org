@@ -6,7 +6,7 @@ services:
   smiles:
     # Use the released image by default. To build locally instead, run:
     #   docker compose up -d --build
-    image: ghcr.io/cheminfo/smiles.cheminfo.org:latest
+    image: ${IMAGE_NAME:-ghcr.io/cheminfo/smiles.cheminfo.org}:${IMAGE_TAG:-latest}
     build: .
     init: true
     restart: unless-stopped

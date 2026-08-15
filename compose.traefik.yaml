@@ -10,7 +10,7 @@ services:
   smiles:
     # Use the released image by default. To build locally instead, run:
     #   docker compose up -d --build
-    image: ghcr.io/cheminfo/smiles.cheminfo.org:latest
+    image: ${IMAGE_NAME:-ghcr.io/cheminfo/smiles.cheminfo.org}:${IMAGE_TAG:-latest}
     build: .
     init: true
     restart: unless-stopped
@@ -37,11 +37,14 @@ services:
       options:
         max-size: '50m'
         max-file: '3'
+    # Only the proxy's network: nothing here talks to a sibling container, and
+    # naming `default` as well would have compose cut a second subnet out of a
+    # pool that runs out after a few dozen stacks on one host.
     networks:
-      - default
       - traefik
     labels:
       - 'traefik.enable=true'
+      - 'traefik.docker.network=traefik'
       - 'traefik.http.routers.smiles.rule=Host(`smiles.cheminfo.org`)'
       - 'traefik.http.routers.smiles.entrypoints=websecure'
       - 'traefik.http.routers.smiles.tls.certresolver=letsencrypt'
