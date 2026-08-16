@@ -46,20 +46,27 @@ the thing to hand out. The **Share** button builds it, and the iframe that
 frames it inside a course:
 
 ```
-smiles.cheminfo.org/exercises?set=patterns&embed=1&hide=list,answers
+smiles.cheminfo.org/exercises/patterns?embed=1&hide=list,answers
+smiles.cheminfo.org/exercises/molecule-to-smiles/w4
 smiles.cheminfo.org/exercises?exercises=w2,w15
 smiles.cheminfo.org/?smiles=CC(%3DO)Oc1ccccc1C(%3DO)O
 smiles.cheminfo.org/lists?source=https://example.org/my-set.smi&q=c1ccccc1
-smiles.cheminfo.org/tutorial?step=12
+smiles.cheminfo.org/tutorial/12
 smiles.cheminfo.org/?kind=reaction&smiles=CC(=O)Cl.OCC%3E%3ECC(=O)OCC.Cl
 ```
 
+- A **step of the tutorial**, a **set of exercises** and a **single exercise**
+  are addresses of their own — `/tutorial/12`, `/exercises/patterns`,
+  `/exercises/patterns/s1` — so each is a page a search engine indexes and a
+  link opens directly. `?step=`, `?set=` and `?exercise=` are what links written
+  before that said, and they still open.
 - `embed=1` drops the header, so only the activity shows through the frame.
 - `hide=` switches parts of a page off. A hidden control still applies whatever
   the link carries — that is how you preset a search nobody can widen.
 - `exercises=` hands out exactly the questions you name, in the order you name
   them. An id nobody knows is skipped rather than fatal, so an old link opens on
-  what is left of it. `exercise=` names the one that is open.
+  what is left of it. A set assembled that way has no address of its own, so it
+  stays in the query string.
 - `kind=` picks the converter's tab — `molecule`, `query` or `reaction`. It is
   left out when the notation says which it is, so a plain `?smiles=` link still
   opens on the right one.

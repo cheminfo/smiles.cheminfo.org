@@ -50,6 +50,56 @@ test.each([
   expect(router.route.page.value).toBe(page);
 });
 
+test.each([
+  ['/tutorial/7', 'tutorial', '/tutorial/7'],
+  ['/exercises/patterns', 'exercises', '/exercises/patterns'],
+  ['/exercises/patterns/s1', 'exercises', '/exercises/patterns/s1'],
+  ['/tutorial/', 'tutorial', '/tutorial'],
+  ['/tutorial/nowhere', 'tutorial', '/tutorial'],
+])('%s is the %s page at %s', async (url, page, path) => {
+  const { router } = await loadRouter(url);
+
+  expect(router.route.page.value).toBe(page);
+  expect(router.route.path.value).toBe(path);
+});
+
+test('the step and the exercise are read off the path', async () => {
+  const { router } = await loadRouter('/exercises/patterns/s1?embed=1');
+
+  expect(router.parsePath('/tutorial/7')).toStrictEqual({
+    page: 'tutorial',
+    step: 7,
+  });
+  expect(router.parsePath('/exercises/patterns/s1')).toStrictEqual({
+    page: 'exercises',
+    setId: 'patterns',
+    exerciseId: 's1',
+  });
+  expect(router.routePath({ page: 'exercises', setId: 'patterns' })).toBe(
+    '/exercises/patterns',
+  );
+  expect(router.routePath({ page: 'tutorial' })).toBe('/tutorial');
+});
+
+test('another step of the same page replaces the address, and keeps the query', async () => {
+  const { router, written } = await loadRouter('/tutorial/1?embed=1');
+
+  router.replacePath('/tutorial/2');
+
+  expect(written.at(-1)).toBe('/tutorial/2?embed=1');
+  expect(router.route.path.value).toBe('/tutorial/2');
+  expect(router.route.page.value).toBe('tutorial');
+});
+
+test('leaving a page leaves the step it was on behind', async () => {
+  const { router, written } = await loadRouter('/exercises/patterns/s1');
+
+  router.navigate('tutorial');
+
+  expect(written.at(-1)).toBe('/tutorial');
+  expect(router.route.path.value).toBe('/tutorial');
+});
+
 test('/search is an alias for the lists page', async () => {
   // Searching a list is what the list page does, and `/search` is what someone
   // looking for it types.

@@ -190,10 +190,24 @@ test('the tutorial walks its steps and keeps the structure live', async ({
   // The step is a starting point, not a slide: editing it re-draws.
   await page.locator('.notation-input input').fill('CCC');
   await expect(page.getByText('C3H8')).toBeVisible();
+
+  // Walking the tour writes the step in the address, so each one is a page.
+  await expect(page).toHaveURL(/\/tutorial\/2$/);
+});
+
+test('a link written before a step had an address of its own still opens it', async ({
+  page,
+}) => {
+  await page.goto('/tutorial?step=3');
+
+  await expect(
+    page.getByRole('heading', { name: /Parentheses open a branch/ }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/tutorial\/3$/);
 });
 
 test('a glossary term explains itself on hover', async ({ page }) => {
-  await page.goto('/tutorial?step=2');
+  await page.goto('/tutorial/2');
 
   await page.locator('.glossary-term').first().hover();
   await expect(page.locator('.glossary-card').first()).toBeVisible();
@@ -238,14 +252,14 @@ test('a cheatsheet row explains itself on hover', async ({ page }) => {
 });
 
 test('the share dialog builds a framed link', async ({ page }) => {
-  await page.goto('/exercises?set=patterns');
+  await page.goto('/exercises/patterns');
 
   await page.getByRole('button', { name: 'Share' }).click();
   await expect(page.getByText('Share or embed')).toBeVisible();
 
   const link = await page.locator('.share-link .code-block pre').textContent();
   expect(link).toContain('embed=1');
-  expect(link).toContain('set=patterns');
+  expect(link).toContain('/exercises/patterns');
 });
 
 test('an SDF pasted into the list page is read as its records', async ({

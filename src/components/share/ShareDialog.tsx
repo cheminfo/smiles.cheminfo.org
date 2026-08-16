@@ -10,7 +10,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
 
 import { EXERCISES_PARAM, SET_PARAM, data } from '../../state/exercises.ts';
-import { route } from '../../state/router.ts';
+import { PATHS, route } from '../../state/router.ts';
 import type { HideKey, ShareConfig } from '../../state/shareConfig.ts';
 import {
   SHARE_PARAM_KEYS,
@@ -153,17 +153,26 @@ function buildUrl(config: ShareConfig, exercises: readonly string[] | null) {
   const params = new URLSearchParams(globalThis.location.search);
   for (const key of SHARE_PARAM_KEYS) params.delete(key);
   applyShareConfig(params, config);
-  if (exercises) applyExercises(params, exercises);
+  const chosen = exercises ? applyExercises(params, exercises) : null;
 
   const search = stringifyParams(params);
   const { origin, pathname } = globalThis.location;
-  return `${origin}${pathname}${search ? `?${search}` : ''}`;
+  // A set assembled question by question has no address of its own: the link
+  // carries the list, so it opens the page holding them rather than a set the
+  // site does not ship.
+  return `${origin}${chosen ?? pathname}${search ? `?${search}` : ''}`;
 }
 
+/**
+ * Write the chosen exercises into the link.
+ * @param params - The query string being built.
+ * @param exercises - The chosen exercise ids, in the order they were picked.
+ * @returns The path the link must open, or null to keep the current one.
+ */
 function applyExercises(
   params: URLSearchParams,
   exercises: readonly string[],
-): void {
+): string | null {
   const set = data.set.peek();
   const whole = set.exercises.map((exercise) => exercise.id);
   const isWholeSet =
@@ -171,19 +180,21 @@ function applyExercises(
     exercises.every((id, index) => id === whole[index]);
 
   if (isWholeSet && set.id !== 'custom') {
-    // The whole set has a name, and a name is shorter, readable, and survives
-    // the set gaining a question later.
+    // The whole set is named by the address itself, which is shorter, readable,
+    // and survives the set gaining a question later.
     params.delete(EXERCISES_PARAM);
-    params.set(SET_PARAM, set.id);
-  } else {
     params.delete(SET_PARAM);
-    params.set(EXERCISES_PARAM, exercises.join(','));
+    return null;
   }
+
+  params.delete(SET_PARAM);
+  params.set(EXERCISES_PARAM, exercises.join(','));
 
   const open = params.get('exercise');
   if (open && exercises.length > 0 && !exercises.includes(open)) {
     params.delete('exercise');
   }
+  return PATHS.exercises;
 }
 
 function buildIframe(url: string, title: string): string {

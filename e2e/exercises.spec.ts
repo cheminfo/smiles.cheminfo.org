@@ -67,7 +67,7 @@ test('the running check reads the draft as it is typed, and never marks it', asy
 });
 
 test('a link can switch the running check off', async ({ page }) => {
-  await page.goto(`${WRITE_EXERCISE}&hide=check`);
+  await page.goto(`${WRITE_EXERCISE}?hide=check`);
 
   await page.getByPlaceholder(WRITE_PLACEHOLDER).fill('CCO');
   await expect(page.locator('.self-check')).toHaveCount(0);
@@ -193,7 +193,7 @@ test('a draft left mid-edit comes back unmarked', async ({ page }) => {
 test('resetting forgets the answer, the attempts and the hints', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=patterns&exercise=s1');
+  await page.goto('/exercises/patterns/s1');
 
   await submitAnswer(page, SMARTS_PLACEHOLDER, 'C=O');
   await page.getByRole('button', { name: 'Reveal a hint (1 of 3)' }).click();
@@ -217,7 +217,7 @@ test('resetting forgets the answer, the attempts and the hints', async ({
 test('a SMARTS exercise lights its test cases up once submitted', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=patterns&exercise=s2');
+  await page.goto('/exercises/patterns/s2');
 
   await expect(page.getByText('Must match', { exact: true })).toBeVisible();
   await expect(page.getByText('Must not match', { exact: true })).toBeVisible();
@@ -234,14 +234,14 @@ test('a SMARTS exercise lights its test cases up once submitted', async ({
 test('an over-matching SMARTS is refused and shows which case broke', async ({
   page,
 }) => {
-  await page.goto('/exercises?set=patterns&exercise=s2');
+  await page.goto('/exercises/patterns/s2');
 
   await submitAnswer(page, SMARTS_PLACEHOLDER, 'C=O');
   await expect(page.locator('.case-cell--fail').first()).toBeVisible();
 });
 
 test('hints come one at a time', async ({ page }) => {
-  await page.goto('/exercises?set=patterns&exercise=s1');
+  await page.goto('/exercises/patterns/s1');
 
   await expect(page.getByText('3 hints, from a nudge')).toBeVisible();
   await page.getByRole('button', { name: 'Reveal a hint (1 of 3)' }).click();
@@ -271,7 +271,7 @@ test('the cheatsheet opens beside the question, holding the notation it is about
     page.getByText('Write the SMILES of this molecule.'),
   ).toBeVisible();
 
-  await page.goto('/exercises?set=patterns&exercise=s1');
+  await page.goto('/exercises/patterns/s1');
   await page
     .locator('.question-card')
     .getByRole('button', { name: 'Cheatsheet' })
@@ -297,7 +297,7 @@ test('the answer can be given up on, and says it is only one of many', async ({
 test('a framed link drops the header and the parts it switches off', async ({
   page,
 }) => {
-  await page.goto(`${WRITE_EXERCISE}&embed=1&hide=list,hints,answers`);
+  await page.goto(`${WRITE_EXERCISE}?embed=1&hide=list,hints,answers`);
 
   await expect(page.locator('.page-header')).toHaveCount(0);
   await expect(page.locator('.exercise-list-card')).toHaveCount(0);
@@ -315,7 +315,7 @@ test('the other sets are one click away', async ({ page }) => {
     .getByText('SMILES → Molecule', { exact: false })
     .click();
 
-  await expect(page).toHaveURL(/set=smiles-to-molecule&exercise=d\d+/);
+  await expect(page).toHaveURL(/\/exercises\/smiles-to-molecule\/d\d+$/);
   await expect(
     page.locator('.exercise-list-card').getByRole('heading', {
       name: 'SMILES → Molecule',
@@ -327,6 +327,17 @@ test('the other sets are one click away', async ({ page }) => {
     .getByText('Write a SMARTS', { exact: false })
     .click();
   await expect(page.getByPlaceholder(SMARTS_PLACEHOLDER)).toBeVisible();
+});
+
+test('a link written before an exercise had an address of its own still opens it', async ({
+  page,
+}) => {
+  await page.goto('/exercises?set=molecule-to-smiles&exercise=w4');
+
+  // The question is the one the old link named, and the address it is read at
+  // afterwards is the one it now has.
+  await expect(page.getByPlaceholder(WRITE_PLACEHOLDER)).toBeVisible();
+  await expect(page).toHaveURL(/\/exercises\/molecule-to-smiles\/w4$/);
 });
 
 test('a link naming exercises hands out exactly those', async ({ page }) => {
@@ -355,5 +366,5 @@ test('reaching the tab from another page opens the first exercise', async ({
   await expect(
     page.getByRole('heading', { name: 'Dichlorodifluoromethane' }),
   ).toBeVisible();
-  await expect(page).toHaveURL('/exercises?exercise=w47');
+  await expect(page).toHaveURL('/exercises/molecule-to-smiles/w47');
 });

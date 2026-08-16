@@ -4,9 +4,9 @@ import { readInput } from '../chemistry/readInput.ts';
 import { TUTORIAL_STEPS } from '../data/tutorial.ts';
 
 import { persistBucket } from './persist.ts';
-import { replaceParameters, route, searchParameter } from './router.ts';
+import { parsePath, replacePath, route, searchParameter } from './router.ts';
 
-/** The name of the parameter a link carries the step in. */
+/** The name of the parameter a link written before `/tutorial/7` carries the step in. */
 export const STEP_PARAM = 'step';
 
 export const view = {
@@ -38,7 +38,11 @@ export function openStep(index: number): void {
   view.step.value = step;
   view.input.value = TUTORIAL_STEPS[step]?.smiles ?? '';
   preferences.furthest.value = Math.max(preferences.furthest.peek(), step);
-  replaceParameters({ [STEP_PARAM]: String(step + 1) });
+  // Only the tutorial writes the tutorial's address; this also runs before the
+  // first paint, to restore the step a link named.
+  if (route.page.peek() === 'tutorial') {
+    replacePath(`/tutorial/${step + 1}`, { [STEP_PARAM]: undefined });
+  }
 }
 
 /** Put the step's own structure back after the student has edited it. */
@@ -49,11 +53,13 @@ export function resetStep(): void {
 /**
  * Read the step a link names.
  *
- * The address counts from 1, because it is read by people: `?step=7` is the
- * seventh step, not the eighth.
+ * The address counts from 1, because it is read by people: `/tutorial/7` is the
+ * seventh step, not the eighth. `?step=7` is what a link written before the
+ * step had an address of its own says, and it still opens.
  */
 export function readAddress(): void {
   if (route.page.peek() !== 'tutorial') return;
-  const named = Number(searchParameter(STEP_PARAM));
+  const named =
+    parsePath(route.path.peek()).step ?? Number(searchParameter(STEP_PARAM));
   if (Number.isFinite(named) && named >= 1) openStep(named - 1);
 }

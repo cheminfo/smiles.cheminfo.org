@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 /** The exercise the write-a-SMILES specs work on: malonic acid. */
-export const WRITE_EXERCISE = '/exercises?set=molecule-to-smiles&exercise=w4';
+export const WRITE_EXERCISE = '/exercises/molecule-to-smiles/w4';
 
 /** The placeholder of the answer box on a write-a-SMILES question. */
 export const WRITE_PLACEHOLDER = 'CC(=O)O';

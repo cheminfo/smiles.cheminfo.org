@@ -13,9 +13,15 @@ import {
   progressOf,
   updateProgress,
 } from './exerciseProgress.ts';
-import { replaceParameters, route, searchParameter } from './router.ts';
+import {
+  parsePath,
+  replaceParameters,
+  replacePath,
+  route,
+  searchParameter,
+} from './router.ts';
 
-/** The parameter naming which set is open. */
+/** The parameter naming which set is open, on a link written before `/exercises/patterns`. */
 export const SET_PARAM = 'set';
 /** The parameter naming a set assembled exercise by exercise. */
 export const EXERCISES_PARAM = 'exercises';
@@ -73,9 +79,26 @@ export function openExercise(id: string): void {
   // Only the exercises page writes the exercises page's address. This also
   // runs before the first paint, to restore what a link named, and navigating
   // from there would drag every other page onto this one.
-  if (route.page.peek() === 'exercises') {
+  if (route.page.peek() === 'exercises') writeAddress(id);
+}
+
+/**
+ * Put the open set and exercise in the address. A set this site ships has an
+ * address of its own — `/exercises/patterns/s1` — so a search result can point
+ * at the question itself; a set a link assembled by hand has no name to write,
+ * so it stays in the query string where the link put it.
+ * @param id - The exercise that is open.
+ */
+function writeAddress(id: string): void {
+  const set = data.set.peek();
+  if (set.id === 'custom') {
     replaceParameters({ [EXERCISE_PARAM]: id });
+    return;
   }
+  replacePath(`/exercises/${set.id}/${id}`, {
+    [SET_PARAM]: undefined,
+    [EXERCISE_PARAM]: undefined,
+  });
 }
 
 /**
@@ -90,8 +113,8 @@ export function openSet(id: string): void {
   const set = EXERCISE_SETS.find((candidate) => candidate.id === id);
   if (!set || set.id === data.set.peek().id) return;
   data.set.value = set;
-  replaceParameters({
-    [SET_PARAM]: id,
+  replacePath(`/exercises/${id}`, {
+    [SET_PARAM]: undefined,
     [EXERCISES_PARAM]: undefined,
     [EXERCISE_PARAM]: undefined,
   });
@@ -181,8 +204,11 @@ export function setShowAnswer(show: boolean): void {
 export function readAddress(): void {
   if (route.page.peek() !== 'exercises') return;
 
+  const address = parsePath(route.path.peek());
   const chosen = searchParameter(EXERCISES_PARAM);
-  const named = searchParameter(SET_PARAM);
+  // `?set=` and `?exercise=` are what a link written before the set had an
+  // address of its own says, and they still open.
+  const named = address.setId ?? searchParameter(SET_PARAM);
 
   if (chosen) {
     const exercises = pickExercises(chosen.split(','));
@@ -203,7 +229,7 @@ export function readAddress(): void {
       (EXERCISE_SETS[0] as ExerciseSet);
   }
 
-  const wanted = searchParameter(EXERCISE_PARAM);
+  const wanted = address.exerciseId ?? searchParameter(EXERCISE_PARAM);
   const set = data.set.peek();
   const opening =
     (wanted && set.exercises.some((exercise) => exercise.id === wanted)

@@ -1,31 +1,29 @@
 import { signal } from '@preact/signals-react';
 
 import type { Page } from './pages.ts';
-import { ALIASES, PATHS } from './pages.ts';
+import { ALIASES, PATHS, parsePath, routePath } from './pages.ts';
 import { SHARE_PARAM_KEYS } from './shareConfig.ts';
 
-export type { Page } from './pages.ts';
-export { ALIASES, PATHS } from './pages.ts';
+export type { Page, Route } from './pages.ts';
+export { ALIASES, PATHS, parsePath, routePath } from './pages.ts';
 
-function readPage(): Page {
+function readPath(): string {
   const { pathname } = globalThis.location;
-  for (const [path, page] of Object.entries(ALIASES)) {
-    if (pathname.startsWith(path)) return page;
-  }
-  for (const [page, path] of Object.entries(PATHS)) {
-    if (path !== '/' && pathname.startsWith(path)) return page as Page;
-  }
-  return 'converter';
+  const alias = Object.keys(ALIASES).find((path) => pathname === path);
+  return alias ?? routePath(parsePath(pathname));
 }
 
 /**
  * Where the browser is. Routing is path based, through the History API,
  * because a teacher hands out an address like
- * `smiles.cheminfo.org/exercises?set=molecule-to-smiles` — a `#` in there would
- * be lost by half the tools that pass links around.
+ * `smiles.cheminfo.org/exercises/patterns` — a `#` in there would be lost by
+ * half the tools that pass links around. The path carries the step or the
+ * exercise as well, so each of those is a page a crawler can fetch and a
+ * search result can point at.
  */
 export const route = {
-  page: signal<Page>(readPage()),
+  page: signal<Page>(parsePath(globalThis.location.pathname).page),
+  path: signal<string>(readPath()),
   search: signal<string>(globalThis.location.search),
 };
 
@@ -72,7 +70,10 @@ export function navigate(
     }
   }
   const query = search.toString();
-  const path = PATHS[page];
+  // Staying on a page keeps the step or the exercise it is on; leaving one
+  // opens the next at its own address rather than under a segment nobody
+  // asked for.
+  const path = page === route.page.peek() ? route.path.peek() : PATHS[page];
   const url = query ? `${path}?${query}` : path;
   if (options.replace) {
     globalThis.history.replaceState(null, '', url);
@@ -80,6 +81,7 @@ export function navigate(
     globalThis.history.pushState(null, '', url);
   }
   route.page.value = page;
+  route.path.value = path;
   route.search.value = query ? `?${query}` : '';
 }
 
@@ -93,6 +95,21 @@ export function replaceParameters(
   parameters: Record<string, string | undefined>,
 ): void {
   navigate(route.page.peek(), parameters, { replace: true });
+}
+
+/**
+ * Open another address of the page one is already on — another step, another
+ * exercise — without adding a history entry, so the back button leaves the
+ * activity rather than walking back through every step that was opened.
+ * @param path - The path to write, from `routePath`.
+ * @param parameters - Query parameters to set; undefined values are removed.
+ */
+export function replacePath(
+  path: string,
+  parameters: Record<string, string | undefined> = {},
+): void {
+  route.path.value = path;
+  replaceParameters(parameters);
 }
 
 /**
@@ -113,6 +130,7 @@ function keptParameters(page: Page): URLSearchParams {
 }
 
 globalThis.addEventListener('popstate', () => {
-  route.page.value = readPage();
+  route.page.value = parsePath(globalThis.location.pathname).page;
+  route.path.value = readPath();
   route.search.value = globalThis.location.search;
 });

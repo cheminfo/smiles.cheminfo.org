@@ -1,7 +1,7 @@
 import { effect } from '@preact/signals-react';
 
 import { SITE_URL, documentTitle } from './pageMeta.ts';
-import { PATHS, route } from './router.ts';
+import { route } from './router.ts';
 
 /**
  * Keep the tab and the canonical address in step with the page on screen. The
@@ -11,7 +11,7 @@ import { PATHS, route } from './router.ts';
  */
 export function startDocumentMeta(): void {
   effect(() => {
-    writeDocumentMeta(PATHS[route.page.value]);
+    writeDocumentMeta(route.path.value);
   });
 }
 

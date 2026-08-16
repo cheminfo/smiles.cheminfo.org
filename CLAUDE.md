@@ -186,10 +186,14 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
 ## Frontend conventions
 
 - Routing is **path based** through the History API — a teacher hands out
-  `smiles.cheminfo.org/exercises?set=patterns`, and a `#` in there does not
-  survive being pasted around. The build writes one file per address so each is
-  titled and described as itself, and the server answers `index.html` for any
-  unknown path. `PATHS` lives in `state/pages.ts`, which reads nothing and
+  `smiles.cheminfo.org/exercises/patterns`, and a `#` in there does not survive
+  being pasted around. **A step of the tutorial and an exercise of a set are
+  addresses, not parameters** (`/tutorial/12`, `/exercises/patterns/s1`): the
+  build writes one file per address so each is titled and described as itself,
+  and a hundred questions behind one address is one search result. `?step=`,
+  `?set=` and `?exercise=` are read on the way in, so a link written before
+  still opens, and the address is rewritten to the one it now has. `PATHS`,
+  `parsePath` and `routePath` live in `state/pages.ts`, which reads nothing and
   listens to nothing, so the build that writes those files can import it in
   Node.
 - `state/shareConfig.ts` owns the two parameters that configure a page rather
