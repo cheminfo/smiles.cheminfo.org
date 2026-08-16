@@ -6,37 +6,22 @@ import unicorn from 'eslint-config-zakodium/unicorn';
 
 export default defineConfig(
   globalIgnores([
-    '**/coverage',
-    '**/dist',
-    // Outside every tsconfig, so the type-aware rules cannot parse them.
-    'frontend/e2e',
-    'frontend/playwright.config.ts',
-    'frontend/playwright-report',
-    'frontend/test-results',
+    'coverage',
+    'dist',
+    // Outside the tsconfig, so the type-aware rules cannot parse them.
+    'e2e',
+    'playwright.config.ts',
+    'playwright-report',
+    'test-results',
   ]),
   ts,
   unicorn,
   {
-    // TypeBox and Fastify use uppercase non-constructor calls.
-    rules: { 'new-cap': ['error', { capIsNew: false }] },
-  },
-  {
-    files: ['backend/**', 'scripts/**'],
+    files: ['scripts/**'],
     languageOptions: { globals: { ...globals.nodeBuiltin } },
   },
   {
-    // The shared chemistry belongs to no workspace: it is imported by both, so
-    // what either of them depends on is what it may import.
-    files: ['chemistry/**'],
-    rules: {
-      'import/no-extraneous-dependencies': [
-        'error',
-        { packageDir: ['.', 'backend', 'frontend'] },
-      ],
-    },
-  },
-  {
-    files: ['frontend/**'],
+    files: ['src/**'],
     extends: [react],
     rules: {
       '@typescript-eslint/no-restricted-imports': [

@@ -6,28 +6,26 @@ this before touching a source file: what follows is shared by the whole
 codebase.
 
 **The chemistry runs in the browser, always.** Every conversion, every search
-and every marked answer is computed in the page by openchemlib. The API exists
-so a script can do the same thing; it is never what the page depends on. A
-visitor may search a set they are not allowed to upload anywhere, and that is
-the point.
+and every marked answer is computed in the page by openchemlib. There is no
+service behind the site and nothing to upload to: a visitor may search a set
+they are not allowed to send anywhere, and that is the point.
 
 ## Stack
 
-- **Shared**: `chemistry/` at the repo root, imported by both workspaces with a
-  relative path. Not a package: Node refuses to strip types under
-  `node_modules`, so a third workspace would need a build step for no gain.
-- **Backend**: Fastify 5 + TypeBox, run directly with
-  `node --experimental-strip-types`. No build step, no database.
-- **Frontend**: React 19 + Vite, `@preact/signals-react` for global state,
-  BlueprintJS for the widgets, `react-ocl` for the editor and the drawings,
-  `react-mf` for every molecular formula on screen.
-- **Ports**: backend `10814`, Vite dev server `10815` (derived from the project
-  creation date, 2026-08-14).
-- One Docker image builds the frontend and serves both.
+- **One page, no service.** React 19 + Vite, `@preact/signals-react` for global
+  state, BlueprintJS for the widgets, `react-ocl` for the editor and the
+  drawings, `react-mf` for every molecular formula on screen,
+  `react-cheminfo` for what the family shares.
+- **The chemistry** lives in `src/chemistry/`, imported by the pages that use
+  it.
+- **Ports**: the page is served on `10814`, the Vite dev server on `10815`
+  (derived from the project creation date, 2026-08-14).
+- One Docker image builds the pages and serves them; there is nothing behind
+  it.
 
 ## Reading a structure
 
-`chemistry/parse.ts#readStructure` is the only way text becomes a molecule, and
+`src/chemistry/parse.ts#readStructure` is the only way text becomes a molecule, and
 it says how it read it. Three things it does that nothing else may undo:
 
 - **The SMILES/SMARTS mode is decided here, not by openchemlib.** Its own
@@ -44,7 +42,7 @@ it says how it read it. Three things it does that nothing else may undo:
 
 ## Identity of a structure
 
-Two structures are the same answer when `chemistry/describe.ts#identity` gives
+Two structures are the same answer when `src/chemistry/describe.ts#identity` gives
 them the same string. That is **not** the raw idCode: an idCode records things a
 SMILES cannot say, so a nitro group drawn as pentavalent nitrogen and the same
 group drawn as `[N+]([O-])=O` have two idCodes and one SMILES. Grading on the
@@ -71,7 +69,7 @@ changelog:
   another one or by an alternation are all refused; `[!C]` parses but loses its
   negation. The cheatsheet documents the notation, not the toolkit, so an
   example the toolkit cannot parse shows its string instead of a drawing — and
-  `UNPARSEABLE_BY_DESIGN` in `frontend/src/data/__tests__/content.test.ts` names
+  `UNPARSEABLE_BY_DESIGN` in `src/data/__tests__/content.test.ts` names
   every one of them, so a gap that closes upstream stops being excused.
 - **The idCode decoder does not validate.** It reads the string as packed bits,
   so a mistyped SMILES like `ZZZ` decodes into thirty-seven disconnected
@@ -86,29 +84,6 @@ changelog:
 - `openchemlib-utils` reads `options.controller` at run time and declares
   `controler` in its JSDoc, so the generated type rejects the spelling the code
   honours. Passing the declared one silently disables cancellation.
-
-## API
-
-Every route is under `/v1`, carries a TypeBox `schema` with `tags`, `summary`
-and `response`, and shows up at `/docs`.
-
-```
-GET  /v1/health
-GET  /v1/convert     ?input&from    -> one structure, written every way
-POST /v1/convert     the same in a body, for a molfile
-POST /v1/batch       { input, from, to } -> a list, failures reported in place
-POST /v1/sdf         { input, from } -> the list as an SDF
-```
-
-`buildApp()` deliberately does not call `ready()`, so a test can still add a
-route to the instance it gets back.
-
-**Who visits is measured by the deployment, never by the code.**
-`TRACKING_SCRIPT` carries the analytics provider's `<script>` tag as written,
-and `utils/injectTrackingScript.ts` is the only thing that ever puts HTML in a
-page: the index is read once, the tag is placed at the end of its `<head>`, and
-that string answers `/`, `/index.html` and every address the frontend routes
-itself — so a page reached through a teacher's link is counted like the root.
 
 ## Exercises
 
@@ -149,7 +124,7 @@ still opens.
 ## Lists
 
 **Converting a list and searching one are the same page, because they are the
-same list.** `frontend/src/chemistry/structureList.ts#readList` parses the text once and
+same list.** `src/chemistry/structureList.ts#readList` parses the text once and
 builds the `MoleculesDB` screening index as it fills the rows, so the table a
 conversion produced is the table a query narrows — and what a query left is what
 every download holds. Splitting them cost a second full parse of the same
@@ -165,9 +140,9 @@ A search that reported molecules would silently drop the duplicate.
 and two verbs is only simpler than two pages if there is no order to get right.
 
 **What the file is written as is worked out, never asked for.** A chemist pastes
-what their spreadsheet exported, so `chemistry/table.ts` finds the separator with
+what their spreadsheet exported, so `src/chemistry/table.ts` finds the separator with
 papaparse — which is also what keeps a quoted name holding a comma, or a field
-spanning two lines, in one piece — and `chemistry/tableLayout.ts` finds the
+spanning two lines, in one piece — and `src/chemistry/tableLayout.ts` finds the
 column that holds the structures **by parsing the cells**, not by trusting a
 header: half of these files carry no header, and the ones that do put the SMILES
 in whatever column the chemist had it in. Only SMILES and SMARTS are tried there,
@@ -212,9 +187,11 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
 
 - Routing is **path based** through the History API — a teacher hands out
   `smiles.cheminfo.org/exercises?set=patterns`, and a `#` in there does not
-  survive being pasted around. The backend answers `index.html` for any unknown
-  path. `PATHS` is declared **above** `route`, because reading the address is
-  the first thing that module does.
+  survive being pasted around. The build writes one file per address so each is
+  titled and described as itself, and the server answers `index.html` for any
+  unknown path. `PATHS` lives in `state/pages.ts`, which reads nothing and
+  listens to nothing, so the build that writes those files can import it in
+  Node.
 - `state/shareConfig.ts` owns the two parameters that configure a page rather
   than feed it: `embed=1` drops the header for a page framed in a course, and
   `hide=` switches parts of it off. Components ask `isHidden(key)`; the keys of
@@ -231,7 +208,7 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
   once rather than once per render — and every atom is an element that can be
   highlighted, hovered and printed. The canvas editor is for drawing, not for
   showing.
-- **The rings are named on the drawing, not beside it.** `chemistry/rings.ts`
+- **The rings are named on the drawing, not beside it.** `src/chemistry/rings.ts`
   writes each atom's rings on it as an openchemlib custom label — a leading `]`
   is openchemlib's own way of saying "above the atom rather than instead of it",
   and `noCarbonLabelWithCustomLabel` keeps the carbon a plain vertex — so a ring
@@ -261,7 +238,7 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
   a failure into the thing a tutor would point at, and never into the answer: a
   structure that would not parse carries the position openchemlib stopped at, so
   the page repeats the input with a caret under the character, plus the rule that
-  was broken in words (`chemistry/hints.ts#parseHint` — `dangling ring closure:
+  was broken in words (`src/chemistry/hints.ts#parseHint` — `dangling ring closure:
 1` is exact and teaches nobody anything). A structure that parses is compared
   in the order a chemist would look: the formula first, element by element, so
   the student is told they are short of `1 C and 3 O` rather than being shown two
@@ -285,7 +262,7 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
 
 ## The specification
 
-`frontend/public/spec/` is a **copy of the OpenSMILES document, not a rewrite**
+`public/spec/` is a **copy of the OpenSMILES document, not a rewrite**
 — the body of the AsciiDoc page and the 85 drawings it points at, imported by
 `scripts/importSpecification.js` and served under `/specification`. opensmiles.org
 answers with a certificate issued for another name, so a browser refuses the
@@ -300,8 +277,8 @@ declaring them anywhere, and a section keeps the anchor upstream gave it.
 
 ```sh
 npm install
-npm run dev              # backend :10814 + frontend :10815
+npm run dev              # the page on :10815
 npm test                 # vitest + check-types + eslint + prettier
-npm run test-e2e         # Playwright, both dev servers started for it
+npm run test-e2e         # Playwright, the dev server started for it
 npx react-doctor@latest  # React anti-pattern scan
 ```

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- The title, the description, the canonical address and the social card
+         are rewritten per page by the server; these are what a build served on
+         its own carries. -->
+    <title>SMILES converter — draw a structure, read its SMILES</title>
+    <!-- The same geometry `src/components/Brand.tsx` draws, written out with
+         literal colours because a file served on its own cannot read the page's
+         custom properties. Change one and change the other. -->
+    <link rel="icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#1c6e42" />
+    <meta
+      name="description"
+      content="Convert between chemical structures and SMILES in both directions, search a list of structures by substructure or SMARTS, and learn the notation through a tutorial and graded exercises."
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "smiles.cheminfo.org",
+        "url": "https://smiles.cheminfo.org/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "description": "Convert between chemical structures and SMILES in both directions, search a list of structures by substructure or SMARTS, and learn the notation through a tutorial and graded exercises.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "isAccessibleForFree": true,
+        "publisher": { "@type": "Organization", "name": "cheminfo" }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <h1>smiles.cheminfo.org — structures in, structures out</h1>
+      <p>
+        Convert between chemical structures and SMILES in both directions,
+        search a list of structures by substructure or SMARTS, and learn the
+        notation step by step. Everything runs in your browser — no structure
+        you open ever leaves your machine — so the tool needs JavaScript.
+      </p>
+      <ul>
+        <li><a href="/">Converter — draw a structure, read its SMILES</a></li>
+        <li><a href="/lists">Lists — convert and search a whole set</a></li>
+        <li>
+          <a href="/tutorial">Tutorial — the notation, one step at a time</a>
+        </li>
+        <li>
+          <a href="/exercises">Exercises — write it and be marked on it</a>
+        </li>
+        <li><a href="/reference">Cheatsheet — SMILES and SMARTS</a></li>
+        <li><a href="/specification">The OpenSMILES specification</a></li>
+      </ul>
+      <h2>Our other tools</h2>
+      <ul>
+        <li><a href="https://inchi.cheminfo.org/">inchi.cheminfo.org</a></li>
+        <li><a href="https://vcl.cheminfo.org/">vcl.cheminfo.org</a></li>
+        <li><a href="https://www.chemcalc.org/">www.chemcalc.org</a></li>
+        <li><a href="https://www.nmrium.org/">www.nmrium.org</a></li>
+        <li><a href="https://surge.cheminfo.org/">surge.cheminfo.org</a></li>
+        <li><a href="https://tex.cheminfo.org/">tex.cheminfo.org</a></li>
+        <li><a href="https://lcao.cheminfo.org/">lcao.cheminfo.org</a></li>
+        <li><a href="https://regexp.cheminfo.org/">regexp.cheminfo.org</a></li>
+        <li><a href="https://pdb.cheminfo.org/">pdb.cheminfo.org</a></li>
+        <li>
+          <a href="https://elucidation.cheminfo.org/"
+            >elucidation.cheminfo.org</a
+          >
+        </li>
+        <li>
+          <a href="https://equilibrium.cheminfo.org/"
+            >equilibrium.cheminfo.org</a
+          >
+        </li>
+        <li>
+          <a href="https://polycarp.cheminfo.org/">polycarp.cheminfo.org</a>
+        </li>
+      </ul>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

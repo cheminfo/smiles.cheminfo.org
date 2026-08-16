@@ -7,7 +7,8 @@ hand out as a link.
 
 **Everything runs in the browser.** The conversion, the search and the marking
 are all done in the page by [openchemlib](https://github.com/cheminfo/openchemlib-js) —
-nothing is uploaded. A REST API does the same thing for scripts.
+nothing is uploaded, and there is no service behind the site. A structure you
+open never leaves your machine.
 
 The chemistry comes from [openchemlib](https://github.com/Actelion/openchemlib),
 the Java library written by Thomas Sander, of which
@@ -64,26 +65,9 @@ smiles.cheminfo.org/?kind=reaction&smiles=CC(=O)Cl.OCC%3E%3ECC(=O)OCC.Cl
   opens on the right one.
 - What a student has done is kept in their browser under `smiles:exercises:v1`.
   A course hosting its own service implements two calls and plugs itself in;
-  see `setProgressStore` in `frontend/src/state/exerciseProgress.ts`.
+  see `setProgressStore` in `src/state/exerciseProgress.ts`.
 
-## API
-
-Interactive documentation at [`/docs`](https://smiles.cheminfo.org/docs).
-
-```sh
-# one structure, written every way at once
-curl 'https://smiles.cheminfo.org/v1/convert?input=CC(%3DO)Oc1ccccc1C(%3DO)O'
-
-# a whole list; a line that cannot be read is reported in place
-curl -X POST https://smiles.cheminfo.org/v1/batch \
-  -H 'content-type: application/json' \
-  -d '{"input":"CCO ethanol\nc1ccccc1 benzene","to":"kekule"}'
-
-# a list as an SDF
-curl -X POST https://smiles.cheminfo.org/v1/sdf \
-  -H 'content-type: application/json' \
-  -d '{"input":"CCO ethanol\nc1ccccc1 benzene"}' -o structures.sdf
-```
+## Lists
 
 A list is one structure per line; anything after the first space is kept as its
 name — the Daylight SMILES-file convention. A CSV or a TSV is read as it comes:
@@ -97,14 +81,14 @@ read as its records, fields included.
 
 ```sh
 npm install
-npm run dev              # backend :10814 + frontend :10815
+npm run dev              # the page on :10815
 npm test                 # vitest + check-types + eslint + prettier
-npm run test-e2e         # Playwright against both dev servers
+npm run test-e2e         # Playwright against the dev server
 ```
 
-The chemistry shared by the API and the page lives in `chemistry/` at the repo
-root and is imported by both workspaces. `CLAUDE.md` is the architecture
-contract — read it before changing anything.
+One package at the repository root: the chemistry lives in `src/chemistry/`,
+imported by the pages that use it. `CLAUDE.md` is the architecture contract —
+read it before changing anything.
 
 ## Deployment
 
@@ -115,15 +99,13 @@ docker compose up -d          # the released image
 docker compose up -d --build  # or build this checkout instead
 ```
 
-| Variable                       | What it does                                                                                                                                |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `COMPOSE_FILE`                 | Which of the three deployments runs. Unset, `compose.yaml` publishes `PORT` on the host.                                                    |
-| `IMAGE_NAME` / `IMAGE_TAG`     | The image the compose files run, and the tag of it.                                                                                         |
-| `PORT`                         | The port the backend listens on, `10814` by default.                                                                                        |
-| `TRUST_PROXY`                  | Whose `X-Forwarded-For` is believed. Unset, none is — set it only when something proxies this service.                                      |
-| `TRACKING_SCRIPT`              | The analytics provider's snippet, placed at the end of the `<head>` of every page served. Unset, nothing is loaded and nothing is measured. |
-| `MAX_BATCH` / `MAX_BODY_BYTES` | The largest conversion one call may ask for, and the largest body accepted.                                                                 |
-| `TUNNEL_TOKEN`                 | The Cloudflare Tunnel token, read by `compose.cloudflared.yaml` alone.                                                                      |
+| Variable                   | What it does                                                                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `COMPOSE_FILE`             | Which of the three deployments runs. Unset, `compose.yaml` publishes `PORT` on the host.                                                    |
+| `IMAGE_NAME` / `IMAGE_TAG` | The image the compose files run, and the tag of it.                                                                                         |
+| `PORT`                     | The port the site is served on, `10814` by default; the dev server takes the one above it.                                                  |
+| `TRACKING_SCRIPT`          | The analytics provider's snippet, placed at the end of the `<head>` of every page served. Unset, nothing is loaded and nothing is measured. |
+| `TUNNEL_TOKEN`             | The Cloudflare Tunnel token, read by `compose.cloudflared.yaml` alone.                                                                      |
 
 **Give each build a tag of its own.** `docker compose build` tags what it builds
 with exactly `IMAGE_NAME:IMAGE_TAG`, so leaving that pair at `:latest` has every

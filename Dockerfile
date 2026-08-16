@@ -1,36 +1,36 @@
-# ── Stage 1: build the frontend ──────────────────────────────────────────────
-FROM node:24-alpine AS frontend-builder
+# syntax=docker/dockerfile:1
+# The site is static: every conversion, every search and every marked answer is
+# computed in the visitor's browser by openchemlib, so the image only has to
+# hand out the built pages. There is no service behind it.
+
+# ── Stage 1: build the site ──────────────────────────────────────────────────
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY backend/package.json ./backend/
-COPY frontend/package.json ./frontend/
-RUN npm ci --workspace=frontend --ignore-scripts
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci
 
-COPY chemistry ./chemistry
-COPY frontend ./frontend
-RUN npm run build --workspace=frontend
+COPY . .
+RUN npm run build
 
 # ── Stage 2: production image ────────────────────────────────────────────────
-FROM node:24-alpine
+FROM joseluisq/static-web-server:2-alpine
 
-WORKDIR /app
+# The build stays here, read-only. The entrypoint copies it to SERVER_ROOT,
+# which is a tmpfs, so the analytics snippet can be put in the pages at startup
+# without the image filesystem ever being writable.
+COPY --from=builder /app/dist /app/dist
+COPY --chmod=0755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-COPY package.json package-lock.json ./
-COPY backend/package.json ./backend/
-COPY frontend/package.json ./frontend/
-RUN npm ci --workspace=backend --omit=dev --ignore-scripts
-
-# The chemistry is one module, imported by the API and by the page alike.
-COPY chemistry ./chemistry
-COPY backend ./backend
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
-
-ENV NODE_ENV=production
-ENV PORT=10814
+ENV SERVER_ROOT=/public
+ENV SERVER_FALLBACK_PAGE=/public/index.html
+# The build writes one file per address, so `/tutorial` is a directory here.
+# Without this, static-web-server 308s it to `/tutorial/` — an address the
+# sitemap, the internal links and the page's own canonical never use.
+ENV SERVER_REDIRECT_TRAILING_SLASH=false
+ENV SERVER_PORT=10814
 EXPOSE 10814
 
-USER node
-WORKDIR /app/backend
-CMD ["node", "--experimental-strip-types", "src/server.ts"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["/usr/local/bin/static-web-server"]

@@ -1,0 +1,1754 @@
+:root {
+  /* Neutrals, geometry and type shared by every *.cheminfo.org site. */
+  --surface: #ffffff;
+  --surface-sunken: #f5f7fa;
+  --surface-raised: #ffffff;
+  --border: #dfe3e8;
+  --border-strong: #c3cad3;
+  --text: #16202c;
+  --text-muted: #5b6875;
+  --text-faint: #8a96a3;
+
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgb(16 32 48 / 8%);
+  --shadow-md: 0 4px 14px rgb(16 32 48 / 10%);
+  --shadow-lg: 0 12px 32px rgb(16 32 48 / 16%);
+
+  --header-height: 3.5rem;
+  --page-max: 1600px;
+
+  /* The two colours this site owns: the structure, and the one line it is
+     written on. */
+  --brand: #1c6e42;
+  --brand-alt: #ea580c;
+
+  /* The mark's orange reaches 3.6:1 on white — short of what text needs, so set
+     text in a darkened one (5.9:1) of the same hue. */
+  --brand-alt-text: #9a3412;
+
+  --accent: var(--brand);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* BlueprintJS focus selectors have a higher specificity, hence !important. */
+*:focus,
+*:focus-visible {
+  outline: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-sunken);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+.page {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+
+.muted {
+  color: #5f6b7c;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.app-header {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header__inner {
+  display: flex;
+  height: var(--header-height);
+  max-width: var(--page-max);
+  align-items: center;
+  padding: 0 24px;
+  margin: 0 auto;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  color: var(--text);
+  font-weight: 700;
+  gap: 0.55rem;
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: block;
+  flex: none;
+}
+
+.wordmark {
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.wordmark__lead {
+  color: var(--brand);
+}
+
+.wordmark__dot {
+  color: var(--text-faint);
+}
+
+.wordmark__alt {
+  color: var(--brand-alt-text);
+}
+
+.page-nav {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 0.15rem;
+  scrollbar-width: thin;
+}
+/* The utilities: they keep the right edge, and never scroll with the pages. */
+.app-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+/* Carried by both a link and a button, so the two read alike in the bar. */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  background: var(--surface-sunken);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-link--active {
+  background: color-mix(in oklab, var(--accent) 12%, white);
+  color: var(--accent);
+}
+
+/* The tagline is what the tool does — too long for the bar, so it sits on its
+   own line directly under it rather than being dropped. */
+.app-tagline {
+  max-width: var(--page-max);
+  padding: 0.6rem 24px 0;
+  margin: 0 auto;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* ── Shared layout ───────────────────────────────────────────────────────── */
+
+.panel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fill-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.card-header h5 {
+  margin: 0;
+}
+
+.card-header-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.field-row--wrap {
+  flex-wrap: wrap;
+}
+
+.draw-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.prose-card p {
+  margin: 0 0 10px;
+}
+
+.prose-card p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── The editor ──────────────────────────────────────────────────────────── */
+
+/* The canvas editor measures its container in pixels, so it is positioned out
+   of the height computation: otherwise card and canvas grow each other. */
+.structure-editor {
+  position: relative;
+  flex: 1;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.structure-editor-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.draw-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 460px;
+}
+
+/* ── Notation inputs ─────────────────────────────────────────────────────── */
+
+/* Blueprint's InputGroup puts `className` on its wrapper, not on the control,
+   so the notation itself is targeted explicitly. */
+.notation-input,
+.notation-input input,
+.notation-input textarea,
+input.notation-input,
+textarea.notation-input {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+.notation-input textarea,
+textarea.notation-input {
+  min-height: 72px;
+}
+
+.notation-error {
+  margin-top: 8px;
+}
+
+/* The caret sits under the character the parser stopped on, so the two lines
+   must be the same monospace and must not wrap. */
+.notation-caret {
+  margin: 6px 0 0;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+  white-space: pre;
+  overflow-x: auto;
+  line-height: 1.3;
+}
+
+.notation-row {
+  border-top: 1px solid #e5e8eb;
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.notation-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notation-row-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5f6b7c;
+  cursor: help;
+}
+
+.notation-row-value {
+  display: block;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* ── Converter ───────────────────────────────────────────────────────────── */
+
+.converter,
+.lists {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(360px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.kind-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-bottom: 16px;
+}
+
+.kind-tab {
+  border: none;
+  border-radius: 4px;
+  background: none;
+  padding: 6px 12px;
+  font: inherit;
+  color: #4338ca;
+  cursor: pointer;
+}
+
+.kind-tab--active {
+  background: #e8e7fb;
+  color: #1c2127;
+  font-weight: 600;
+}
+
+.result-depiction {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── Reactions ───────────────────────────────────────────────────────────── */
+
+.reaction-view {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.reaction-side {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.reaction-term {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reaction-plus,
+.reaction-arrow-glyph {
+  font-size: 20px;
+  color: #5f6b7c;
+}
+
+/* The agents sit over the arrow, which is where a reaction scheme puts them. */
+.reaction-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+}
+
+.reaction-agents {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reaction-component {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reaction-component figcaption {
+  font-size: 11px;
+  color: #5f6b7c;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* A reaction file is a hundred lines: it scrolls rather than pushing every
+   row under it off the screen. */
+.notation-row-value--block {
+  white-space: pre;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.result-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2px 12px;
+  align-content: start;
+}
+
+.result-facts dt {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5f6b7c;
+}
+
+.result-facts dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The three counts of a reaction on one line, each under its own label. It
+   follows `.result-facts` because it overrides it and they weigh the same. */
+.result-facts--wide {
+  grid-template-columns: repeat(3, auto auto);
+  justify-content: start;
+  gap: 2px 24px;
+}
+
+.example-menu {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* ── Lists and search ────────────────────────────────────────────────────── */
+
+.list-input {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  min-height: 220px;
+  resize: vertical;
+}
+
+.lists-format {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  background: #f6f7f9;
+  border: 1px solid #d3d8de;
+  border-radius: 4px;
+  font-size: 12px;
+  overflow-x: auto;
+}
+
+/* react-window places the rows itself and scrolls this box, so the height is
+   given rather than grown: a list of half a million rows has no other bound.
+   The value itself is inline, because it depends on how many rows there are. */
+.list-rows {
+  min-height: 120px;
+}
+
+/* The gap between rows lives inside the measured slot: rows are positioned
+   absolutely, so a margin between them would place nothing. */
+.list-row-slot {
+  padding-bottom: 4px;
+}
+
+.list-row {
+  display: grid;
+  grid-template-columns: 40px 110px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 1px solid #e5e8eb;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.list-row--failed {
+  grid-template-columns: 40px 1fr;
+  background: #fdeaea;
+  border-color: #eaa8a8;
+}
+
+.list-row-line {
+  color: #5f6b7c;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.list-row-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.list-row-output {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.list-row-error {
+  color: #c23030;
+}
+
+.list-row-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  font-size: 11px;
+}
+
+.list-row-field-name {
+  color: #738091;
+}
+
+.fragment-dialog {
+  width: 640px;
+  max-width: 90vw;
+}
+
+/* ── Tutorial ────────────────────────────────────────────────────────────── */
+
+.tutorial {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tutorial-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+
+.tutorial-nav-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.tutorial-nav-label {
+  font-weight: 600;
+  min-width: 210px;
+}
+
+.tutorial-nav-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tutorial-nav-step {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgb(0 0 0 / 12%);
+  border-radius: 4px;
+  background: rgb(255 255 255 / 70%);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.tutorial-nav-step:hover {
+  background: #fff;
+}
+
+.tutorial-nav-step--active {
+  font-weight: 700;
+  border-color: rgb(0 0 0 / 35%);
+}
+
+.tutorial-step-index {
+  color: #5f6b7c;
+  font-variant-numeric: tabular-nums;
+}
+
+.tutorial-step-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.tutorial-description {
+  margin: 0 0 12px;
+  max-width: 78ch;
+  font-size: 14px;
+}
+
+.tutorial-playground {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) minmax(280px, auto);
+  gap: 16px;
+  align-items: start;
+}
+
+.tutorial-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tutorial-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tutorial-drawing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 8px;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* ── Glossary ────────────────────────────────────────────────────────────── */
+
+.glossary-term {
+  border-bottom: 1px dashed #4338ca;
+  color: #3730a3;
+  cursor: help;
+}
+
+.glossary-popover .bp6-popover-content {
+  border-radius: 6px;
+}
+
+.glossary-card {
+  width: min(420px, 90vw);
+  padding: 10px 12px;
+}
+
+.glossary-card h6 {
+  margin: 0 0 4px;
+}
+
+.glossary-card p {
+  margin: 0 0 8px;
+}
+
+.glossary-examples {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.glossary-example {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.glossary-example code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.smiles-thumb-fallback {
+  display: inline-block;
+  padding: 4px 6px;
+  background: #f6f7f9;
+  border: 1px dashed #c5cbd3;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #5f6b7c;
+  overflow-wrap: anywhere;
+}
+
+.reaction-thumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.reaction-side,
+.reaction-component {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reaction-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 18px;
+}
+
+.reaction-arrow code {
+  font-size: 10px;
+}
+
+/* ── Cheatsheet ──────────────────────────────────────────────────────────── */
+
+.reference {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reference-grid {
+  columns: 2 460px;
+  column-gap: 16px;
+}
+
+.reference-section {
+  break-inside: avoid;
+  margin: 0 0 16px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  /* A section link lands a little above the card rather than exactly on it. */
+  scroll-margin-top: 12px;
+}
+
+.reference-section h5 {
+  margin: 0 0 6px;
+  color: #3730a3;
+}
+
+.reference-anchor {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.reference-anchor-icon {
+  opacity: 0;
+  color: #5c7080;
+}
+
+.reference-section:hover .reference-anchor-icon,
+.reference-anchor:focus .reference-anchor-icon {
+  opacity: 1;
+}
+
+.reference-contents {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.reference-contents-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+}
+
+.reference-contents-group > span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5c7080;
+}
+
+.reference-contents-group a {
+  padding: 1px 8px;
+  font-size: 11px;
+  color: #3730a3;
+  text-decoration: none;
+  background: #eef2ff;
+  border-radius: 10px;
+}
+
+.reference-contents-group a:hover {
+  background: #e0e7ff;
+}
+
+.reference-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reference-row td {
+  padding: 3px 6px 3px 0;
+  vertical-align: top;
+  border-top: 1px solid #eef0f2;
+}
+
+.reference-row--rich {
+  cursor: help;
+}
+
+.reference-row--rich:hover td {
+  background: #eef2ff;
+}
+
+.reference-syntax {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.reference-syntax code {
+  font-size: 12px;
+  color: #1c2127;
+}
+
+.syntax-popover .bp6-popover-content {
+  border-radius: 6px;
+}
+
+.syntax-card {
+  width: min(460px, 92vw);
+  padding: 10px 12px;
+}
+
+.syntax-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.syntax-card-header code {
+  padding: 2px 6px;
+  background: #eef2ff;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.syntax-card-header span {
+  font-weight: 600;
+}
+
+.syntax-card p {
+  margin: 0 0 8px;
+}
+
+.syntax-card-summary {
+  color: #5f6b7c;
+}
+
+.syntax-card-example {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: #f6f7f9;
+  border-radius: 4px;
+}
+
+.syntax-card-example code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* The same sheet, read beside a question rather than printed: the contents
+   stay in view on the left while the sections scroll on the right. */
+.cheatsheet-dialog {
+  width: 1040px;
+  max-width: 96vw;
+  height: 82vh;
+}
+
+.cheatsheet-dialog-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  overflow: hidden;
+  padding: 12px 16px;
+}
+
+.cheatsheet-dialog-contents {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-content: start;
+  overflow-y: auto;
+  padding-right: 4px;
+  border-right: 1px solid #d3d8de;
+}
+
+.cheatsheet-dialog-contents .reference-contents-group {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.cheatsheet-dialog-contents .reference-contents-group > span {
+  margin-bottom: 2px;
+}
+
+.cheatsheet-dialog-sections {
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.cheatsheet-dialog-sections .reference-section {
+  scroll-margin-top: 0;
+}
+
+/* ── Exercises ───────────────────────────────────────────────────────────── */
+
+.exercises {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(320px, 1.3fr) minmax(
+      320px,
+      1.3fr
+    );
+  gap: 16px;
+  align-items: start;
+}
+
+.exercises--alone {
+  grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
+}
+
+.exercise-list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 80px);
+}
+
+.set-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.exercise-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.exercise-row {
+  display: grid;
+  grid-template-columns: 20px 24px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  margin-bottom: 2px;
+  border: 1px solid transparent;
+  border-left: 4px solid #c5cbd3;
+  border-radius: 4px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.exercise-row:hover {
+  background: #f6f7f9;
+}
+
+.exercise-row--beginner {
+  border-left-color: #32a467;
+}
+
+.exercise-row--intermediate {
+  border-left-color: #d1980b;
+}
+
+.exercise-row--advanced {
+  border-left-color: #cd4246;
+}
+
+.exercise-row--active {
+  border-color: #4338ca;
+  background: #eef2ff;
+}
+
+.exercise-row-index {
+  color: #5f6b7c;
+  font-variant-numeric: tabular-nums;
+}
+
+.exercise-row-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.question-structure {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.question-smiles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.question-smiles code {
+  flex: 1;
+  padding: 8px 10px;
+  background: #f6f7f9;
+  border: 1px solid #d3d8de;
+  border-radius: 4px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.answer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 420px;
+}
+
+.verdict-formula,
+.verdict-hint {
+  margin: 6px 0 0;
+}
+
+.verdict-hint {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  border-top: 1px solid rgb(0 0 0 / 8%);
+  padding-top: 6px;
+}
+
+.answer-submit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.answer-reveal .question-smiles {
+  margin-bottom: 4px;
+}
+
+.self-check {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.self-check-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+}
+
+.self-check-row.is-off {
+  color: #935610;
+}
+
+.self-check .verdict-formula {
+  margin: 0 0 0 20px;
+}
+
+.self-check-hint {
+  margin: 4px 0 0;
+  color: #5f6b7c;
+}
+
+.hint-list {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.case-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.case-column h6 {
+  margin: 0 0 6px;
+}
+
+.case-column--match h6 {
+  color: #1c6e42;
+}
+
+.case-column--reject h6 {
+  color: #c23030;
+}
+
+.case-cell {
+  margin: 0 0 6px;
+  padding: 4px;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.case-cell--pass {
+  background: #eefaf1;
+  border-color: #a3d9b1;
+}
+
+.case-cell--fail {
+  background: #fdeaea;
+  border-color: #eaa8a8;
+}
+
+.case-cell figcaption {
+  font-size: 11px;
+  color: #5f6b7c;
+  text-align: center;
+}
+
+/* ── Share ───────────────────────────────────────────────────────────────── */
+
+.share-dialog {
+  width: 1040px;
+  max-width: 96vw;
+}
+
+.share-link {
+  flex: none;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #d3d8de;
+}
+
+.share-link-intro {
+  margin: 0 0 8px;
+}
+
+.share-link-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.share-link .code-block pre {
+  max-height: 84px;
+  overflow-y: auto;
+}
+
+.code-block {
+  margin-bottom: 8px;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 8px 10px;
+  background: #f6f7f9;
+  border: 1px solid #d3d8de;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.share-section {
+  margin-top: 18px;
+}
+
+.share-section:first-child {
+  margin-top: 0;
+}
+
+.share-section h6 {
+  margin: 0 0 8px;
+}
+
+.share-feature {
+  margin-bottom: 8px;
+}
+
+.share-hint {
+  display: block;
+  font-size: 12px;
+  color: #5f6b7c;
+  margin-left: 26px;
+}
+
+.share-set-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.share-set-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: #5f6b7c;
+}
+
+.share-set {
+  list-style: none;
+  margin: 0;
+  padding: 6px 12px;
+  max-height: min(440px, 48vh);
+  overflow-y: auto;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  background: #fff;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2px 14px;
+}
+
+.share-set-item {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding-right: 8px;
+  border-radius: 4px;
+}
+
+.share-set-item:hover {
+  background: #f0f2f5;
+}
+
+.share-set-item.share-set-item--chosen {
+  background: #eef2ff;
+}
+
+.share-set .bp6-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 0;
+  padding-inline-start: 0;
+  min-width: 0;
+}
+
+.share-set-id {
+  flex: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #5f6b7c;
+  min-width: 26px;
+}
+
+.share-set-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.share-set-level {
+  margin-left: auto;
+  font-size: 11px;
+  color: #5f6b7c;
+}
+
+.exercise-preview-popover .bp6-popover-content {
+  border-radius: 6px;
+}
+
+.exercise-preview {
+  padding: 8px 10px 10px;
+  width: min(480px, 90vw);
+}
+
+.exercise-preview-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.exercise-preview-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+  color: #5f6b7c;
+}
+
+.structure-grid--preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 4px;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+/* ── Specification ───────────────────────────────────────────────────────── */
+
+/* The OpenSMILES document, copied in as it was generated in 2007 and given the
+   only thing it was missing: a way to move around it. The contents hold the
+   left of the screen, the article keeps a measure, and every class below is one
+   the AsciiDoc generator emits — none of them are ours to rename. */
+
+.specification {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.specification-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.spec-intro .card-header {
+  margin-bottom: 4px;
+}
+
+.spec-contents {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 32px);
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+}
+
+.spec-contents details,
+.spec-contents-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+/* Beside the article the fold is always open, so it shows no handle. */
+.spec-contents-summary {
+  display: none;
+}
+
+.spec-contents-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.spec-contents-empty {
+  margin: 2px 4px 4px;
+}
+
+.spec-entry {
+  display: flex;
+  gap: 6px;
+  padding: 3px 6px;
+  font-size: 12px;
+  color: #404854;
+  border-left: 2px solid transparent;
+  border-radius: 0 4px 4px 0;
+}
+
+.spec-entry:hover {
+  background: #eef2ff;
+  text-decoration: none;
+}
+
+.spec-entry-number {
+  flex: none;
+  color: #8f99a8;
+  font-variant-numeric: tabular-nums;
+}
+
+.spec-entry--l2 {
+  margin-top: 6px;
+  font-weight: 600;
+  color: #1c2127;
+}
+
+.spec-entry--l3 {
+  padding-left: 16px;
+}
+
+.spec-entry--l4 {
+  padding-left: 30px;
+  font-size: 11.5px;
+}
+
+.spec-entry--on {
+  color: #3730a3;
+}
+
+.spec-entry--active {
+  background: #eef2ff;
+  border-left-color: #4338ca;
+  color: #3730a3;
+  font-weight: 600;
+}
+
+.spec-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 40px;
+  justify-content: center;
+}
+
+.spec-article {
+  padding: 4px 32px 40px;
+  background: #fff;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* The front matter of the document says, in its own words, what the card above
+   the article says in ours. It is the authors' attribution, so it stays — small,
+   and out of the way of the first chapter. */
+.spec-article #preamble {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  background: #f6f7f9;
+  border: 1px solid #e5e8eb;
+  border-radius: 4px;
+  font-size: 12.5px;
+  color: #5f6b7c;
+}
+
+.spec-article #preamble p {
+  margin: 0 0 4px;
+}
+
+.spec-article #preamble p:last-child {
+  margin: 0;
+}
+
+.spec-article #preamble + .sect1 h2 {
+  margin-top: 28px;
+}
+
+.spec-article h2,
+.spec-article h3,
+.spec-article h4 {
+  /* The anchors are the ones the specification is cited by, so a jump must
+     land a little above the heading rather than exactly on it. */
+  scroll-margin-top: 12px;
+  color: #1c2127;
+}
+
+.spec-article h2 {
+  margin: 40px 0 14px;
+  padding-bottom: 8px;
+  font-size: 21px;
+  border-bottom: 2px solid #e0e2f5;
+}
+
+.spec-article h3 {
+  margin: 30px 0 10px;
+  font-size: 17px;
+  color: #3730a3;
+}
+
+.spec-article h4 {
+  margin: 22px 0 8px;
+  font-size: 14.5px;
+}
+
+.spec-article p {
+  margin: 0 0 12px;
+  max-width: 82ch;
+}
+
+.spec-article ul {
+  max-width: 82ch;
+  padding-left: 22px;
+}
+
+.spec-article em {
+  color: #3730a3;
+}
+
+.spec-article strong {
+  color: #1c2127;
+}
+
+.spec-article .red {
+  color: #c23030;
+}
+
+.spec-article code {
+  padding: 1px 4px;
+  background: #f1f3f7;
+  border-radius: 3px;
+  font-size: 0.92em;
+}
+
+.spec-article .sidebarblock {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  max-width: 82ch;
+  background: #f7f8fb;
+  border-left: 3px solid #4338ca;
+  border-radius: 0 4px 4px 0;
+}
+
+.spec-article .sidebarblock p:last-child {
+  margin-bottom: 0;
+}
+
+/* A grammar table is wider than any column: it scrolls in place rather than
+   pushing the article sideways. */
+.spec-article .tableblock {
+  margin: 0 0 18px;
+  overflow-x: auto;
+}
+
+.spec-article table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.spec-article th {
+  padding: 6px 10px;
+  text-align: left;
+  background: #f6f7f9;
+  border-bottom: 2px solid #d3d8de;
+}
+
+.spec-article td {
+  padding: 6px 10px;
+  vertical-align: top;
+  border-top: 1px solid #eef0f2;
+}
+
+.spec-article tbody tr:hover {
+  background: #fafbfd;
+}
+
+.spec-article p.table {
+  margin: 0;
+  max-width: none;
+}
+
+.spec-article img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+/* ── Narrow screens ──────────────────────────────────────────────────────── */
+
+/* A phone gets one column and one scrollbar: a box that scrolls inside a page
+   that scrolls is a trap on a touch screen. */
+@media (max-width: 1100px) {
+  .converter,
+  .lists,
+  .exercises,
+  .exercises--alone,
+  .tutorial-playground,
+  .specification {
+    grid-template-columns: 1fr;
+  }
+
+  .spec-contents {
+    position: static;
+    max-height: none;
+  }
+
+  .spec-contents-summary {
+    display: list-item;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .spec-contents details[open] .spec-contents-summary {
+    margin-bottom: 8px;
+  }
+
+  .spec-article {
+    padding: 4px 16px 32px;
+  }
+
+  .exercise-list-card {
+    position: static;
+    max-height: none;
+  }
+
+  .exercise-list {
+    overflow: visible;
+    max-height: none;
+  }
+
+  /* Only the rows on screen exist, so printing gives what is on screen: the
+     page still has to fit them rather than clip at the viewport. */
+  .list-rows {
+    overflow: visible;
+    height: auto;
+    max-height: none;
+  }
+
+  .reference-grid {
+    columns: 1;
+  }
+
+  .tutorial-nav-label {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 18px;
+  }
+
+  .page-header-subtitle {
+    margin-left: 0;
+    display: block;
+  }
+
+  .case-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Print ───────────────────────────────────────────────────────────────── */
+
+/* Students print a cheatsheet whatever anybody intends, so this one is built
+   to be printed: the chrome goes, the sections do not split across pages. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+
+  .reference-grid {
+    columns: 2;
+  }
+
+  .reference-section {
+    border-color: #ccc;
+  }
+
+  .specification {
+    display: block;
+  }
+
+  .spec-article {
+    padding: 0;
+    border: none;
+    font-size: 11pt;
+  }
+
+  .spec-article h2,
+  .spec-article h3,
+  .spec-article h4 {
+    break-after: avoid;
+  }
+
+  .spec-article .tableblock,
+  .spec-article .sidebarblock {
+    break-inside: avoid;
+  }
+}
+
+/* The family, in the page rather than only behind the Tools button: this is
+   what lets a crawler — and a reader — walk from one of our tools to the next. */
+.app-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+  background: var(--surface);
+}
+
+.app-footer__inner {
+  max-width: var(--page-max);
+  padding: 1.25rem;
+  margin: 0 auto;
+}
