@@ -33,10 +33,6 @@ services:
       # the entrypoint: nothing is loaded.
       SERVER_PORT: ${PORT:-10814}
       TRACKING_SCRIPT: ${TRACKING_SCRIPT:-}
-    environment:
-      # cloudflared reaches the container over the Docker bridge, so its
-      # address is what X-Forwarded-For must be believed from.
-      TRUST_PROXY: ${TRUST_PROXY:-172.16.0.0/12}
     mem_limit: 512m
     cpus: 1
     pids_limit: 512
