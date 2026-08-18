@@ -41,7 +41,12 @@ test.each([
   ['/lists', 'lists'],
   ['/exercises', 'exercises'],
   ['/tutorial', 'tutorial'],
-  ['/reference', 'reference'],
+  ['/smiles', 'smiles'],
+  ['/smarts', 'smarts'],
+  // The sheet covering both notations was split in two; the address it had
+  // opens the SMILES one rather than nothing.
+  ['/reference', 'smiles'],
+  ['/cheatsheet', 'smiles'],
   ['/specification', 'specification'],
   ['/exercises?set=patterns', 'exercises'],
   ['/nothing-by-that-name', 'converter'],

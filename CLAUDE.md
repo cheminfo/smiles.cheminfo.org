@@ -265,6 +265,34 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
 - The cheatsheet is meant to be printed: chrome carries `no-print`, sections do
   not split across pages.
 
+## The two sheets
+
+**SMILES and SMARTS are two languages that share their characters, so they get
+two pages.** `/smiles` and `/smarts` are separate addresses with separate
+titles, and `src/data/reference/` holds one module per notation. One sheet
+covering both taught the pair as a single language with a long tail, and every
+row of it had to pick one of the two readings to state — which is how the site
+came to say that `C` is a carbon with four hydrogens on a page about queries,
+where it is a carbon with any number of them.
+
+`shared.ts` is the answer to that: **one section, the same object, printed on
+both sheets** — the characters whose meaning changes, each row stating both
+readings. It opens the SMARTS sheet, because a reader arriving there has SMILES
+habits to unlearn, and closes the SMILES one, where it is a warning rather than
+a prerequisite. A row of it that gives only one reading is the defect the split
+exists to remove, so `content.test.ts` requires every summary in it to name both
+notations.
+
+Which sheet a section belongs to is the array it is in, not a prefix on its id.
+`referenceSectionsFor` dedupes, so asking for both notations — as a query
+exercise does — prints the shared section once.
+
+Written against the OpenSMILES specification for one and the Daylight theory
+manual for the other, and **the two differ on what silence means**: a property a
+SMILES leaves out takes a default, while a property a SMARTS leaves out is not a
+condition at all. Nearly every divergence follows from that one sentence, so
+check a new row against it before writing anything else.
+
 ## The specification
 
 `public/spec/` is a **copy of the OpenSMILES document, not a rewrite**

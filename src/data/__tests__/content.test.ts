@@ -15,7 +15,13 @@ import {
 } from '../examples.ts';
 import { EXERCISES_BY_ID, EXERCISE_SETS } from '../exercises.ts';
 import { GLOSSARY } from '../glossary.ts';
-import { REFERENCE_SECTIONS, referenceSectionsFor } from '../reference.ts';
+import {
+  REFERENCE_SECTIONS,
+  SMARTS_SECTIONS,
+  SMILES_SECTIONS,
+  referenceSectionsFor,
+} from '../reference/index.ts';
+import { SMILES_VS_SMARTS } from '../reference/shared.ts';
 import { LIBRARY_SAMPLE } from '../samples/library.ts';
 import { TUTORIAL_LEVELS, TUTORIAL_STEPS } from '../tutorial.ts';
 
@@ -38,6 +44,9 @@ const UNPARSEABLE_BY_DESIGN = new Set([
   '[cx3]',
   // Negated ring membership.
   '[!C;!R0]',
+  // The "or unspecified" chirality and atom-map forms.
+  'C[C@?H](F)O',
+  '[C:?1]>>[C:?1]',
   // A recursive SMARTS followed by another one, or by an alternation.
   'C[$(aaO);$(aaaN)]',
   '[$([OX2H]),$([OX1-])]',
@@ -115,21 +124,49 @@ test('every cheatsheet section carries an address of its own', () => {
   expect(ids).toContain('smarts-logic');
 });
 
-test('the sheet narrowed to a notation keeps every section of it', () => {
-  // The dialog an exercise opens shows what the question is about, and reads
-  // that off the ids — so a section named unlike its neighbours would be shown
-  // to nobody rather than shown twice.
+test('each sheet holds its own notation and nothing of the other', () => {
+  // The two sheets are two pages, and the whole point of splitting them is that
+  // a student writing a molecule is never shown a query primitive as if it were
+  // one of the notation's own constructs.
   const smiles = referenceSectionsFor(['smiles']);
-  const both = referenceSectionsFor(['smiles', 'smarts']);
-  expect(both).toStrictEqual(REFERENCE_SECTIONS);
-  expect(smiles.length).toBeLessThan(both.length);
+  const smarts = referenceSectionsFor(['smarts']);
+  expect(smiles).toStrictEqual(SMILES_SECTIONS);
+  expect(smarts).toStrictEqual(SMARTS_SECTIONS);
+
   for (const section of smiles) {
+    if (section === SMILES_VS_SMARTS) continue;
     expect(section.id.startsWith('smiles-'), section.id).toBe(true);
   }
+  for (const section of smarts) {
+    if (section === SMILES_VS_SMARTS) continue;
+    expect(section.id.startsWith('smarts-'), section.id).toBe(true);
+  }
   expect(smiles.map((section) => section.id)).toContain('smiles-rings');
+  expect(smarts.map((section) => section.id)).toContain('smarts-logic');
+});
+
+test('the section the two sheets share is on both, and listed once', () => {
+  // It is what neither sheet can say alone, so it is the same object on both —
+  // and asking for both notations must not print it twice.
+  expect(SMILES_SECTIONS).toContain(SMILES_VS_SMARTS);
+  expect(SMARTS_SECTIONS).toContain(SMILES_VS_SMARTS);
   expect(
-    referenceSectionsFor(['smarts']).map((section) => section.id),
-  ).toContain('smarts-logic');
+    REFERENCE_SECTIONS.filter((section) => section === SMILES_VS_SMARTS),
+  ).toHaveLength(1);
+  expect(referenceSectionsFor(['smiles', 'smarts'])).toStrictEqual(
+    REFERENCE_SECTIONS,
+  );
+  expect(REFERENCE_SECTIONS).toHaveLength(
+    SMILES_SECTIONS.length + SMARTS_SECTIONS.length - 1,
+  );
+
+  // Every row of it states both readings, because a row giving one of them is
+  // the defect the section exists to correct.
+  expect(SMILES_VS_SMARTS.entries.length).toBeGreaterThanOrEqual(14);
+  for (const entry of SMILES_VS_SMARTS.entries) {
+    expect(entry.summary, entry.syntax).toMatch(/SMILES/);
+    expect(entry.summary, entry.syntax).toMatch(/SMARTS/);
+  }
 });
 
 test('the known toolkit gaps are still gaps', () => {

@@ -50,3 +50,17 @@ export function absoluteUrl(path: string): string {
     globalThis.location?.origin ?? new URL(DEFAULT_SITE_URL).origin;
   return `${origin}${withBase(path)}`;
 }
+
+/**
+ * A link to an anchor on the page being read.
+ *
+ * The page carries a `<base>`, so a bare `#id` resolves against the mount
+ * rather than against the address open — which would leave the page instead of
+ * scrolling down it.
+ * @param id - The id of the element to jump to.
+ * @returns The address of that anchor on the current page.
+ */
+export function anchorHref(id: string): string {
+  const { pathname, search } = globalThis.location;
+  return `${pathname}${search}#${id}`;
+}

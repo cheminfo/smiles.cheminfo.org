@@ -4,10 +4,20 @@ import { useEffect } from 'react';
 import jumpToAnchor from '../../components/jumpToAnchor.ts';
 import ReferenceContents from '../../components/reference/ReferenceContents.tsx';
 import ReferenceSectionCard from '../../components/reference/ReferenceSectionCard.tsx';
-import { REFERENCE_SECTIONS } from '../../data/reference.ts';
+import type { Notation } from '../../data/reference/index.ts';
+import { referenceSectionsFor } from '../../data/reference/index.ts';
+import { PATHS, navigate } from '../../state/router.ts';
+import { withBase } from '../../state/site.ts';
+
+import { SHEETS } from './sheets.tsx';
 
 /**
- * The whole notation on one page.
+ * One notation on one page.
+ *
+ * There are two of these — SMILES and SMARTS — because the two notations share
+ * their characters and not their meanings, and one sheet holding both was read
+ * as a single language with a long tail. Each sheet ends on the section they
+ * share, which is the list of characters that stop meaning what they meant.
  *
  * It is built to be printed: the header, the tabs and the share button carry
  * `no-print`, the sections break cleanly, and the drawings come out with them.
@@ -18,43 +28,48 @@ import { REFERENCE_SECTIONS } from '../../data/reference.ts';
  * ring bond closures hands out the section rather than the page. The anchors
  * are the identifiers the sections are declared with, which is what keeps a
  * link written today working after the sheet is reordered.
+ * @param props - Which notation the sheet is about.
  * @returns The cheatsheet page.
  */
-export default function ReferencePage() {
+export default function ReferencePage(props: { notation: Notation }) {
+  const { notation } = props;
+  const sheet = SHEETS[notation];
+  const sections = referenceSectionsFor([notation]);
+
   useEffect(jumpToAnchor, []);
 
   return (
     <div className="reference">
       <Card className="prose-card no-print">
-        <H4>SMILES and SMARTS on one page</H4>
+        <H4>{sheet.heading}</H4>
+        {sheet.intro}
         <p>
-          Hover any row for the longer story and a drawn example. Everything
-          here is written against the{' '}
-          <a
-            href="https://opensmiles.org/opensmiles.html"
-            target="_blank"
-            rel="noreferrer"
-          >
-            OpenSMILES specification
-          </a>{' '}
-          and the{' '}
-          <a
-            href="https://www.daylight.com/dayhtml/doc/theory/theory.smarts.html"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Daylight theory manual
-          </a>
-          . A few constructs the specification allows are not implemented by the
-          toolkit this page runs on; those show their example as text rather
-          than as a drawing. Every section has an address of its own: jump to it
-          below, or click its title to put it in the bar and hand it out.
+          Hover any row for the longer story and a drawn example. Every section
+          has an address of its own: jump to it below, or click its title to put
+          it in the bar and hand it out.
         </p>
-        <ReferenceContents sections={REFERENCE_SECTIONS} />
+        <p>
+          {/* A real address, so it is followed by a crawler and can be opened
+              in a tab of its own; the click is handled in the page, because
+              reloading the site to change sheet loses nothing but costs a
+              second. */}
+          <a
+            className="sheet-switch"
+            href={withBase(PATHS[sheet.other])}
+            onClick={(event) => {
+              if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+              event.preventDefault();
+              navigate(sheet.other);
+            }}
+          >
+            {sheet.otherLabel}
+          </a>
+        </p>
+        <ReferenceContents sections={sections} />
       </Card>
 
       <div className="reference-grid">
-        {REFERENCE_SECTIONS.map((section) => (
+        {sections.map((section) => (
           <ReferenceSectionCard
             key={section.id}
             section={section}

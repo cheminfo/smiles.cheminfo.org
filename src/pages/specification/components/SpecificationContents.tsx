@@ -3,6 +3,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import type { SpecHeading } from '../../../specification/headings.ts';
+import { anchorHref } from '../../../state/site.ts';
 import { shownHeadings, view } from '../../../state/specification.ts';
 
 /** Where the column no longer fits beside the article, and folds instead. */
@@ -105,7 +106,7 @@ function Entry(props: {
     <li>
       <a
         className={classes.join(' ')}
-        href={`#${heading.id}`}
+        href={anchorHref(heading.id)}
         data-active={isActive ? 'true' : undefined}
       >
         <span className="spec-entry-number">{heading.number}</span>

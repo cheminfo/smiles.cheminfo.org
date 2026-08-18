@@ -44,10 +44,15 @@ const PAGE_META: Record<Page, Omit<RouteMeta, 'path'>> = {
     description:
       'A guided tour of the SMILES notation: atoms, bonds, branches, rings, aromaticity, charges and stereochemistry, each step drawn as you edit it.',
   },
-  reference: {
-    title: 'SMILES and SMARTS cheatsheet',
+  smiles: {
+    title: 'SMILES cheatsheet — every construct of the notation',
     description:
-      'Every construct of the SMILES and SMARTS notations in one printable table, each with the structure it draws and a note on what it matches.',
+      'Every construct of the SMILES notation in one printable table — atoms, bonds, rings, aromaticity, charges and stereochemistry — each with what it draws.',
+  },
+  smarts: {
+    title: 'SMARTS cheatsheet — every primitive of the query language',
+    description:
+      'Every primitive of the SMARTS query language in one printable table, and what each shared character stops meaning once a SMILES is read as a question.',
   },
   specification: {
     title: 'The OpenSMILES specification',
@@ -90,7 +95,7 @@ export const SITE_ROUTES: readonly RouteMeta[] = [...PAGE_ROUTES, SEARCH_ROUTE];
  *
  * A crawl path is a menu, and {@link PAGE_ROUTES} carries an entry per tutorial
  * step and per exercise: listing all of them would be a hundred and thirty-seven
- * links nobody reads. What is listed is the six pages and, under the exercises,
+ * links nobody reads. What is listed is the seven pages and, under the exercises,
  * the three sets — each under the name the site's own menu gives it rather than
  * the sentence it is indexed under.
  */
@@ -161,7 +166,8 @@ function buildNoscriptRoutes(): NoscriptRoute[] {
         ),
       ],
     },
-    listed('/reference', 'Cheatsheet — SMILES and SMARTS'),
+    listed('/smiles', 'SMILES sheet — every construct of the notation'),
+    listed('/smarts', 'SMARTS sheet — every primitive of the query language'),
     listed('/specification', 'The OpenSMILES specification'),
   ];
 }

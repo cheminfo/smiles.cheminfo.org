@@ -1,8 +1,10 @@
 import { Button, Dialog, DialogBody, DialogFooter } from '@blueprintjs/core';
 import { useRef } from 'react';
 
-import type { Notation } from '../../data/reference.ts';
-import { referenceSectionsFor } from '../../data/reference.ts';
+import type { Notation } from '../../data/reference/index.ts';
+import { referenceSectionsFor } from '../../data/reference/index.ts';
+import { PATHS } from '../../state/router.ts';
+import { withBase } from '../../state/site.ts';
 
 import ReferenceContents from './ReferenceContents.tsx';
 import ReferenceSectionCard from './ReferenceSectionCard.tsx';
@@ -27,6 +29,7 @@ export default function ReferenceDialog(props: {
 }) {
   const pane = useRef<HTMLDivElement>(null);
   const sections = referenceSectionsFor(props.notations);
+  const sheet = props.notations.at(-1) ?? 'smiles';
 
   return (
     <Dialog
@@ -61,12 +64,15 @@ export default function ReferenceDialog(props: {
         actions={
           <>
             {/* In a tab of its own: leaving the page for the sheet would
-                throw away whatever is on the canvas. */}
+                throw away whatever is on the canvas. The sheet opened is the
+                one the question is about — a query exercise is answered on the
+                SMARTS page, whose last section is what the two notations do
+                differently. */}
             <Button
               icon="share"
-              text="The whole sheet, in a new tab"
+              text={`The whole ${sheet.toUpperCase()} sheet, in a new tab`}
               onClick={() =>
-                globalThis.open('/reference', '_blank', 'noopener')
+                globalThis.open(withBase(PATHS[sheet]), '_blank', 'noopener')
               }
             />
             <Button

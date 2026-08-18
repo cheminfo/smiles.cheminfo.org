@@ -27,7 +27,8 @@ port.
 | **Lists & search** | A whole list in, a whole list out — SMILES, SMARTS, molfiles, idCodes or an **SDF**, in either direction. A line that cannot be read keeps its place with the reason beside it. Reading the list also indexes it, so the same table answers a query — by substructure, by SMARTS, exactly, without stereochemistry, or by similarity — with the matched atoms painted. Downloads what is on screen as SMILES, CSV or SDF, hits included. |
 | **Tutorial**       | Eighteen steps from a single atom to a stereochemically complete natural product, each one a working structure you can take apart, with a hoverable definition on every piece of jargon.                                                                                                                                                                                                                                                 |
 | **Exercises**      | 110 graded questions in three sets: _Molecule → SMILES_, _SMILES → Molecule_, and _Write a SMARTS_. Marked on the molecule, never on the string, so any correct spelling is accepted.                                                                                                                                                                                                                                                    |
-| **Cheatsheet**     | The whole of SMILES and SMARTS on one printable page — 134 constructs, each with a drawn example.                                                                                                                                                                                                                                                                                                                                        |
+| **SMILES sheet**   | The whole of the SMILES notation on one printable page, each construct with a drawn example — and, at the end, what every character it shares with SMARTS stops meaning there.                                                                                                                                                                                                                                                           |
+| **SMARTS sheet**   | The whole of the SMARTS query language on its own printable page — the atom and bond primitives, the logical operators, recursive SMARTS, component grouping and reaction queries — opening on the same shared section, because a query is read as a question and not as a structure.                                                                                                                                                    |
 | **Specification**  | The OpenSMILES specification itself, mirrored here word for word with a table of contents down the left — the original is served with a certificate no browser accepts.                                                                                                                                                                                                                                                                  |
 
 ## What it replaces
@@ -52,9 +53,15 @@ smiles.cheminfo.org/exercises?exercises=w2,w15
 smiles.cheminfo.org/?smiles=CC(%3DO)Oc1ccccc1C(%3DO)O
 smiles.cheminfo.org/lists?source=https://example.org/my-set.smi&q=c1ccccc1
 smiles.cheminfo.org/tutorial/12
+smiles.cheminfo.org/smiles#smiles-rings
+smiles.cheminfo.org/smarts#smarts-logic
 smiles.cheminfo.org/?kind=reaction&smiles=CC(=O)Cl.OCC%3E%3ECC(=O)OCC.Cl
 ```
 
+- The two **cheatsheets** are `/smiles` and `/smarts`, and every section of
+  either is an address — `/smiles#smiles-rings` hands out ring bond closures
+  rather than the whole page. `/reference`, the one address the two sheets used
+  to share, opens the SMILES one.
 - A **step of the tutorial**, a **set of exercises** and a **single exercise**
   are addresses of their own — `/tutorial/12`, `/exercises/patterns`,
   `/exercises/patterns/s1` — so each is a page a search engine indexes and a

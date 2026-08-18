@@ -49,3 +49,25 @@ test('a link to a section of the specification opens on it', async ({
     page.getByRole('heading', { name: '3.1.2. Hydrogens' }),
   ).toBeInViewport();
 });
+
+test('the contents scroll inside their column, never over the footer', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/specification');
+  await page.getByRole('heading', { name: '1. Introduction' }).waitFor();
+  await page.evaluate(() => globalThis.scrollTo(0, document.body.scrollHeight));
+
+  const bottoms = await page.evaluate(() => {
+    const box = (selector: string) =>
+      document.querySelector(selector)!.getBoundingClientRect();
+    return {
+      list: box('.spec-contents-list').bottom,
+      column: box('.spec-contents').bottom,
+      footer: box('.app-footer').top,
+    };
+  });
+
+  expect(bottoms.list).toBeLessThanOrEqual(bottoms.column);
+  expect(bottoms.column).toBeLessThanOrEqual(bottoms.footer);
+});

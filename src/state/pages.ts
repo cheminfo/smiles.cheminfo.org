@@ -3,7 +3,8 @@ export type Page =
   | 'lists'
   | 'exercises'
   | 'tutorial'
-  | 'reference'
+  | 'smiles'
+  | 'smarts'
   | 'specification';
 
 /**
@@ -18,16 +19,21 @@ export const PATHS: Record<Page, string> = {
   lists: '/lists',
   exercises: '/exercises',
   tutorial: '/tutorial',
-  reference: '/reference',
+  smiles: '/smiles',
+  smarts: '/smarts',
   specification: '/specification',
 };
 
 /**
  * Addresses a page also answers to. Searching a list is what the list page
- * does, and `/search` is what someone looking for it types.
+ * does, and `/search` is what someone looking for it types; `/reference` and
+ * `/cheatsheet` are where one sheet covering both notations used to live, and
+ * every link handed out while it did opens the SMILES one.
  */
 export const ALIASES: Record<string, Page> = {
   '/search': 'lists',
+  '/reference': 'smiles',
+  '/cheatsheet': 'smiles',
 };
 
 export interface Route {

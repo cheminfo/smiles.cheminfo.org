@@ -9,7 +9,7 @@ import GlossaryText from '../../../components/GlossaryText.tsx';
 import SmilesThumb from '../../../components/SmilesThumb.tsx';
 import StructureView from '../../../components/StructureView.tsx';
 import ReferenceDialog from '../../../components/reference/ReferenceDialog.tsx';
-import type { Notation } from '../../../data/reference.ts';
+import type { Notation } from '../../../data/reference/index.ts';
 import type { Exercise } from '../../../exercises/types.ts';
 import { levelOf } from '../../../exercises/validate.ts';
 import { view } from '../../../state/exercises.ts';

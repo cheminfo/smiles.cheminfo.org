@@ -1,4 +1,5 @@
-import type { ReferenceSection } from '../../data/reference.ts';
+import type { ReferenceSection } from '../../data/reference/index.ts';
+import { anchorHref } from '../../state/site.ts';
 
 interface ContentsGroup {
   /** What the sections of the group have in common, empty when nothing does. */
@@ -34,7 +35,7 @@ export default function ReferenceContents(props: {
           {group.sections.map((section) => (
             <a
               key={section.id}
-              href={`#${section.id}`}
+              href={anchorHref(section.id)}
               onClick={
                 onPick
                   ? (event) => {

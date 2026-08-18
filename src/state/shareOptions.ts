@@ -169,8 +169,13 @@ const PAGES: Record<Page, PageShareOptions> = {
     features: [],
     hasExercises: false,
   },
-  reference: {
-    title: 'Cheatsheet',
+  smiles: {
+    title: 'SMILES sheet',
+    features: [],
+    hasExercises: false,
+  },
+  smarts: {
+    title: 'SMARTS sheet',
     features: [],
     hasExercises: false,
   },

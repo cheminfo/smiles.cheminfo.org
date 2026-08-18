@@ -213,20 +213,57 @@ test('a glossary term explains itself on hover', async ({ page }) => {
   await expect(page.locator('.glossary-card').first()).toBeVisible();
 });
 
-test('the cheatsheet lists every section', async ({ page }) => {
-  await page.goto('/reference');
+test('the SMILES sheet lists the notation and not the query language', async ({
+  page,
+}) => {
+  await page.goto('/smiles');
 
   await expect(
     page.getByRole('heading', { name: 'SMILES — Atoms' }),
   ).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'SMARTS — Logical operators' }),
-  ).toBeVisible();
-  await expect(page.locator('.reference-section')).toHaveCount(16);
+  ).toHaveCount(0);
+  await expect(page.locator('.reference-section')).toHaveCount(11);
 });
 
-test('a link opens the cheatsheet on one section', async ({ page }) => {
-  await page.goto('/reference#smarts-logic');
+test('the SMARTS sheet lists the query language and what it borrows', async ({
+  page,
+}) => {
+  await page.goto('/smarts');
+
+  await expect(
+    page.getByRole('heading', { name: 'SMARTS — Logical operators' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'SMILES — Atoms' }),
+  ).toHaveCount(0);
+  // The section the two sheets share opens this one.
+  await expect(page.locator('#smiles-vs-smarts')).toBeVisible();
+  await expect(page.locator('.reference-section')).toHaveCount(8);
+});
+
+test('each sheet links to the other', async ({ page }) => {
+  await page.goto('/smiles');
+
+  await page.locator('.sheet-switch').click();
+
+  await expect(page).toHaveURL(/\/smarts$/);
+  await expect(
+    page.getByRole('heading', { name: 'SMARTS — Atom primitives' }),
+  ).toBeVisible();
+});
+
+test('the address the one sheet had opens the SMILES one', async ({ page }) => {
+  await page.goto('/reference');
+
+  await expect(
+    page.getByRole('heading', { name: 'SMILES — Atoms' }),
+  ).toBeVisible();
+});
+
+test('a link opens a sheet on one section', async ({ page }) => {
+  await page.goto('/smarts#smarts-logic');
 
   await expect(page.locator('#smarts-logic')).toBeInViewport();
 });
@@ -234,7 +271,7 @@ test('a link opens the cheatsheet on one section', async ({ page }) => {
 test('the contents jump to a section and name it in the address', async ({
   page,
 }) => {
-  await page.goto('/reference');
+  await page.goto('/smiles');
 
   await page
     .locator('.reference-contents-group a', { hasText: 'Aromaticity' })
@@ -245,7 +282,7 @@ test('the contents jump to a section and name it in the address', async ({
 });
 
 test('a cheatsheet row explains itself on hover', async ({ page }) => {
-  await page.goto('/reference');
+  await page.goto('/smiles');
 
   await page.locator('.reference-row--rich').first().hover();
   await expect(page.locator('.syntax-card').first()).toBeVisible();

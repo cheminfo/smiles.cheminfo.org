@@ -23,7 +23,15 @@ test('each page is titled and described on its own', () => {
   expect(metaFor('/exercises').title).toBe(
     'SMILES exercises — write the notation and be marked on it',
   );
-  expect(metaFor('/reference').title).toBe('SMILES and SMARTS cheatsheet');
+  expect(metaFor('/smiles').title).toBe(
+    'SMILES cheatsheet — every construct of the notation',
+  );
+  expect(metaFor('/smarts').title).toBe(
+    'SMARTS cheatsheet — every primitive of the query language',
+  );
+  // The address the one sheet had is indexed as the SMILES one, so the two
+  // never compete for the same result.
+  expect(metaFor('/reference').path).toBe('/smiles');
   expect(metaFor('/specification').title).toBe('The OpenSMILES specification');
   expect(metaFor('/').title).toBe(
     'SMILES converter — draw a structure, read its SMILES',
@@ -134,12 +142,12 @@ test('the build writes one page per address the router knows', () => {
   const pages = PAGE_ROUTES;
   const paths = pages.map((page) => page.path);
 
-  // The six pages first, then every step, then every set with its exercises.
-  expect(paths.slice(0, 6)).toStrictEqual(Object.values(PATHS));
+  // The seven pages first, then every step, then every set with its exercises.
+  expect(paths.slice(0, 7)).toStrictEqual(Object.values(PATHS));
   expect(paths).toContain('/tutorial/18');
   expect(paths).toContain('/exercises/patterns');
   expect(paths).toContain('/exercises/patterns/s1');
-  expect(paths).toHaveLength(137);
+  expect(paths).toHaveLength(138);
 
   expect(new Set(paths).size).toBe(pages.length);
   expect(new Set(pages.map((page) => page.title)).size).toBe(pages.length);

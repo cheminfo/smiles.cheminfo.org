@@ -676,6 +676,10 @@ textarea.notation-input {
   opacity: 1;
 }
 
+.sheet-switch {
+  font-weight: 600;
+}
+
 .reference-contents {
   display: flex;
   flex-direction: column;
@@ -736,6 +740,22 @@ textarea.notation-input {
 .reference-syntax code {
   font-size: 12px;
   color: #1c2127;
+}
+
+/* Notation quoted inside a sentence — a construct, not a code block, so it
+   takes the type of the line it sits in and only a tint to set it apart. */
+.reference-row td:last-child code,
+.reference-section > .muted code,
+.syntax-card code:not(.reference-syntax code) {
+  padding: 0 3px;
+  font-size: 0.92em;
+  color: #1c2127;
+  background: #eef0f2;
+  border-radius: 3px;
+}
+
+.syntax-card-header code {
+  background: none;
 }
 
 .syntax-popover .bp6-popover-content {
@@ -1270,6 +1290,14 @@ textarea.notation-input {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: 0;
+}
+
+/* Chrome wraps the open fold in a block of its own, which stops the column's
+   height from reaching the list and lets the contents spill over the footer. */
+.spec-contents details::details-content {
+  display: flex;
+  flex-direction: column;
   min-height: 0;
 }
 

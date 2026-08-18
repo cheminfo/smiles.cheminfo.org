@@ -20,7 +20,8 @@ const TABS: Array<{ page: Page; label: string }> = [
   { page: 'lists', label: 'Lists & search' },
   { page: 'tutorial', label: 'Tutorial' },
   { page: 'exercises', label: 'Exercises' },
-  { page: 'reference', label: 'Cheatsheet' },
+  { page: 'smiles', label: 'SMILES sheet' },
+  { page: 'smarts', label: 'SMARTS sheet' },
   { page: 'specification', label: 'Specification' },
 ];
 
@@ -52,8 +53,10 @@ function CurrentPage(props: { page: Page }) {
       return <TutorialPage />;
     case 'exercises':
       return <ExercisesPage />;
-    case 'reference':
-      return <ReferencePage />;
+    case 'smiles':
+      return <ReferencePage notation="smiles" />;
+    case 'smarts':
+      return <ReferencePage notation="smarts" />;
     case 'specification':
       return <SpecificationPage />;
     case 'converter':

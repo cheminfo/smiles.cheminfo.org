@@ -9,7 +9,8 @@ const PAGES: Page[] = [
   'lists',
   'exercises',
   'tutorial',
-  'reference',
+  'smiles',
+  'smarts',
   'specification',
 ];
 
@@ -18,7 +19,8 @@ test.each([
   ['lists', ['load', 'options', 'export', 'about']],
   ['exercises', ['sets', 'hints', 'check', 'answers', 'clear']],
   ['tutorial', []],
-  ['reference', []],
+  ['smiles', []],
+  ['smarts', []],
   ['specification', ['list']],
 ] as Array<[Page, string[]]>)(
   'the %s page offers exactly the controls a link can switch off',
