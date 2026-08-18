@@ -3,12 +3,13 @@ import { signal } from '@preact/signals-react';
 import type { Page } from './pages.ts';
 import { ALIASES, PATHS, parsePath, routePath } from './pages.ts';
 import { SHARE_PARAM_KEYS } from './shareConfig.ts';
+import { pathWithoutBase, withBase } from './site.ts';
 
 export type { Page, Route } from './pages.ts';
 export { ALIASES, PATHS, parsePath, routePath } from './pages.ts';
 
 function readPath(): string {
-  const { pathname } = globalThis.location;
+  const pathname = pathWithoutBase(globalThis.location.pathname);
   const alias = Object.keys(ALIASES).find((path) => pathname === path);
   return alias ?? routePath(parsePath(pathname));
 }
@@ -22,7 +23,9 @@ function readPath(): string {
  * search result can point at.
  */
 export const route = {
-  page: signal<Page>(parsePath(globalThis.location.pathname).page),
+  page: signal<Page>(
+    parsePath(pathWithoutBase(globalThis.location.pathname)).page,
+  ),
   path: signal<string>(readPath()),
   search: signal<string>(globalThis.location.search),
 };
@@ -74,7 +77,8 @@ export function navigate(
   // opens the next at its own address rather than under a segment nobody
   // asked for.
   const path = page === route.page.peek() ? route.path.peek() : PATHS[page];
-  const url = query ? `${path}?${query}` : path;
+  const mounted = withBase(path);
+  const url = query ? `${mounted}?${query}` : mounted;
   if (options.replace) {
     globalThis.history.replaceState(null, '', url);
   } else {
@@ -130,7 +134,9 @@ function keptParameters(page: Page): URLSearchParams {
 }
 
 globalThis.addEventListener('popstate', () => {
-  route.page.value = parsePath(globalThis.location.pathname).page;
+  route.page.value = parsePath(
+    pathWithoutBase(globalThis.location.pathname),
+  ).page;
   route.path.value = readPath();
   route.search.value = globalThis.location.search;
 });

@@ -1,9 +1,8 @@
 import { Icon } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
-import { EcosystemButton, EcosystemLinks } from 'react-cheminfo/ui';
+import { EcosystemButton, SiteFooter, SiteHeader } from 'react-cheminfo/ui';
 
-import { BrandMark, Wordmark } from './components/Brand.tsx';
 import ShareDialog from './components/share/ShareDialog.tsx';
 import ConverterPage from './pages/converter/ConverterPage.tsx';
 import ExercisesPage from './pages/exercises/ExercisesPage.tsx';
@@ -14,6 +13,7 @@ import TutorialPage from './pages/tutorial/TutorialPage.tsx';
 import type { Page } from './state/router.ts';
 import { navigate, route } from './state/router.ts';
 import { isEmbedded } from './state/shareConfig.ts';
+import { withBase } from './state/site.ts';
 
 const TABS: Array<{ page: Page; label: string }> = [
   { page: 'converter', label: 'Converter' },
@@ -39,13 +39,7 @@ export default function App() {
       <div className="page">
         <CurrentPage page={page} />
       </div>
-      {isEmbedded() ? null : (
-        <footer className="app-footer no-print">
-          <div className="app-footer__inner">
-            <EcosystemLinks currentSiteId="smiles" />
-          </div>
-        </footer>
-      )}
+      <SiteFooter siteId="smiles" embedded={isEmbedded()} />
     </>
   );
 }
@@ -73,29 +67,17 @@ function Header(props: { page: Page }) {
 
   return (
     <>
-      <header className="app-header no-print">
-        <div className="app-header__inner">
-          <a href="/" className="brand" title="smiles.cheminfo.org">
-            <BrandMark />
-            <Wordmark />
-          </a>
-          <nav className="page-nav">
-            {TABS.map((tab) => (
-              <button
-                key={tab.page}
-                type="button"
-                className={
-                  tab.page === props.page
-                    ? 'nav-link nav-link--active'
-                    : 'nav-link'
-                }
-                onClick={() => navigate(tab.page)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-          <div className="app-header-actions">
+      <SiteHeader
+        siteId="smiles"
+        homeHref={withBase('/')}
+        activeId={props.page}
+        nav={TABS.map((tab) => ({
+          id: tab.page,
+          label: tab.label,
+          onSelect: () => navigate(tab.page),
+        }))}
+        actions={
+          <>
             <EcosystemButton currentSiteId="smiles" />
             <button
               type="button"
@@ -106,9 +88,9 @@ function Header(props: { page: Page }) {
               <Icon icon="share" size={14} />
               Share
             </button>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
       <p className="app-tagline no-print">a molecule, written on one line</p>
       {isSharing ? (
         <ShareDialog isOpen onClose={() => setSharing(false)} />

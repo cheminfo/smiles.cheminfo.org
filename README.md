@@ -88,7 +88,7 @@ read as its records, fields included.
 
 ```sh
 npm install
-npm run dev              # the page on :10815
+npm run dev              # the page on :10607
 npm test                 # vitest + check-types + eslint + prettier
 npm run test-e2e         # Playwright against the dev server
 ```
@@ -96,6 +96,24 @@ npm run test-e2e         # Playwright against the dev server
 One package at the repository root: the chemistry lives in `src/chemistry/`,
 imported by the pages that use it. `CLAUDE.md` is the architecture contract —
 read it before changing anything.
+
+### Where the site is served
+
+The site does not assume it owns the root of a host. `SITE_URL` is read **at
+build time** and carries the origin and the path together; its path half is
+what every asset, route, canonical link, social card and sitemap entry is
+written under, so putting the tool under a path is one variable and no code
+change:
+
+```sh
+SITE_URL=https://example.org/smiles/ npm run build
+docker build --build-arg SITE_URL=https://example.org/smiles/ .
+```
+
+Left unset it is `https://smiles.cheminfo.org/` — its own host, at the root of it — which is what
+every deployment does today. Note that a crawler only reads `robots.txt` from
+the root of a host, so a site mounted under a path is covered by whatever
+answers that root, not by the file the build writes.
 
 ## Deployment
 
@@ -108,9 +126,10 @@ docker compose up -d --build  # or build this checkout instead
 
 | Variable                   | What it does                                                                                                                                |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SITE_URL`                 | Build time only: where the site will be served, origin and mount path together. Unset, `https://smiles.cheminfo.org/`.                      |
 | `COMPOSE_FILE`             | Which of the three deployments runs. Unset, `compose.yaml` publishes `PORT` on the host.                                                    |
 | `IMAGE_NAME` / `IMAGE_TAG` | The image the compose files run, and the tag of it.                                                                                         |
-| `PORT`                     | The port the site is served on, `10814` by default; the dev server takes the one above it.                                                  |
+| `PORT`                     | The port the site is served on, `10606` by default; the dev server takes the one above it.                                                  |
 | `TRACKING_SCRIPT`          | The analytics provider's snippet, placed at the end of the `<head>` of every page served. Unset, nothing is loaded and nothing is measured. |
 | `TUNNEL_TOKEN`             | The Cloudflare Tunnel token, read by `compose.cloudflared.yaml` alone.                                                                      |
 

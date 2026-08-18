@@ -18,8 +18,9 @@ they are not allowed to send anywhere, and that is the point.
   `react-cheminfo` for what the family shares.
 - **The chemistry** lives in `src/chemistry/`, imported by the pages that use
   it.
-- **Ports**: the page is served on `10814`, the Vite dev server on `10815`
-  (derived from the project creation date, 2026-08-14).
+- **Ports**: the page is served on `10606`, the Vite dev server on `10607`
+  (derived from 2026-06-06; the creation date's own pair was already claimed by
+  a sibling site and by `react-cheminfo`'s Storybook).
 - One Docker image builds the pages and serves them; there is nothing behind
   it.
 
@@ -281,7 +282,7 @@ declaring them anywhere, and a section keeps the anchor upstream gave it.
 
 ```sh
 npm install
-npm run dev              # the page on :10815
+npm run dev              # the page on :10607
 npm test                 # vitest + check-types + eslint + prettier
 npm run test-e2e         # Playwright, the dev server started for it
 npx react-doctor@latest  # React anti-pattern scan

@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const sitePort = Number(process.env.PORT ?? 10814);
+const sitePort = Number(process.env.PORT ?? 10606);
 const devServerPort = Number(process.env.VITE_PORT ?? sitePort + 1);
 
 export default defineConfig({
