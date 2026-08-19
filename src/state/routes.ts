@@ -59,6 +59,11 @@ const PAGE_META: Record<Page, Omit<RouteMeta, 'path'>> = {
     description:
       'The OpenSMILES specification, served in full with its drawings and its original anchors, so the definition of the notation stays readable and citable.',
   },
+  about: {
+    title: 'About — what this SMILES tool is and what it runs on',
+    description:
+      'What smiles.cheminfo.org is, what you can do with it, the work it runs on, the papers to cite when you publish what it made, and where to report a problem.',
+  },
 };
 
 /**
@@ -94,10 +99,10 @@ export const SITE_ROUTES: readonly RouteMeta[] = [...PAGE_ROUTES, SEARCH_ROUTE];
  * The pages the crawl path a visitor with no JavaScript reads links.
  *
  * A crawl path is a menu, and {@link PAGE_ROUTES} carries an entry per tutorial
- * step and per exercise: listing all of them would be a hundred and thirty-seven
- * links nobody reads. What is listed is the seven pages and, under the exercises,
- * the three sets — each under the name the site's own menu gives it rather than
- * the sentence it is indexed under.
+ * step and per exercise: listing all of them would be a hundred and thirty-eight
+ * links nobody reads. What is listed is the eight pages and, under the
+ * exercises, the three sets — each under the name the site's own menu gives it
+ * rather than the sentence it is indexed under.
  */
 export const NOSCRIPT_ROUTES: readonly NoscriptRoute[] = buildNoscriptRoutes();
 
@@ -169,6 +174,7 @@ function buildNoscriptRoutes(): NoscriptRoute[] {
     listed('/smiles', 'SMILES sheet — every construct of the notation'),
     listed('/smarts', 'SMARTS sheet — every primitive of the query language'),
     listed('/specification', 'The OpenSMILES specification'),
+    listed('/about', 'About — what the tool runs on, and how to cite it'),
   ];
 }
 

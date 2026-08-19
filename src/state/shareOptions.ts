@@ -71,11 +71,6 @@ const CONVERTER: ShareFeature[] = [
     label: 'The example molecules',
     description: 'The menu that replaces what is on screen with a known one.',
   },
-  {
-    key: 'about',
-    label: 'About and citation',
-    description: 'What the converter does, and the papers that define SMILES.',
-  },
 ];
 
 const LISTS: ShareFeature[] = [
@@ -97,11 +92,6 @@ const LISTS: ShareFeature[] = [
     label: 'Download the result',
     description:
       'The buttons that hand the list — or whatever the query kept — back as SMILES, CSV or an SDF.',
-  },
-  {
-    key: 'about',
-    label: 'About',
-    description: 'What the page does.',
   },
 ];
 
@@ -182,6 +172,11 @@ const PAGES: Record<Page, PageShareOptions> = {
   specification: {
     title: 'Specification',
     features: SPECIFICATION,
+    hasExercises: false,
+  },
+  about: {
+    title: 'About',
+    features: [],
     hasExercises: false,
   },
 };

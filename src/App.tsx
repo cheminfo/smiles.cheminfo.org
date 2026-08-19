@@ -1,9 +1,15 @@
 import { Icon } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
-import { EcosystemButton, SiteFooter, SiteHeader } from 'react-cheminfo/ui';
+import {
+  EcosystemButton,
+  NavLink,
+  SiteFooter,
+  SiteHeader,
+} from 'react-cheminfo/ui';
 
 import ShareDialog from './components/share/ShareDialog.tsx';
+import AboutPage from './pages/about/AboutPage.tsx';
 import ConverterPage from './pages/converter/ConverterPage.tsx';
 import ExercisesPage from './pages/exercises/ExercisesPage.tsx';
 import ListsPage from './pages/lists/ListsPage.tsx';
@@ -59,6 +65,8 @@ function CurrentPage(props: { page: Page }) {
       return <ReferencePage notation="smarts" />;
     case 'specification':
       return <SpecificationPage />;
+    case 'about':
+      return <AboutPage />;
     case 'converter':
       return <ConverterPage />;
     // no default
@@ -81,6 +89,20 @@ function Header(props: { page: Page }) {
         }))}
         actions={
           <>
+            {/* About leads the utilities on every site of the family, and is a
+                real address rather than a dialog: a page is indexed, linkable
+                and printable. */}
+            <NavLink
+              item={{
+                id: 'about',
+                label: 'About',
+                icon: 'info-sign',
+                href: withBase('/about'),
+                title: 'What this tool is, what it runs on, and how to cite it',
+                onSelect: () => navigate('about'),
+              }}
+              active={props.page === 'about'}
+            />
             <EcosystemButton currentSiteId="smiles" />
             <button
               type="button"
@@ -94,7 +116,9 @@ function Header(props: { page: Page }) {
           </>
         }
       />
-      <p className="app-tagline no-print">a molecule, written on one line</p>
+      {props.page === 'about' ? null : (
+        <p className="app-tagline no-print">a molecule, written on one line</p>
+      )}
       {isSharing ? (
         <ShareDialog isOpen onClose={() => setSharing(false)} />
       ) : null}

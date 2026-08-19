@@ -9,7 +9,6 @@ const HIDE_KEYS = [
   'options',
   'export',
   'load',
-  'about',
   'list',
   'sets',
   'hints',

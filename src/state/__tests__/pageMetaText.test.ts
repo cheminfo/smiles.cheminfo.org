@@ -79,7 +79,7 @@ test('the step the comma was left on is described without it', () => {
 });
 
 test('no page is described by a sentence ending on what it was cut from', () => {
-  expect(PAGE_ROUTES).toHaveLength(138);
+  expect(PAGE_ROUTES).toHaveLength(139);
   for (const route of PAGE_ROUTES) {
     expect(route.description).not.toMatch(/[\s,;:—–-]…$/u);
   }

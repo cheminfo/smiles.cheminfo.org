@@ -5,7 +5,8 @@ export type Page =
   | 'tutorial'
   | 'smiles'
   | 'smarts'
-  | 'specification';
+  | 'specification'
+  | 'about';
 
 /**
  * Where each page lives, the converter being the root.
@@ -22,6 +23,7 @@ export const PATHS: Record<Page, string> = {
   smiles: '/smiles',
   smarts: '/smarts',
   specification: '/specification',
+  about: '/about',
 };
 
 /**

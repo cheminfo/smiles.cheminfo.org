@@ -12,16 +12,18 @@ const PAGES: Page[] = [
   'smiles',
   'smarts',
   'specification',
+  'about',
 ];
 
 test.each([
-  ['converter', ['kinds', 'editor', 'formats', 'examples', 'about']],
-  ['lists', ['load', 'options', 'export', 'about']],
+  ['converter', ['kinds', 'editor', 'formats', 'examples']],
+  ['lists', ['load', 'options', 'export']],
   ['exercises', ['sets', 'hints', 'check', 'answers', 'clear']],
   ['tutorial', []],
   ['smiles', []],
   ['smarts', []],
   ['specification', ['list']],
+  ['about', []],
 ] as Array<[Page, string[]]>)(
   'the %s page offers exactly the controls a link can switch off',
   (page, keys) => {
