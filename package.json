@@ -16,6 +16,7 @@
   "author": "Luc Patiny",
   "scripts": {
     "build": "vite build",
+    "check-tokens": "node node_modules/react-cheminfo/bin/check-tokens.mjs src",
     "check-types": "tsc --noEmit",
     "dev": "vite",
     "eslint": "eslint .",
@@ -23,7 +24,7 @@
     "prettier": "prettier --check .",
     "prettier-write": "prettier --write .",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "npm run test-only && npm run check-types && npm run eslint && npm run prettier",
+    "test": "npm run test-only && npm run check-types && npm run check-tokens && npm run eslint && npm run prettier",
     "test-e2e": "playwright test",
     "test-e2e-ui": "playwright test --ui",
     "test-only": "vitest run --coverage"

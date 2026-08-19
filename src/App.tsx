@@ -6,6 +6,7 @@ import {
   NavLink,
   SiteFooter,
   SiteHeader,
+  SiteTheme,
 } from 'react-cheminfo/ui';
 
 import ShareDialog from './components/share/ShareDialog.tsx';
@@ -42,6 +43,7 @@ export default function App() {
 
   return (
     <>
+      <SiteTheme siteId="smiles" />
       {isEmbedded() ? null : <Header page={page} />}
       <div className="page">
         <CurrentPage page={page} />

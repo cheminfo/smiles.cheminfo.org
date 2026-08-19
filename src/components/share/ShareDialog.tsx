@@ -198,11 +198,13 @@ function applyExercises(
 }
 
 function buildIframe(url: string, title: string): string {
+  // The snippet is read in the embedder's page, which carries none of our
+  // custom properties, so the family's own literal for a framed border.
   return `<iframe
   src="${url.replaceAll('&', '&amp;')}"
   width="100%"
   height="800"
-  style="border: 1px solid #d3d8de; border-radius: 8px"
+  style="border: 1px solid #ddd; border-radius: 8px"
   title="SMILES — ${title}"
 ></iframe>`;
 }

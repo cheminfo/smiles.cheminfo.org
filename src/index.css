@@ -4,17 +4,6 @@
 :root {
   --page-max: 1600px;
 
-  /* The two colours this site owns: the structure, and the one line it is
-     written on. */
-  --brand: #1c6e42;
-  --brand-alt: #ea580c;
-
-  /* The mark's orange reaches 3.6:1 on white — short of what text needs, so set
-     text in a darkened one (5.9:1) of the same hue. */
-  --brand-alt-text: #9a3412;
-
-  --accent: var(--brand);
-
   color-scheme: light;
 }
 
@@ -59,7 +48,7 @@ code {
 }
 
 .muted {
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
@@ -141,7 +130,7 @@ code {
 .structure-editor {
   position: relative;
   flex: 1;
-  border: 1px solid #d3d8de;
+  border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;
   background: #fff;
@@ -208,7 +197,7 @@ textarea.notation-input {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #5f6b7c;
+  color: var(--text-muted);
   cursor: help;
 }
 
@@ -286,7 +275,7 @@ textarea.notation-input {
 .reaction-plus,
 .reaction-arrow-glyph {
   font-size: 20px;
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 /* The agents sit over the arrow, which is where a reaction scheme puts them. */
@@ -313,7 +302,7 @@ textarea.notation-input {
 
 .reaction-component figcaption {
   font-size: 11px;
-  color: #5f6b7c;
+  color: var(--text-muted);
   text-align: center;
   overflow-wrap: anywhere;
 }
@@ -338,7 +327,7 @@ textarea.notation-input {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 .result-facts dd {
@@ -370,8 +359,8 @@ textarea.notation-input {
 .lists-format {
   margin: 0 0 10px;
   padding: 8px 10px;
-  background: #f6f7f9;
-  border: 1px solid #d3d8de;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 12px;
   overflow-x: auto;
@@ -408,7 +397,7 @@ textarea.notation-input {
 }
 
 .list-row-line {
-  color: #5f6b7c;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -453,7 +442,7 @@ textarea.notation-input {
 }
 
 .tutorial-step-index {
-  color: #5f6b7c;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -488,7 +477,7 @@ textarea.notation-input {
   justify-content: center;
   min-height: 200px;
   padding: 8px;
-  border: 1px solid #d3d8de;
+  border: 1px solid var(--border);
   border-radius: 6px;
   background: #fff;
 }
@@ -543,11 +532,11 @@ textarea.notation-input {
 .smiles-thumb-fallback {
   display: inline-block;
   padding: 4px 6px;
-  background: #f6f7f9;
+  background: var(--surface-sunken);
   border: 1px dashed #c5cbd3;
   border-radius: 4px;
   font-size: 11px;
-  color: #5f6b7c;
+  color: var(--text-muted);
   overflow-wrap: anywhere;
 }
 
@@ -594,7 +583,7 @@ textarea.notation-input {
   margin: 0 0 16px;
   padding: 12px;
   background: #fff;
-  border: 1px solid #d3d8de;
+  border: 1px solid var(--border);
   border-radius: 6px;
   /* A section link lands a little above the card rather than exactly on it. */
   scroll-margin-top: 12px;
@@ -737,7 +726,7 @@ textarea.notation-input {
 }
 
 .syntax-card-summary {
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 .syntax-card-example {
@@ -745,7 +734,7 @@ textarea.notation-input {
   flex-direction: column;
   gap: 4px;
   padding: 8px;
-  background: #f6f7f9;
+  background: var(--surface-sunken);
   border-radius: 4px;
 }
 
@@ -777,7 +766,7 @@ textarea.notation-input {
   align-content: start;
   overflow-y: auto;
   padding-right: 4px;
-  border-right: 1px solid #d3d8de;
+  border-right: 1px solid var(--border);
 }
 
 .cheatsheet-dialog-contents .reference-contents-group {
@@ -857,7 +846,7 @@ textarea.notation-input {
 }
 
 .exercise-row:hover {
-  background: #f6f7f9;
+  background: var(--surface-sunken);
 }
 
 .exercise-row--beginner {
@@ -878,7 +867,7 @@ textarea.notation-input {
 }
 
 .exercise-row-index {
-  color: #5f6b7c;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -892,7 +881,7 @@ textarea.notation-input {
   display: flex;
   justify-content: center;
   padding: 8px;
-  border: 1px solid #d3d8de;
+  border: 1px solid var(--border);
   border-radius: 6px;
   background: #fff;
 }
@@ -906,8 +895,8 @@ textarea.notation-input {
 .question-smiles code {
   flex: 1;
   padding: 8px 10px;
-  background: #f6f7f9;
-  border: 1px solid #d3d8de;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 14px;
   overflow-wrap: anywhere;
@@ -967,7 +956,7 @@ textarea.notation-input {
 
 .self-check-hint {
   margin: 4px 0 0;
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 .hint-list {
@@ -999,7 +988,7 @@ textarea.notation-input {
 .case-cell {
   margin: 0 0 6px;
   padding: 4px;
-  border: 1px solid #d3d8de;
+  border: 1px solid var(--border);
   border-radius: 6px;
   background: #fff;
   display: flex;
@@ -1019,7 +1008,7 @@ textarea.notation-input {
 
 .case-cell figcaption {
   font-size: 11px;
-  color: #5f6b7c;
+  color: var(--text-muted);
   text-align: center;
 }
 
@@ -1034,7 +1023,7 @@ textarea.notation-input {
   flex: none;
   padding: 12px 16px;
   background: #fff;
-  border-bottom: 1px solid #d3d8de;
+  border-bottom: 1px solid var(--border);
 }
 
 .share-link-intro {
@@ -1059,8 +1048,8 @@ textarea.notation-input {
 .code-block pre {
   margin: 0;
   padding: 8px 10px;
-  background: #f6f7f9;
-  border: 1px solid #d3d8de;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 12px;
   white-space: pre-wrap;
@@ -1086,7 +1075,7 @@ textarea.notation-input {
 .share-hint {
   display: block;
   font-size: 12px;
-  color: #5f6b7c;
+  color: var(--text-muted);
   margin-left: 26px;
 }
 
@@ -1100,7 +1089,7 @@ textarea.notation-input {
 .share-set-count {
   margin-left: auto;
   font-size: 12px;
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 .share-set {
@@ -1109,7 +1098,7 @@ textarea.notation-input {
   padding: 6px 12px;
   max-height: min(440px, 48vh);
   overflow-y: auto;
-  border: 1px solid #d3d8de;
+  border: 1px solid var(--border);
   border-radius: 6px;
   background: #fff;
   display: grid;
@@ -1147,7 +1136,7 @@ textarea.notation-input {
   flex: none;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 11px;
-  color: #5f6b7c;
+  color: var(--text-muted);
   min-width: 26px;
 }
 
@@ -1160,7 +1149,7 @@ textarea.notation-input {
 .share-set-level {
   margin-left: auto;
   font-size: 11px;
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 .exercise-preview-popover .bp6-popover-content {
@@ -1184,7 +1173,7 @@ textarea.notation-input {
   margin-left: auto;
   font-size: 12px;
   font-weight: 400;
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 .structure-grid--preview {
@@ -1228,7 +1217,7 @@ textarea.notation-input {
   max-height: calc(100vh - 32px);
   padding: 10px;
   background: #fff;
-  border: 1px solid #d3d8de;
+  border: 1px solid var(--border);
   border-radius: 6px;
 }
 
@@ -1323,7 +1312,7 @@ textarea.notation-input {
 .spec-article {
   padding: 4px 32px 40px;
   background: #fff;
-  border: 1px solid #d3d8de;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
   line-height: 1.65;
@@ -1335,11 +1324,11 @@ textarea.notation-input {
 .spec-article #preamble {
   margin: 12px 0 0;
   padding: 10px 14px;
-  background: #f6f7f9;
+  background: var(--surface-sunken);
   border: 1px solid #e5e8eb;
   border-radius: 4px;
   font-size: 12.5px;
-  color: #5f6b7c;
+  color: var(--text-muted);
 }
 
 .spec-article #preamble p {
@@ -1439,8 +1428,8 @@ textarea.notation-input {
 .spec-article th {
   padding: 6px 10px;
   text-align: left;
-  background: #f6f7f9;
-  border-bottom: 2px solid #d3d8de;
+  background: var(--surface-sunken);
+  border-bottom: 2px solid var(--border);
 }
 
 .spec-article td {
