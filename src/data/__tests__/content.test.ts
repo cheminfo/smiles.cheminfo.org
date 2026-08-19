@@ -23,7 +23,7 @@ import {
 } from '../reference/index.ts';
 import { SMILES_VS_SMARTS } from '../reference/shared.ts';
 import { LIBRARY_SAMPLE } from '../samples/library.ts';
-import { TUTORIAL_LEVELS, TUTORIAL_STEPS } from '../tutorial.ts';
+import { TUTORIAL_LEVEL_LABELS, TUTORIAL_STEPS } from '../tutorial.ts';
 
 import { parsesNotation } from './parsing.ts';
 
@@ -65,7 +65,7 @@ test('every tutorial step carries a structure that parses', () => {
 });
 
 test('every tutorial level is used, and every step has one', () => {
-  const levels = new Set(TUTORIAL_LEVELS.map((level) => level.level));
+  const levels = new Set(Object.keys(TUTORIAL_LEVEL_LABELS));
   const used = new Set(TUTORIAL_STEPS.map((step) => step.level));
   expect([...used].toSorted()).toStrictEqual([...levels].toSorted());
 });

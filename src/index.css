@@ -452,62 +452,9 @@ textarea.notation-input {
   gap: 16px;
 }
 
-.tutorial-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px;
-}
-
-.tutorial-nav-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 6px;
-}
-
-.tutorial-nav-label {
-  font-weight: 600;
-  min-width: 210px;
-}
-
-.tutorial-nav-steps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.tutorial-nav-step {
-  width: 28px;
-  height: 28px;
-  border: 1px solid rgb(0 0 0 / 12%);
-  border-radius: 4px;
-  background: rgb(255 255 255 / 70%);
-  font: inherit;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-}
-
-.tutorial-nav-step:hover {
-  background: #fff;
-}
-
-.tutorial-nav-step--active {
-  font-weight: 700;
-  border-color: rgb(0 0 0 / 35%);
-}
-
 .tutorial-step-index {
   color: #5f6b7c;
   font-variant-numeric: tabular-nums;
-}
-
-.tutorial-step-actions {
-  display: flex;
-  gap: 6px;
-  margin-left: auto;
 }
 
 .tutorial-description {
@@ -1569,11 +1516,6 @@ textarea.notation-input {
 
   .reference-grid {
     columns: 1;
-  }
-
-  .tutorial-nav-label {
-    min-width: 0;
-    width: 100%;
   }
 }
 

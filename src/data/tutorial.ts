@@ -20,38 +20,14 @@ export interface TutorialStep {
 }
 
 /**
- * Metadata for one of the three tutorial levels. The colors are used both for
- * the group background and for the active button highlight.
+ * What each of the three coloured strips is called on this course. The colours
+ * and the layout are the ecosystem's, and come with `TutorialStepStrip`.
  */
-export interface TutorialLevelMeta {
-  level: ExerciseLevel;
-  label: string;
-  /** Light background color applied to the group container. */
-  background: string;
-  /** Slightly darker color used for the currently selected step. */
-  activeBackground: string;
-}
-
-export const TUTORIAL_LEVELS: TutorialLevelMeta[] = [
-  {
-    level: 'beginner',
-    label: 'Atoms, bonds and rings',
-    background: '#d1fae5',
-    activeBackground: '#6ee7b7',
-  },
-  {
-    level: 'intermediate',
-    label: 'Aromatics and brackets',
-    background: '#fef3c7',
-    activeBackground: '#fcd34d',
-  },
-  {
-    level: 'advanced',
-    label: 'Stereochemistry and beyond',
-    background: '#fce7f3',
-    activeBackground: '#f9a8d4',
-  },
-];
+export const TUTORIAL_LEVEL_LABELS: Record<ExerciseLevel, string> = {
+  beginner: 'Atoms, bonds and rings',
+  intermediate: 'Aromatics and brackets',
+  advanced: 'Stereochemistry and beyond',
+};
 
 export const TUTORIAL_STEPS: TutorialStep[] = [
   {

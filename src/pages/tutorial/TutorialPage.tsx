@@ -1,8 +1,8 @@
-import { Button, Card, H5 } from '@blueprintjs/core';
+import { Card, H5 } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import { TUTORIAL_STEPS } from '../../data/tutorial.ts';
-import { openStep, view } from '../../state/tutorial.ts';
+import { view } from '../../state/tutorial.ts';
 
 import StepNavigator from './components/StepNavigator.tsx';
 import StepPlayground from './components/StepPlayground.tsx';
@@ -28,23 +28,6 @@ export default function TutorialPage() {
             <span className="tutorial-step-index">{index + 1}.</span>{' '}
             {step.title}
           </H5>
-          <div className="tutorial-step-actions">
-            <Button
-              size="small"
-              icon="chevron-left"
-              text="Previous"
-              disabled={index === 0}
-              onClick={() => openStep(index - 1)}
-            />
-            <Button
-              size="small"
-              endIcon="chevron-right"
-              text="Next"
-              intent="primary"
-              disabled={index === TUTORIAL_STEPS.length - 1}
-              onClick={() => openStep(index + 1)}
-            />
-          </div>
         </div>
         <StepPlayground step={step} />
       </Card>
