@@ -1,92 +1,113 @@
 import { signal } from '@preact/signals-react';
+import type { ShareConfig, ShareVocabulary } from 'react-cheminfo/core';
+import {
+  EMBED_PARAM,
+  HIDE_PARAM,
+  isHidden as isPartHidden,
+  parseShareConfig,
+} from 'react-cheminfo/core';
 
-/** Every part of a page a shared link can switch off. */
-const HIDE_KEYS = [
-  'editor',
-  'kinds',
-  'formats',
-  'examples',
-  'options',
-  'export',
-  'load',
-  'list',
-  'sets',
-  'hints',
-  'check',
-  'answers',
-  'clear',
-] as const;
+/**
+ * Every part of a page a shared link can switch off, with what switching it
+ * off does — written for the person building the link rather than for the
+ * visitor. The order is the one the dialog and `hide=` both use, so two people
+ * who ticked the same boxes hand out the same link.
+ *
+ * This is the only place that knows those names. Components ask
+ * {@link isHidden} and never read the address themselves.
+ */
+export const SHARE_VOCABULARY = {
+  parts: [
+    {
+      key: 'kinds',
+      label: 'The molecule / query / reaction tabs',
+      description:
+        'The strip that says what the box holds. Hiding it leaves the visitor on the tab your link opens.',
+    },
+    {
+      key: 'editor',
+      label: 'The drawing canvas',
+      description:
+        'Half of the converter. Hide it for a frame that only reads SMILES out loud.',
+    },
+    {
+      key: 'formats',
+      label: 'Every other notation',
+      description:
+        'The Kekulé form, the SMARTS, the idCode and the molfile under the SMILES.',
+      hiddenByDefault: true,
+    },
+    {
+      key: 'examples',
+      label: 'The example molecules',
+      description: 'The menu that replaces what is on screen with a known one.',
+    },
+    {
+      key: 'load',
+      label: 'The list itself',
+      description:
+        'The box a list is pasted or dropped into, and the Convert button. Hiding it leaves the visitor searching the list your link loaded.',
+    },
+    {
+      key: 'options',
+      label: 'Conversion and search options',
+      description:
+        'What the list is read as and written as, and how a query matches. A hidden option still applies.',
+      hiddenByDefault: true,
+    },
+    {
+      key: 'export',
+      label: 'Download the result',
+      description:
+        'The buttons that hand the list — or whatever the query kept — back as SMILES, CSV or an SDF.',
+    },
+    {
+      key: 'sets',
+      label: 'The other sets',
+      description:
+        'The capsules above the list, which walk from one set to the next. Hiding them leaves the link on the set it names.',
+    },
+    {
+      key: 'hints',
+      label: 'Hints',
+      description: 'The hint ladder, revealed one rung at a time.',
+    },
+    {
+      key: 'check',
+      label: 'The running check',
+      description:
+        'Whether the draft reads as a structure, and whether its atoms add up. It never says the answer is right.',
+    },
+    {
+      key: 'answers',
+      label: 'Give up and see the answer',
+      description:
+        'The correction. Hiding it leaves getting it right as the only way through.',
+    },
+    {
+      key: 'clear',
+      label: 'Clear the answers',
+      description:
+        'The buttons that forget what was done, for one exercise and for all of them.',
+    },
+    {
+      key: 'list',
+      label: 'The table of contents',
+      description:
+        'The column on the left. Hide it for a frame pointing at one section.',
+    },
+  ],
+} as const satisfies ShareVocabulary;
 
 /**
  * A part of a page a shared link switches off. A key a page does not know
  * about is simply ignored, so a link written for an older version of the site
  * still opens.
  */
-export type HideKey = (typeof HIDE_KEYS)[number];
-
-const KNOWN: ReadonlySet<string> = new Set(HIDE_KEYS);
+export type HideKey = (typeof SHARE_VOCABULARY)['parts'][number]['key'];
 
 /** Parameters that configure the page rather than feed the tool. */
-export const SHARE_PARAM_KEYS = ['embed', 'hide'] as const;
-
-export interface ShareConfig {
-  /** Drop the header, so only the activity shows through an iframe. */
-  embed: boolean;
-  /** Parts of the page the link switches off. */
-  hidden: readonly HideKey[];
-}
-
-/**
- * Read the share configuration out of a query string.
- * @param search - The query string, with or without its leading `?`.
- * @returns The configuration; anything absent or unknown reads as off.
- */
-export function parseShareConfig(search: string): ShareConfig {
-  const params = new URLSearchParams(search);
-  return {
-    // A bare `?embed` counts: these addresses are retyped by hand.
-    embed: params.has('embed') && params.get('embed') !== '0',
-    hidden: parseHidden(params.get('hide')),
-  };
-}
-
-/**
- * Write a share configuration into a set of query parameters. What is left at
- * its default is deleted rather than written, so a plain link stays plain.
- * @param params - The parameters to update in place; the inputs of the page are left untouched.
- * @param config - The configuration to encode.
- */
-export function applyShareConfig(
-  params: URLSearchParams,
-  config: ShareConfig,
-): void {
-  if (config.embed) params.set('embed', '1');
-  else params.delete('embed');
-
-  if (config.hidden.length > 0) params.set('hide', config.hidden.join(','));
-  else params.delete('hide');
-}
-
-/**
- * Serialize query parameters, leaving the commas alone: they are legal in a
- * query value and parse back identically, but `URLSearchParams` escapes them to
- * `%2C`, which makes a link a teacher has to read or dictate needlessly
- * cryptic.
- * @param params - The parameters to serialize.
- * @returns The query string, without its leading `?`.
- */
-export function stringifyParams(params: URLSearchParams): string {
-  return params.toString().replaceAll('%2C', ',');
-}
-
-/**
- * Whether a configuration differs from an unconfigured link.
- * @param config - The configuration to test.
- * @returns True when the link configures anything at all.
- */
-export function isShareConfigured(config: ShareConfig): boolean {
-  return config.embed || config.hidden.length > 0;
-}
+export const SHARE_PARAM_KEYS = [EMBED_PARAM, HIDE_PARAM] as const;
 
 /**
  * The configuration of the page currently open, read once from the address it
@@ -95,7 +116,7 @@ export function isShareConfigured(config: ShareConfig): boolean {
  * reload — or a link copied out of the frame — restores the same page.
  */
 export const shareConfig = signal<ShareConfig>(
-  parseShareConfig(globalThis.location?.search ?? ''),
+  parseShareConfig(globalThis.location?.search ?? '', SHARE_VOCABULARY),
 );
 
 /**
@@ -116,18 +137,5 @@ export function isEmbedded(): boolean {
  * @returns True when it must not be rendered.
  */
 export function isHidden(key: HideKey): boolean {
-  return shareConfig.value.hidden.includes(key);
-}
-
-function parseHidden(value: string | null): readonly HideKey[] {
-  if (!value) return [];
-  const hidden: HideKey[] = [];
-  const seen = new Set<HideKey>();
-  for (const entry of value.split(',')) {
-    const key = entry.trim() as HideKey;
-    if (!KNOWN.has(key) || seen.has(key)) continue;
-    seen.add(key);
-    hidden.push(key);
-  }
-  return hidden;
+  return isPartHidden(shareConfig.value, key);
 }

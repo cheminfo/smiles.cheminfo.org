@@ -8,21 +8,19 @@ import {
 } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
+import type { ShareConfig, ShareVocabulary } from 'react-cheminfo/core';
+import {
+  applyShareConfig,
+  buildEmbedCode,
+  isShareConfigured,
+  suggestedShareConfig,
+} from 'react-cheminfo/core';
 
 import { EXERCISES_PARAM, SET_PARAM, data } from '../../state/exercises.ts';
 import { PATHS, route } from '../../state/router.ts';
-import type { HideKey, ShareConfig } from '../../state/shareConfig.ts';
-import {
-  SHARE_PARAM_KEYS,
-  applyShareConfig,
-  isShareConfigured,
-  shareConfig,
-  stringifyParams,
-} from '../../state/shareConfig.ts';
-import {
-  defaultShareConfig,
-  shareOptionsOf,
-} from '../../state/shareOptions.ts';
+import type { HideKey } from '../../state/shareConfig.ts';
+import { shareConfig } from '../../state/shareConfig.ts';
+import { shareOptionsOf } from '../../state/shareOptions.ts';
 import CodeBlock from '../CodeBlock.tsx';
 import CopyButton from '../CopyButton.tsx';
 
@@ -45,9 +43,9 @@ export default function ShareDialog(props: {
   // course, without the parts that course has no use for. A page already
   // running a configuration shows that one instead of resetting it.
   const [draft, setDraft] = useState<ShareConfig>(() =>
-    isShareConfigured(shareConfig.value)
+    isShareConfigured(shareConfig.value, options.vocabulary)
       ? shareConfig.value
-      : defaultShareConfig(options),
+      : suggestedShareConfig(options.vocabulary),
   );
   // Until the teacher touches the list, the link hands out the whole set —
   // derived rather than copied at mount, so a set still loading when the
@@ -64,7 +62,16 @@ export default function ShareDialog(props: {
   }
 
   const hidden = new Set(draft.hidden);
-  const url = buildUrl(draft, options.hasExercises ? selected : null);
+  const url = buildUrl(
+    draft,
+    options.vocabulary,
+    options.hasExercises ? selected : null,
+  );
+  const frame = buildEmbedCode({
+    url,
+    title: `SMILES — ${options.title}`,
+    height: 800,
+  });
 
   return (
     <Dialog
@@ -89,10 +96,7 @@ export default function ShareDialog(props: {
             onClick={() => globalThis.open(url, '_blank', 'noopener')}
           />
           {/* The markup itself is never read: it is pasted. */}
-          <CopyButton
-            code={buildIframe(url, options.title)}
-            text="Copy the iframe"
-          />
+          <CopyButton code={frame} text="Copy the iframe" />
         </div>
       </div>
       <DialogBody>
@@ -108,19 +112,19 @@ export default function ShareDialog(props: {
           />
         </section>
 
-        {options.features.length > 0 ? (
+        {options.vocabulary.parts.length > 0 ? (
           <section className="share-section">
             <H6>Show on the page</H6>
-            {options.features.map((feature) => (
-              <div key={feature.key} className="share-feature">
+            {options.vocabulary.parts.map((part) => (
+              <div key={part.key} className="share-feature">
                 <Checkbox
-                  checked={!hidden.has(feature.key)}
-                  label={feature.label}
+                  checked={!hidden.has(part.key)}
+                  label={part.label}
                   onChange={(event) =>
-                    setHidden(feature.key, !event.currentTarget.checked)
+                    setHidden(part.key as HideKey, !event.currentTarget.checked)
                   }
                 />
-                <span className="share-hint">{feature.description}</span>
+                <span className="share-hint">{part.description}</span>
               </div>
             ))}
           </section>
@@ -146,16 +150,19 @@ export default function ShareDialog(props: {
  * The address of the page, with the configuration of the dialog written over
  * whatever the current one carries.
  * @param config - What the dialog holds.
+ * @param vocabulary - What this page's links can say.
  * @param exercises - The chosen exercises, or null on a page without a set.
  * @returns The absolute address.
  */
-function buildUrl(config: ShareConfig, exercises: readonly string[] | null) {
+function buildUrl(
+  config: ShareConfig,
+  vocabulary: ShareVocabulary,
+  exercises: readonly string[] | null,
+) {
   const params = new URLSearchParams(globalThis.location.search);
-  for (const key of SHARE_PARAM_KEYS) params.delete(key);
-  applyShareConfig(params, config);
   const chosen = exercises ? applyExercises(params, exercises) : null;
 
-  const search = stringifyParams(params);
+  const search = applyShareConfig(params.toString(), config, vocabulary);
   const { origin, pathname } = globalThis.location;
   // A set assembled question by question has no address of its own: the link
   // carries the list, so it opens the page holding them rather than a set the
@@ -195,16 +202,4 @@ function applyExercises(
     params.delete('exercise');
   }
   return PATHS.exercises;
-}
-
-function buildIframe(url: string, title: string): string {
-  // The snippet is read in the embedder's page, which carries none of our
-  // custom properties, so the family's own literal for a framed border.
-  return `<iframe
-  src="${url.replaceAll('&', '&amp;')}"
-  width="100%"
-  height="800"
-  style="border: 1px solid #ddd; border-radius: 8px"
-  title="SMILES — ${title}"
-></iframe>`;
 }

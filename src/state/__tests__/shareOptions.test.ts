@@ -1,8 +1,9 @@
+import { parseShareConfig, suggestedShareConfig } from 'react-cheminfo/core';
 import { expect, test } from 'vitest';
 
 import type { Page } from '../router.ts';
-import { parseShareConfig } from '../shareConfig.ts';
-import { defaultShareConfig, shareOptionsOf } from '../shareOptions.ts';
+import { SHARE_VOCABULARY } from '../shareConfig.ts';
+import { shareOptionsOf } from '../shareOptions.ts';
 
 const PAGES: Page[] = [
   'converter',
@@ -14,6 +15,11 @@ const PAGES: Page[] = [
   'specification',
   'about',
 ];
+
+const partsOf = (page: Page) =>
+  shareOptionsOf(page).vocabulary.parts.map((part) => part.key);
+const suggested = (page: Page) =>
+  suggestedShareConfig(shareOptionsOf(page).vocabulary);
 
 test.each([
   ['converter', ['kinds', 'editor', 'formats', 'examples']],
@@ -27,14 +33,10 @@ test.each([
 ] as Array<[Page, string[]]>)(
   'the %s page offers exactly the controls a link can switch off',
   (page, keys) => {
-    const options = shareOptionsOf(page);
-    expect(options.title, page).not.toBe('');
-    // The exact list, not merely that there is one: a page whose features
+    expect(shareOptionsOf(page).title, page).not.toBe('');
+    // The exact list, not merely that there is one: a page whose parts
     // silently emptied would still be an array.
-    expect(
-      options.features.map((feature) => feature.key),
-      page,
-    ).toStrictEqual(keys);
+    expect(partsOf(page), page).toStrictEqual(keys);
   },
 );
 
@@ -51,18 +53,18 @@ test('only the exercises hand out a set of questions', () => {
   expect(withExercises).toStrictEqual(['exercises']);
 });
 
-test('a feature is named once per page', () => {
+test('a part is named once per page', () => {
   for (const page of PAGES) {
-    const keys = shareOptionsOf(page).features.map((feature) => feature.key);
+    const keys = partsOf(page);
     expect(new Set(keys).size, page).toBe(keys.length);
   }
 });
 
-test('every feature is described, positively, for the person building a link', () => {
+test('every part is described, positively, for the person building a link', () => {
   for (const page of PAGES) {
-    for (const feature of shareOptionsOf(page).features) {
-      expect(feature.label, `${page}/${feature.key}`).not.toBe('');
-      expect(feature.description, `${page}/${feature.key}`).not.toBe('');
+    for (const part of shareOptionsOf(page).vocabulary.parts) {
+      expect(part.label, `${page}/${part.key}`).not.toBe('');
+      expect(part.description, `${page}/${part.key}`).not.toBe('');
     }
   }
 });
@@ -72,36 +74,45 @@ test('every key a page offers is one a link can carry', () => {
   // does not know — so a key declared here and unknown there would build a
   // link that quietly does nothing.
   for (const page of PAGES) {
-    const keys = shareOptionsOf(page).features.map((feature) => feature.key);
+    const keys = partsOf(page);
     if (keys.length === 0) continue;
     expect(
-      parseShareConfig(`hide=${keys.join(',')}`).hidden,
+      parseShareConfig(`hide=${keys.join(',')}`, SHARE_VOCABULARY).hidden,
       page,
     ).toStrictEqual(keys);
   }
 });
 
 test('the dialog opens on a framed link with the parts a course cannot use off', () => {
-  const exercises = defaultShareConfig(shareOptionsOf('exercises'));
-  expect(exercises).toStrictEqual({ embed: true, hidden: [] });
-
-  const converter = defaultShareConfig(shareOptionsOf('converter'));
-  expect(converter).toStrictEqual({ embed: true, hidden: ['formats'] });
-
-  const lists = defaultShareConfig(shareOptionsOf('lists'));
-  expect(lists).toStrictEqual({ embed: true, hidden: ['options'] });
-});
-
-test('a page with nothing to switch off still offers to frame itself', () => {
-  expect(defaultShareConfig(shareOptionsOf('tutorial'))).toStrictEqual({
+  expect(suggested('exercises')).toStrictEqual({
     embed: true,
     hidden: [],
+    params: {},
+  });
+  expect(suggested('converter')).toStrictEqual({
+    embed: true,
+    hidden: ['formats'],
+    params: {},
+  });
+  expect(suggested('lists')).toStrictEqual({
+    embed: true,
+    hidden: ['options'],
+    params: {},
   });
 });
 
+test('a page with nothing to switch off still offers to frame itself', () => {
+  expect(
+    suggestedShareConfig(shareOptionsOf('tutorial').vocabulary),
+  ).toStrictEqual({ embed: true, hidden: [], params: {} });
+});
+
 test('the exercises can hide the hints, the check and the answers', () => {
-  const keys = shareOptionsOf('exercises').features.map(
-    (feature) => feature.key,
-  );
-  expect(keys).toStrictEqual(['sets', 'hints', 'check', 'answers', 'clear']);
+  expect(partsOf('exercises')).toStrictEqual([
+    'sets',
+    'hints',
+    'check',
+    'answers',
+    'clear',
+  ]);
 });
