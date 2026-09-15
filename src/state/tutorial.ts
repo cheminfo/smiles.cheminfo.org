@@ -1,9 +1,9 @@
-import { computed, signal } from '@preact/signals-react';
+import { computed, effect, signal } from '@preact/signals-react';
+import { persistSignalBucket } from 'react-cheminfo/core';
 
 import { readInput } from '../chemistry/readInput.ts';
 import { TUTORIAL_STEPS } from '../data/tutorial.ts';
 
-import { persistBucket } from './persist.ts';
 import { parsePath, replacePath, route, searchParameter } from './router.ts';
 
 /** The name of the parameter a link written before `/tutorial/7` carries the step in. */
@@ -16,9 +16,13 @@ export const view = {
   input: signal<string>(TUTORIAL_STEPS[0]?.smiles ?? 'C'),
 };
 
-export const preferences = persistBucket('smiles:tutorial:v1', {
-  /** The furthest step reached, so the tab reopens where the student was. */
-  furthest: signal<number>(0),
+export const preferences = persistSignalBucket({
+  key: 'smiles:tutorial',
+  effect,
+  bucket: {
+    /** The furthest step reached, so the tab reopens where the student was. */
+    furthest: signal<number>(0),
+  },
 });
 
 /** The structure in the playground, or what is wrong with it. */

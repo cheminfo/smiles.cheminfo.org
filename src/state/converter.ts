@@ -1,11 +1,11 @@
-import { computed, signal } from '@preact/signals-react';
+import { computed, effect, signal } from '@preact/signals-react';
+import { persistSignalBucket } from 'react-cheminfo/core';
 
 import { looksLikeReaction } from '../chemistry/parseReaction.ts';
 import { readInput } from '../chemistry/readInput.ts';
 import { readReactionInput } from '../chemistry/readReactionInput.ts';
 import type { InputFormat, StructureKind } from '../chemistry/types.ts';
 
-import { persistBucket } from './persist.ts';
 import { replaceParameters, route, searchParameter } from './router.ts';
 
 /** What the converter is working on. */
@@ -28,14 +28,18 @@ export const view = {
   editorRevision: signal<number>(0),
 };
 
-export const preferences = persistBucket('smiles:converter:v1', {
-  /**
-   * Whether the drawing names the rings: which ring every ring atom is in,
-   * written above it, and the ring bonds painted. What a ring closure digit
-   * in the SMILES stands for is the thing the drawing otherwise leaves the
-   * reader to work out for themselves.
-   */
-  showRings: signal<boolean>(false),
+export const preferences = persistSignalBucket({
+  key: 'smiles:converter',
+  effect,
+  bucket: {
+    /**
+     * Whether the drawing names the rings: which ring every ring atom is in,
+     * written above it, and the ring bonds painted. What a ring closure digit
+     * in the SMILES stands for is the thing the drawing otherwise leaves the
+     * reader to work out for themselves.
+     */
+    showRings: signal<boolean>(false),
+  },
 });
 
 /**

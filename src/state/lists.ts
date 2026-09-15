@@ -1,5 +1,6 @@
-import { signal } from '@preact/signals-react';
+import { effect, signal } from '@preact/signals-react';
 import type { MoleculesDB } from 'openchemlib-utils';
+import { persistSignalBucket } from 'react-cheminfo/core';
 
 import { structureErrorMessage } from '../chemistry/errorMessage.ts';
 import type { ListHit, SearchMode } from '../chemistry/moleculesDatabase.ts';
@@ -9,7 +10,6 @@ import type { ListRow } from '../chemistry/structureList.ts';
 import { readList } from '../chemistry/structureList.ts';
 import type { InputFormat, OutputFormat } from '../chemistry/types.ts';
 
-import { persistBucket } from './persist.ts';
 import { replaceParameters, route, searchParameter } from './router.ts';
 
 /** The name of the parameter a link carries the query in. */
@@ -47,12 +47,16 @@ export const view = {
   error: signal<string | null>(null),
 };
 
-export const preferences = persistBucket('smiles:lists:v1', {
-  from: signal<InputFormat>('auto'),
-  to: signal<OutputFormat>('smiles'),
-  mode: signal<SearchMode>('substructure'),
-  /** Most hits shown. A list of ten thousand can match most of itself. */
-  limit: signal<number>(500),
+export const preferences = persistSignalBucket({
+  key: 'smiles:lists',
+  effect,
+  bucket: {
+    from: signal<InputFormat>('auto'),
+    to: signal<OutputFormat>('smiles'),
+    mode: signal<SearchMode>('substructure'),
+    /** Most hits shown. A list of ten thousand can match most of itself. */
+    limit: signal<number>(500),
+  },
 });
 
 let running: AbortController | null = null;
