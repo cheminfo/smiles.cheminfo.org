@@ -1,4 +1,5 @@
 import { Molecule, SSSearcher } from 'openchemlib';
+import type { ExerciseLevel } from 'react-cheminfo/core';
 
 import { constitution, identity } from '../chemistry/describe.ts';
 import { readStructure } from '../chemistry/parse.ts';
@@ -35,9 +36,7 @@ export function validate(exercise: Exercise, answer: string): Verdict {
  * @param exercise - The question.
  * @returns Its level.
  */
-export function levelOf(
-  exercise: Exercise,
-): 'beginner' | 'intermediate' | 'advanced' {
+export function levelOf(exercise: Exercise): ExerciseLevel {
   if (exercise.kind === 'smarts') return 'advanced';
   const atoms = countAtoms(exercise.smiles);
   if (atoms <= 8) return 'beginner';

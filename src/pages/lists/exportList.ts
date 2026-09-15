@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import { downloadText, sanitizeFileName } from 'react-cheminfo/core';
 import { create } from 'sdf-creator';
 
 import { writeMolecule } from '../../chemistry/describe.ts';
@@ -59,14 +60,7 @@ export function exportList(
  * @param file - What to save.
  */
 export function download(file: ExportFile): void {
-  const url = URL.createObjectURL(
-    new Blob([file.content], { type: file.mime }),
-  );
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = file.name;
-  link.click();
-  URL.revokeObjectURL(url);
+  downloadText(file.content, sanitizeFileName(file.name), file.mime);
 }
 
 function toText(rows: readonly ShownRow[]): string {

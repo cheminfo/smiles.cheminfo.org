@@ -1,3 +1,5 @@
+import type { ExerciseSet as SharedExerciseSet } from 'react-cheminfo/core';
+
 import type { FormulaDifference } from '../chemistry/hints.ts';
 import type { StructureError } from '../chemistry/types.ts';
 
@@ -44,12 +46,7 @@ export interface SmartsExercise extends BaseExercise {
 export type Exercise = WriteExercise | DrawExercise | SmartsExercise;
 
 /** A named list of exercises, which is what a link hands out. */
-export interface ExerciseSet {
-  id: string;
-  title: string;
-  description: string;
-  exercises: Exercise[];
-}
+export type ExerciseSet = SharedExerciseSet<Exercise>;
 
 /** How one test case of a SMARTS exercise came out. */
 export interface CaseResult {

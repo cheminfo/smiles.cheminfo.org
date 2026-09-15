@@ -1,7 +1,8 @@
 import { Button, Callout, Card, H5, InputGroup, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { pluralize } from 'react-cheminfo/core';
+import { CopyButton } from 'react-cheminfo/ui';
 
-import CopyButton from '../../../components/CopyButton.tsx';
 import StructureEditor from '../../../components/StructureEditor.tsx';
 import type { Exercise } from '../../../exercises/types.ts';
 import { progressOf } from '../../../state/exerciseProgress.ts';
@@ -129,7 +130,7 @@ export default function AnswerPanel(props: { exercise: Exercise }) {
         <Callout intent="warning" icon="key" compact className="answer-reveal">
           <div className="question-smiles">
             <code>{exercise.smiles}</code>
-            <CopyButton size="small" code={exercise.smiles} />
+            <CopyButton small content={exercise.smiles} />
           </div>
           <span className="muted">
             Any SMILES of the same molecule is accepted — this is only one of
@@ -158,12 +159,12 @@ function ProgressTags(props: { attempts: number; hintsRevealed: number }) {
     <>
       {attempts > 0 ? (
         <Tag minimal icon="edit" htmlTitle="Answers submitted">
-          {attempts} attempt{attempts === 1 ? '' : 's'}
+          {attempts} {pluralize(attempts, 'attempt')}
         </Tag>
       ) : null}
       {hintsRevealed > 0 ? (
         <Tag minimal icon="lightbulb" htmlTitle="Hints opened">
-          {hintsRevealed} hint{hintsRevealed === 1 ? '' : 's'}
+          {hintsRevealed} {pluralize(hintsRevealed, 'hint')}
         </Tag>
       ) : null}
     </>
@@ -182,7 +183,7 @@ function attemptSummary(attempts: number, hintsRevealed: number): string {
   const hints =
     hintsRevealed === 0
       ? ''
-      : `, with ${hintsRevealed} hint${hintsRevealed === 1 ? '' : 's'}`;
+      : `, with ${hintsRevealed} ${pluralize(hintsRevealed, 'hint')}`;
   return `${tries}${hints}.`;
 }
 

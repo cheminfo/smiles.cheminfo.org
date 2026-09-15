@@ -1,43 +1,12 @@
 import { signal } from '@preact/signals-react';
+import { progressSummary } from 'react-cheminfo/core';
 
-import type { ProgressByExercise, ProgressStore } from './progressStore.ts';
-import { localStorageProgressStore } from './progressStore.ts';
-
-/** What a student has done on one exercise. */
-export interface ExerciseProgress {
-  /** Never attempted, attempted, or right. */
-  status: 'idle' | 'attempted' | 'solved';
-  /**
-   * What they last wrote or drew. A drawing is kept as the editor value,
-   * coordinates included, so a reload gives back their own structure rather
-   * than a layout computed from the answer.
-   */
-  answer: string;
-  /**
-   * The answer of their last submission — what the verdict on screen is about.
-   * Kept apart from `answer`, which follows the pen and the keyboard, so a
-   * reload restores a half-written answer without a mark against it.
-   */
-  submitted: string;
-  /** How many times they have submitted an answer. */
-  attempts: number;
-  /** How many hints they have opened. */
-  hintsRevealed: number;
-  /** Whether they asked to see the answer. */
-  showAnswer: boolean;
-}
-
-/** An exercise nobody has touched. */
-export function emptyProgress(): ExerciseProgress {
-  return {
-    status: 'idle',
-    answer: '',
-    submitted: '',
-    attempts: 0,
-    hintsRevealed: 0,
-    showAnswer: false,
-  };
-}
+import type {
+  ExerciseProgress,
+  ProgressByExercise,
+  ProgressStore,
+} from './progressStore.ts';
+import { emptyProgress, localStorageProgressStore } from './progressStore.ts';
 
 /** Everything a student has done, keyed by exercise id. */
 export const progress = signal<ProgressByExercise>({});
@@ -112,10 +81,7 @@ export function clearProgress(id?: string): void {
  * @returns How many are solved.
  */
 export function solvedCount(ids: readonly string[]): number {
-  const current = progress.value;
-  let solved = 0;
-  for (const id of ids) {
-    if (current[id]?.status === 'solved') solved++;
-  }
-  return solved;
+  return progressSummary(progress.value, ids).solved;
 }
+
+export { type ExerciseProgress, emptyProgress } from './progressStore.ts';

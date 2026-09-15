@@ -1,5 +1,6 @@
 import { Button, Callout, Card, H5 } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { pluralize } from 'react-cheminfo/core';
 
 import GlossaryText from '../../../components/GlossaryText.tsx';
 import type { Exercise } from '../../../exercises/types.ts';
@@ -41,7 +42,7 @@ export default function HintsPanel(props: { exercise: Exercise }) {
       </div>
       {shown === 0 ? (
         <p className="muted">
-          {hints.length} hint{hints.length === 1 ? '' : 's'}, from a nudge to
+          {hints.length} {pluralize(hints.length, 'hint')}, from a nudge to
           almost the answer. Take them one at a time.
         </p>
       ) : (

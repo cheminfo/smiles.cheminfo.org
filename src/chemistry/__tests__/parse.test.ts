@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { looksLikeMolfile, looksLikeSmarts, readStructure } from '../parse.ts';
+import { looksLikeSmarts, readStructure } from '../parse.ts';
 
 test('reads a SMILES', () => {
   const { molecule, format } = readStructure('CCO');
@@ -80,7 +80,6 @@ test('an idCode is read once the line notation has failed', () => {
 
 test('a molfile is recognised by its counts line', () => {
   const molfile = readStructure('CCO').molecule.toMolfile();
-  expect(looksLikeMolfile(molfile)).toBe(true);
   expect(readStructure(molfile).format).toBe('molfile');
 });
 
@@ -95,7 +94,7 @@ test('a molfile keeps its blank title line', () => {
 });
 
 test('a one-line string is never mistaken for a molfile', () => {
-  expect(looksLikeMolfile('CCO')).toBe(false);
+  expect(readStructure('CCO').format).toBe('smiles');
 });
 
 test('an explicit format is obeyed', () => {

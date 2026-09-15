@@ -1,3 +1,5 @@
+import { pluralize } from 'react-cheminfo/core';
+
 import type { ListLayout } from '../../chemistry/splitList.ts';
 
 /** What a separator is called, so the page says `comma` and not `,`. */
@@ -39,7 +41,7 @@ export function describeLayout(layout: ListLayout): string | null {
 
   const kept = columns.length - (layout.labelColumn === undefined ? 1 : 2);
   if (kept > 0) {
-    parts.push(`${kept} other column${kept === 1 ? '' : 's'} kept as fields`);
+    parts.push(`${kept} other ${pluralize(kept, 'column')} kept as fields`);
   }
   return `${parts.join(', ')}.`;
 }

@@ -2,11 +2,9 @@ import type { Exercise, ExerciseSet } from '../exercises/types.ts';
 import { sortByDifficulty } from '../exercises/validate.ts';
 
 /**
- * The two sets this site was built to replace, taken from the cheminfo
- * visualizer views they ran in before. Every structure was re-derived from the
- * original openchemlib idCode and kept only if it survives being written as a
- * SMILES and read back — an exercise whose own answer does not round trip
- * cannot be marked fairly.
+ * The two structure sets. Every structure is stored as an openchemlib idCode
+ * and kept only if it survives being written as a SMILES and read back — an
+ * exercise whose own answer does not round trip cannot be marked fairly.
  *
  * No level is written down here: `levelOf` reads it off the molecule, so a set
  * a teacher assembles from their own molecules is coloured exactly like these.

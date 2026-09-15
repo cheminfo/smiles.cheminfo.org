@@ -8,6 +8,7 @@
  */
 
 import type { AboutContent, CitedWork } from 'react-cheminfo/core';
+import { PLATFORM_WORK } from 'react-cheminfo/core';
 
 /** The record the `/about` page is drawn from. */
 export const ABOUT: AboutContent = {
@@ -25,6 +26,8 @@ export const ABOUT: AboutContent = {
     'Everything runs in the page on openchemlib, the JavaScript port of the Java library Thomas Sander wrote. Nothing you draw, paste or open is uploaded, and there is no service behind the site: reading a list also indexes it, so a set you are not allowed to send anywhere is still one you can search here.',
     'A canonical SMILES is the one string a toolkit picks out of the many that describe the same molecule, so two people who wrote it differently can still tell they meant the same one. That is what makes the exercises gradable — an answer is marked on the molecule, never on the string — and the second SMILES paper is where it is defined.',
   ],
+  people: [{ name: 'Luc Patiny' }],
+  providedBy: ['epfl'],
   credits: [
     'openchemlib',
     'openchemlib-utils',
@@ -40,13 +43,14 @@ export const ABOUT: AboutContent = {
 };
 
 /**
- * The papers a reader publishing what this page produced owes: the notation
- * itself, the algorithm that makes one SMILES canonical, and the toolkit that
- * reads and draws every structure here.
+ * The papers a reader publishing what this page produced owes: the platform the
+ * site runs on, the notation itself, the algorithm that makes one SMILES
+ * canonical, and the toolkit that reads and draws every structure here.
  * @returns The works, in the order the page lists them.
  */
 function citedWorks(): CitedWork[] {
   return [
+    PLATFORM_WORK,
     {
       reference: {
         authors: [{ given: 'D.', family: 'Weininger' }],

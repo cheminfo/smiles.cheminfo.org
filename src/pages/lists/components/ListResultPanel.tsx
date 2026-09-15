@@ -1,9 +1,10 @@
 import { Button, Callout, Card, H5, InputGroup, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useDeferredValue, useMemo } from 'react';
+import { formatInteger, pluralize } from 'react-cheminfo/core';
+import { CopyButton } from 'react-cheminfo/ui';
 import { List, useDynamicRowHeight } from 'react-window';
 
-import CopyButton from '../../../components/CopyButton.tsx';
 import { data, preferences, view } from '../../../state/lists.ts';
 import { isHidden } from '../../../state/shareConfig.ts';
 import { describeLayout } from '../describeLayout.ts';
@@ -81,15 +82,15 @@ export default function ListResultPanel() {
           ) : null}
           {hits === null && failed > 0 ? (
             <Tag minimal intent="danger">
-              {failed.toLocaleString()} could not be read
+              {formatInteger(failed)} could not be read
             </Tag>
           ) : null}
           {isHidden('export') ? null : (
             <>
               <CopyButton
-                size="small"
-                text="Copy"
-                code={() => exportList(selected, 'text').content}
+                small
+                label="Copy"
+                content={() => exportList(selected, 'text').content}
               />
               <Button
                 size="small"
@@ -180,12 +181,12 @@ function countText(
   hits: number | undefined,
   shown: number,
 ): string {
-  const count = total.toLocaleString();
+  const count = formatInteger(total);
   if (hits === undefined) {
     return shown === total
-      ? `${count} structure${total === 1 ? '' : 's'}`
-      : `${shown.toLocaleString()} of ${count}`;
+      ? `${count} ${pluralize(total, 'structure')}`
+      : `${formatInteger(shown)} of ${count}`;
   }
-  const found = `${hits.toLocaleString()} hit${hits === 1 ? '' : 's'} of ${count}`;
-  return shown === hits ? found : `${shown.toLocaleString()} of ${found}`;
+  const found = `${formatInteger(hits)} ${pluralize(hits, 'hit')} of ${count}`;
+  return shown === hits ? found : `${formatInteger(shown)} of ${found}`;
 }

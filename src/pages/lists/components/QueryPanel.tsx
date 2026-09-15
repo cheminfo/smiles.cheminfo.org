@@ -108,6 +108,7 @@ export default function QueryPanel() {
               min={1}
               max={5000}
               stepSize={100}
+              majorStepSize={1000}
               value={preferences.limit.value}
               onValueChange={(value) => {
                 if (Number.isFinite(value)) preferences.limit.value = value;

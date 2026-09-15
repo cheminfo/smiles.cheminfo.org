@@ -1,14 +1,11 @@
-import {
-  Alert,
-  Button,
-  Card,
-  H5,
-  Icon,
-  ProgressBar,
-  Tag,
-} from '@blueprintjs/core';
+import { Alert, Button, Card, H5, ProgressBar, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import { pluralize } from 'react-cheminfo/core';
+import {
+  ExerciseStatusIcon,
+  useListKeyboardNavigation,
+} from 'react-cheminfo/ui';
 
 import type { Exercise } from '../../../exercises/types.ts';
 import { levelOf } from '../../../exercises/validate.ts';
@@ -34,12 +31,21 @@ export default function ExerciseList() {
   const [clearing, setClearing] = useState(false);
   const set = data.set.value;
   const current = view.current.value;
-  const listRef = useRef<HTMLUListElement>(null);
 
   const ids = set.exercises.map((exercise) => exercise.id);
   const solved = solvedCount(ids);
 
-  useArrowKeys(listRef, ids, current);
+  // The handler sits on the list rather than on the window, so the arrow keys
+  // still move a caret inside the answer box — which is where they belong when
+  // the answer box is what has the focus.
+  const onKeyDown = useListKeyboardNavigation({
+    length: ids.length,
+    selectedIndex: ids.indexOf(current),
+    onSelect: (index) => {
+      const next = ids[index];
+      if (next !== undefined) openExercise(next);
+    },
+  });
 
   return (
     <Card className="exercise-list-card">
@@ -57,7 +63,7 @@ export default function ExerciseList() {
       />
       <p className="muted">{set.description}</p>
 
-      <ul ref={listRef} className="exercise-list">
+      <ul className="exercise-list" onKeyDown={onKeyDown}>
         {set.exercises.map((exercise, index) => (
           <Row
             key={exercise.id}
@@ -117,22 +123,7 @@ function Row(props: { exercise: Exercise; index: number; active: boolean }) {
         aria-current={active}
         onClick={() => openExercise(exercise.id)}
       >
-        <Icon
-          icon={
-            progress.status === 'solved'
-              ? 'tick-circle'
-              : progress.status === 'attempted'
-                ? 'warning-sign'
-                : 'circle'
-          }
-          intent={
-            progress.status === 'solved'
-              ? 'success'
-              : progress.status === 'attempted'
-                ? 'warning'
-                : 'none'
-          }
-        />
+        <ExerciseStatusIcon status={progress.status} />
         <span className="exercise-row-index">{index + 1}</span>
         <span className="exercise-row-title">{exercise.title}</span>
         {progress.attempts > 1 ? (
@@ -142,47 +133,10 @@ function Row(props: { exercise: Exercise; index: number; active: boolean }) {
         ) : null}
         {progress.hintsRevealed > 0 ? (
           <Tag minimal htmlTitle="Hints opened">
-            {progress.hintsRevealed} hint
-            {progress.hintsRevealed === 1 ? '' : 's'}
+            {progress.hintsRevealed} {pluralize(progress.hintsRevealed, 'hint')}
           </Tag>
         ) : null}
       </button>
     </li>
   );
-}
-
-/**
- * Walk the list with ArrowUp and ArrowDown.
- *
- * The handler sits on the list rather than on the window, so the arrow keys
- * still move a caret inside the answer box — which is where they belong when
- * the answer box is what has the focus.
- * @param listRef - The list element.
- * @param ids - Every exercise of the set, in order.
- * @param current - Which one is open.
- */
-function useArrowKeys(
-  listRef: React.RefObject<HTMLUListElement | null>,
-  ids: readonly string[],
-  current: string,
-): void {
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      const step =
-        event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : 0;
-      if (step === 0) return;
-      const at = ids.indexOf(current);
-      const next = ids[Math.min(Math.max(at + step, 0), ids.length - 1)];
-      if (next && next !== current) {
-        event.preventDefault();
-        openExercise(next);
-      }
-    };
-
-    list.addEventListener('keydown', onKeyDown);
-    return () => list.removeEventListener('keydown', onKeyDown);
-  }, [listRef, ids, current]);
 }

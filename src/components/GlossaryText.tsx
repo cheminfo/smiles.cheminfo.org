@@ -1,11 +1,11 @@
 import { PopoverNext } from '@blueprintjs/core';
 import { Fragment } from 'react';
+import { parseGlossaryMarkers } from 'react-cheminfo/core';
 
 import type { GlossaryEntry } from '../data/glossary.ts';
 import { GLOSSARY } from '../data/glossary.ts';
 
 import SmilesThumb from './SmilesThumb.tsx';
-import { MARKER } from './glossaryMarkers.ts';
 
 /**
  * Render prose in which jargon is marked with `[[double brackets]]`, turning
@@ -19,25 +19,19 @@ import { MARKER } from './glossaryMarkers.ts';
  */
 export default function GlossaryText(props: { text: string }) {
   const pieces: React.ReactNode[] = [];
-  let at = 0;
 
-  for (const match of props.text.matchAll(MARKER)) {
-    const start = match.index;
-    if (start > at) pieces.push(props.text.slice(at, start));
-    const term = match.groups?.term ?? '';
-    const entry = GLOSSARY[term.toLowerCase()];
-    // Keyed on where the marker sits in the prose, which is unique even when
+  for (const segment of parseGlossaryMarkers(props.text)) {
+    const entry = segment.kind === 'term' ? GLOSSARY[segment.term] : undefined;
+    // Keyed on where the piece sits in the prose, which is unique even when
     // the same term is linked twice in one paragraph.
     pieces.push(
       entry ? (
-        <GlossaryTerm key={`${start}-${term}`} term={term} entry={entry} />
+        <GlossaryTerm key={segment.start} term={segment.text} entry={entry} />
       ) : (
-        <Fragment key={`${start}-${term}`}>{term}</Fragment>
+        <Fragment key={segment.start}>{segment.text}</Fragment>
       ),
     );
-    at = start + match[0].length;
   }
-  if (at < props.text.length) pieces.push(props.text.slice(at));
 
   return <>{pieces}</>;
 }

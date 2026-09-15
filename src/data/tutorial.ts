@@ -1,5 +1,6 @@
+import type { ExerciseLevel } from 'react-cheminfo/core';
+
 /** Pedagogic level used to group and color-code tutorial steps and exercises. */
-export type ExerciseLevel = 'beginner' | 'intermediate' | 'advanced';
 
 /**
  * One stop in the guided tour. The description may contain `[[term]]` markers
@@ -156,3 +157,5 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     smiles: 'CN1[C@H]2CC[C@@H]1[C@H]([C@H](C2)OC(=O)c3ccccc3)C(=O)OC',
   },
 ];
+
+export { type ExerciseLevel } from 'react-cheminfo/core';

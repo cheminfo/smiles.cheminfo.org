@@ -1,4 +1,4 @@
-import CopyButton from '../../../components/CopyButton.tsx';
+import { CopyButton } from 'react-cheminfo/ui';
 
 interface NotationRowProps {
   label: string;
@@ -26,7 +26,7 @@ export default function NotationRow(props: NotationRowProps) {
         <span className="notation-row-label" title={hint}>
           {label}
         </span>
-        <CopyButton size="small" code={text} title={`Copy the ${label}`} />
+        <CopyButton small content={text} title={`Copy the ${label}`} />
       </div>
       <code
         className={`notation-row-value${block ? ' notation-row-value--block' : ''}`}

@@ -1,10 +1,10 @@
 import { Button, Card, H5, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
+import { CopyButton } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 
 import { readInput } from '../../../chemistry/readInput.ts';
-import CopyButton from '../../../components/CopyButton.tsx';
 import GlossaryText from '../../../components/GlossaryText.tsx';
 import SmilesThumb from '../../../components/SmilesThumb.tsx';
 import StructureView from '../../../components/StructureView.tsx';
@@ -113,7 +113,7 @@ function DrawQuestion(props: { smiles: string }) {
       <p className="muted">Draw the molecule this SMILES describes.</p>
       <div className="question-smiles">
         <code>{props.smiles}</code>
-        <CopyButton size="small" code={props.smiles} />
+        <CopyButton small content={props.smiles} />
       </div>
     </>
   );

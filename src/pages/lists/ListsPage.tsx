@@ -10,10 +10,9 @@ import QueryPanel from './components/QueryPanel.tsx';
  *
  * Converting a list and searching one are the same list and the same reading,
  * so they are the same page: the table a conversion fills is the table a query
- * narrows, and what is left is what every download holds. This is what replaces
- * the "Smiles list to SDF" activity — but it runs both ways, it answers a
- * substructure query, and it runs here, so a list of ten thousand never leaves
- * the browser.
+ * narrows, and what is left is what every download holds. It runs both ways,
+ * it answers a substructure query, and it runs here, so a list of ten thousand
+ * never leaves the browser.
  * @returns The lists page.
  */
 export default function ListsPage() {

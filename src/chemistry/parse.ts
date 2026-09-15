@@ -1,6 +1,9 @@
 import { Molecule, SmilesParser } from 'openchemlib';
+import { readStructure as classifyStructure } from 'react-cheminfo/structure';
 
 import type { InputFormat } from './types.ts';
+
+export { looksLikeSmarts } from 'react-cheminfo/structure';
 
 /** How a piece of text turned out to be written. */
 export type ReadFormat = 'smiles' | 'smarts' | 'molfile' | 'idcode';
@@ -64,50 +67,6 @@ export function parseStructure(
 }
 
 /**
- * Whether a line notation uses syntax that exists in SMARTS and not in SMILES.
- *
- * Only the inside of a bracket atom is inspected for the primitives, because
- * `#` is a triple bond outside one and `D`, `X`, `R`, `v` and `h` are the
- * start of real element symbols. `~`, `&`, `,`, `;`, `!` and `$(` are SMARTS
- * anywhere they appear.
- * @param text - The line notation.
- * @returns True when it can only be a query.
- */
-export function looksLikeSmarts(text: string): boolean {
-  if (/[~&;,!]/.test(text) || text.includes('$(')) return true;
-  for (const match of text.matchAll(/\[(?<atom>[^\]]*)\]/g)) {
-    const atom = match.groups?.atom ?? '';
-    // #6 (atomic number), X3 / D2 / R1 / r5 / v4 / h1 / x2 (counts), and the
-    // a / A wildcards. A digit is required after the letter, so [Xe] and [Rn]
-    // stay elements. The wildcard is anchored to the start of the atom, after
-    // an optional isotope: unanchored it matches the `a` of `[Na+]`, and every
-    // bracketed element holding a lowercase a — Na, Ca, Ba, La, Ta — is then
-    // read as a query rather than as the atom it is.
-    if (/#\d|[DXRrvhx]\d|^\*|^\d*[aA](?![a-z])/.test(atom)) return true;
-  }
-  // Outside a bracket the wildcard has to stand on its own: a letter on either
-  // side and it is part of a word, not a pattern. Widening this to any `a` or
-  // `A` reads the header `CAS` as the three-atom SMARTS `C`,`A`,`S`, and a
-  // spreadsheet's header row stops being recognised as one.
-  return /(?:^|[^A-Za-z])[aA](?![a-z])/.test(
-    text.replaceAll(/\[[^\]]*\]/g, ''),
-  );
-}
-
-/**
- * Whether a string looks like a molfile rather than a line notation. A molfile
- * is several lines and carries a counts line; a SMILES never contains a
- * newline.
- * @param text - The structure, as typed or pasted.
- * @returns True when it should be read as a molfile.
- */
-export function looksLikeMolfile(text: string): boolean {
-  const lines = text.trim().split('\n');
-  if (lines.length < 4) return false;
-  return lines.some((line) => line.includes('V2000') || line.includes('V3000'));
-}
-
-/**
  * Read whatever was pasted: a molfile, an idCode, or a line notation that may
  * be a SMILES or a SMARTS.
  * @param input - The trimmed structure, which is what a line notation needs.
@@ -115,11 +74,12 @@ export function looksLikeMolfile(text: string): boolean {
  * @returns The molecule and the notation it was read as.
  */
 function parseAuto(input: string, raw: string): ReadStructure {
-  if (looksLikeMolfile(input)) {
-    return { molecule: Molecule.fromMolfile(raw), format: 'molfile' };
+  const sniffed = classifyStructure(raw);
+  if (sniffed.kind === 'molfile') {
+    return { molecule: Molecule.fromMolfile(sniffed.value), format: 'molfile' };
   }
 
-  const format: ReadFormat = looksLikeSmarts(input) ? 'smarts' : 'smiles';
+  const format: ReadFormat = sniffed.kind === 'smarts' ? 'smarts' : 'smiles';
   try {
     return { molecule: parseSmiles(input, format), format };
   } catch (error) {

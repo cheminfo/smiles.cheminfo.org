@@ -31,15 +31,6 @@ port.
 | **SMARTS sheet**   | The whole of the SMARTS query language on its own printable page — the atom and bond primitives, the logical operators, recursive SMARTS, component grouping and reaction queries — opening on the same shared section, because a query is read as a question and not as a structure.                                                                                                                                                    |
 | **Specification**  | The OpenSMILES specification itself, mirrored here word for word with a table of contents down the left — the original is served with a certificate no browser accepts.                                                                                                                                                                                                                                                                  |
 
-## What it replaces
-
-Three activities that used to run in the cheminfo visualizer:
-
-- `Molecule -> SMILES` and `SMILES -> Molecule` — now the two structure
-  exercise sets, with their original molecules.
-- `Smiles list to SDF` — now the Lists & search page, which also runs the other
-  way, and searches what it converted.
-
 ## Sharing and embedding
 
 Every page writes what it is working on into its own address, so the address is

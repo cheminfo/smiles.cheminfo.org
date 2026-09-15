@@ -1,3 +1,5 @@
+import { trimTrailingSlash } from 'react-cheminfo/core';
+
 export type Page =
   | 'converter'
   | 'lists'
@@ -106,8 +108,4 @@ export function routePath(route: Route): string {
       : `/exercises/${setId}`;
   }
   return PATHS[page];
-}
-
-function trimTrailingSlash(value: string): string {
-  return value.length > 1 && value.endsWith('/') ? value.slice(0, -1) : value;
 }

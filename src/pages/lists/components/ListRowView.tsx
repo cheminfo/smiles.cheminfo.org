@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
+import { CopyButton } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 import type { RowComponentProps } from 'react-window';
 
 import { writeMolecule } from '../../../chemistry/describe.ts';
 import type { OutputFormat } from '../../../chemistry/types.ts';
-import CopyButton from '../../../components/CopyButton.tsx';
 import StructureView from '../../../components/StructureView.tsx';
 import type { ShownRow } from '../shownRows.ts';
 
@@ -73,7 +73,7 @@ export default function ListRowView(props: RowComponentProps<ListRowsProps>) {
           )}
           <RowFields fields={row.fields} />
         </div>
-        <CopyButton size="small" code={output} />
+        <CopyButton small content={output} />
       </div>
     </div>
   );

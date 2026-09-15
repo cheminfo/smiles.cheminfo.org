@@ -1,28 +1,12 @@
-import {
-  Button,
-  Checkbox,
-  Dialog,
-  DialogBody,
-  DialogFooter,
-  H6,
-} from '@blueprintjs/core';
+import { H6 } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
-import type { ShareConfig, ShareVocabulary } from 'react-cheminfo/core';
-import {
-  applyShareConfig,
-  buildEmbedCode,
-  isShareConfigured,
-  suggestedShareConfig,
-} from 'react-cheminfo/core';
+import { ShareDialog as SharePanel } from 'react-cheminfo/ui';
 
 import { EXERCISES_PARAM, SET_PARAM, data } from '../../state/exercises.ts';
 import { PATHS, route } from '../../state/router.ts';
-import type { HideKey } from '../../state/shareConfig.ts';
-import { shareConfig } from '../../state/shareConfig.ts';
 import { shareOptionsOf } from '../../state/shareOptions.ts';
-import CodeBlock from '../CodeBlock.tsx';
-import CopyButton from '../CopyButton.tsx';
+import { absoluteUrl } from '../../state/site.ts';
 
 import ShareExerciseSet from './ShareExerciseSet.tsx';
 
@@ -39,167 +23,67 @@ export default function ShareDialog(props: {
 }) {
   useSignals();
   const options = shareOptionsOf(route.page.value);
-  // The dialog opens on the link one actually hands out — a tile inside a
-  // course, without the parts that course has no use for. A page already
-  // running a configuration shows that one instead of resetting it.
-  const [draft, setDraft] = useState<ShareConfig>(() =>
-    isShareConfigured(shareConfig.value, options.vocabulary)
-      ? shareConfig.value
-      : suggestedShareConfig(options.vocabulary),
-  );
   // Until the teacher touches the list, the link hands out the whole set —
   // derived rather than copied at mount, so a set still loading when the
   // dialog opens does not leave it ticking nothing.
   const [chosen, setChosen] = useState<string[] | null>(null);
   const selected =
     chosen ?? data.set.value.exercises.map((exercise) => exercise.id);
-
-  function setHidden(key: HideKey, hidden: boolean): void {
-    setDraft((previous) => {
-      const rest = previous.hidden.filter((entry) => entry !== key);
-      return { ...previous, hidden: hidden ? [...rest, key] : rest };
-    });
-  }
-
-  const hidden = new Set(draft.hidden);
-  const url = buildUrl(
-    draft,
-    options.vocabulary,
-    options.hasExercises ? selected : null,
-  );
-  const frame = buildEmbedCode({
-    url,
-    title: `SMILES — ${options.title}`,
-    height: 800,
-  });
+  const link = options.hasExercises ? exerciseLink(selected) : null;
 
   return (
-    <Dialog
+    <SharePanel
       isOpen={props.isOpen}
       onClose={props.onClose}
-      title="Share or embed"
-      icon="share"
-      className="share-dialog"
+      vocabulary={options.vocabulary}
+      title={options.title}
+      frameTitle={`SMILES — ${options.title}`}
+      frameHeight={800}
+      baseUrl={link?.baseUrl}
+      search={link?.search}
     >
-      {/* The link is what one came for, so it sits outside the scrolling body:
-          always in view, and showing what every box below does to it. */}
-      <div className="share-link">
-        <p className="muted share-link-intro">
-          A link to <b>{options.title}</b> as you have it set up now.
-        </p>
-        <CodeBlock code={url} />
-        <div className="share-link-actions">
-          <CopyButton code={url} text="Copy the link" />
-          <Button
-            icon="share"
-            text="Open in a new tab"
-            onClick={() => globalThis.open(url, '_blank', 'noopener')}
-          />
-          {/* The markup itself is never read: it is pasted. */}
-          <CopyButton code={frame} text="Copy the iframe" />
-        </div>
-      </div>
-      <DialogBody>
-        <section className="share-section">
-          <H6>Layout</H6>
-          <Checkbox
-            checked={draft.embed}
-            label="Frame it: no header, no navigation"
-            onChange={(event) => {
-              const embed = event.currentTarget.checked;
-              setDraft((previous) => ({ ...previous, embed }));
-            }}
-          />
-        </section>
-
-        {options.vocabulary.parts.length > 0 ? (
-          <section className="share-section">
-            <H6>Show on the page</H6>
-            {options.vocabulary.parts.map((part) => (
-              <div key={part.key} className="share-feature">
-                <Checkbox
-                  checked={!hidden.has(part.key)}
-                  label={part.label}
-                  onChange={(event) =>
-                    setHidden(part.key as HideKey, !event.currentTarget.checked)
-                  }
-                />
-                <span className="share-hint">{part.description}</span>
-              </div>
-            ))}
-          </section>
-        ) : null}
-
-        {options.hasExercises ? (
-          <section className="share-section">
-            <H6>Exercises</H6>
-            <ShareExerciseSet selected={selected} onChange={setChosen} />
-          </section>
-        ) : null}
-      </DialogBody>
-      <DialogFooter
-        actions={
-          <Button intent="primary" text="Done" onClick={props.onClose} />
-        }
-      />
-    </Dialog>
+      {options.hasExercises ? (
+        <>
+          <H6>Exercises</H6>
+          <ShareExerciseSet selected={selected} onChange={setChosen} />
+        </>
+      ) : undefined}
+    </SharePanel>
   );
 }
 
 /**
- * The address of the page, with the configuration of the dialog written over
- * whatever the current one carries.
- * @param config - What the dialog holds.
- * @param vocabulary - What this page's links can say.
- * @param exercises - The chosen exercises, or null on a page without a set.
- * @returns The absolute address.
- */
-function buildUrl(
-  config: ShareConfig,
-  vocabulary: ShareVocabulary,
-  exercises: readonly string[] | null,
-) {
-  const params = new URLSearchParams(globalThis.location.search);
-  const chosen = exercises ? applyExercises(params, exercises) : null;
-
-  const search = applyShareConfig(params.toString(), config, vocabulary);
-  const { origin, pathname } = globalThis.location;
-  // A set assembled question by question has no address of its own: the link
-  // carries the list, so it opens the page holding them rather than a set the
-  // site does not ship.
-  return `${origin}${chosen ?? pathname}${search ? `?${search}` : ''}`;
-}
-
-/**
- * Write the chosen exercises into the link.
- * @param params - The query string being built.
+ * The address of the page with the chosen exercises written into it, which is
+ * what the dialog then writes its own configuration over.
  * @param exercises - The chosen exercise ids, in the order they were picked.
- * @returns The path the link must open, or null to keep the current one.
+ * @returns The query string, and the page the link must open when it is not the current one.
  */
-function applyExercises(
-  params: URLSearchParams,
-  exercises: readonly string[],
-): string | null {
+function exerciseLink(exercises: readonly string[]): {
+  baseUrl: string | undefined;
+  search: string;
+} {
+  const params = new URLSearchParams(globalThis.location?.search ?? '');
   const set = data.set.peek();
-  const whole = set.exercises.map((exercise) => exercise.id);
   const isWholeSet =
-    exercises.length === whole.length &&
-    exercises.every((id, index) => id === whole[index]);
+    exercises.length === set.exercises.length &&
+    exercises.every((id, index) => id === set.exercises[index]?.id);
 
   if (isWholeSet && set.id !== 'custom') {
     // The whole set is named by the address itself, which is shorter, readable,
     // and survives the set gaining a question later.
     params.delete(EXERCISES_PARAM);
     params.delete(SET_PARAM);
-    return null;
+    return { baseUrl: undefined, search: params.toString() };
   }
 
   params.delete(SET_PARAM);
   params.set(EXERCISES_PARAM, exercises.join(','));
-
   const open = params.get('exercise');
   if (open && exercises.length > 0 && !exercises.includes(open)) {
     params.delete('exercise');
   }
-  return PATHS.exercises;
+  // A set assembled question by question has no address of its own: the link
+  // carries the list, so it opens the page holding them rather than a set the
+  // site does not ship.
+  return { baseUrl: absoluteUrl(PATHS.exercises), search: params.toString() };
 }

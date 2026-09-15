@@ -88,9 +88,8 @@ changelog:
 
 ## Exercises
 
-The site replaces two cheminfo visualizer views, and its two structure sets are
-those views' molecules, re-derived from the original idCodes and kept only
-where the structure survives being written as a SMILES and read back.
+Every molecule of the two structure sets is kept only where it survives being
+written as a SMILES and read back.
 
 **The level of an exercise is read off it, never written down.**
 `exercises/validate.ts#levelOf` decides from the heavy-atom count, so a set a

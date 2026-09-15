@@ -1,14 +1,16 @@
-import { Icon } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
 import {
+  CiteButton,
   EcosystemButton,
   NavLink,
+  ShareButton,
   SiteFooter,
   SiteHeader,
   SiteTheme,
 } from 'react-cheminfo/ui';
 
+import { ABOUT } from './about.ts';
 import ShareDialog from './components/share/ShareDialog.tsx';
 import AboutPage from './pages/about/AboutPage.tsx';
 import ConverterPage from './pages/converter/ConverterPage.tsx';
@@ -44,9 +46,11 @@ export default function App() {
   return (
     <>
       <SiteTheme siteId="smiles" />
-      {isEmbedded() ? null : <Header page={page} />}
-      <div className="page">
-        <CurrentPage page={page} />
+      <div className="app-screen">
+        {isEmbedded() ? null : <Header page={page} />}
+        <main className="page">
+          <CurrentPage page={page} />
+        </main>
       </div>
       <SiteFooter siteId="smiles" embedded={isEmbedded()} />
     </>
@@ -105,16 +109,12 @@ function Header(props: { page: Page }) {
               }}
               active={props.page === 'about'}
             />
+            {ABOUT.cite ? <CiteButton works={ABOUT.cite} /> : null}
             <EcosystemButton currentSiteId="smiles" />
-            <button
-              type="button"
-              className="nav-link"
+            <ShareButton
               title="Share a link to this page, or frame it in your own site"
               onClick={() => setSharing(true)}
-            >
-              <Icon icon="share" size={14} />
-              Share
-            </button>
+            />
           </>
         }
       />

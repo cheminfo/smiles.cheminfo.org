@@ -1,5 +1,5 @@
-import { Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { CapsuleFilter } from 'react-cheminfo/ui';
 
 import { EXERCISE_SETS } from '../../../data/exercises.ts';
 import { solvedCount } from '../../../state/exerciseProgress.ts';
@@ -16,28 +16,26 @@ import { data, openSet } from '../../../state/exercises.ts';
  */
 export default function SetPicker() {
   useSignals();
-  const current = data.set.value.id;
 
   return (
-    <div className="set-picker">
-      {EXERCISE_SETS.map((set) => {
-        const active = set.id === current;
+    <CapsuleFilter
+      className="set-picker"
+      label="Exercise set"
+      value={data.set.value.id}
+      onChange={openSet}
+      options={EXERCISE_SETS.map((set) => {
         const solved = solvedCount(
           set.exercises.map((exercise) => exercise.id),
         );
-        return (
-          <Tag
-            key={set.id}
-            interactive
-            minimal={!active}
-            intent={solved === set.exercises.length ? 'success' : 'primary'}
-            htmlTitle={set.description}
-            onClick={() => openSet(set.id)}
-          >
-            {set.title} ({solved}/{set.exercises.length})
-          </Tag>
-        );
+        return {
+          value: set.id,
+          // The ratio is what says how far through the set the student is, so
+          // it rides in the label rather than as a bare count.
+          label: `${set.title} (${solved}/${set.exercises.length})`,
+          intent: solved === set.exercises.length ? 'success' : 'primary',
+          title: set.description,
+        };
       })}
-    </div>
+    />
   );
 }

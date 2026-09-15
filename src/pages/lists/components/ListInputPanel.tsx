@@ -13,6 +13,7 @@ import {
 } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useRef } from 'react';
+import { formatInteger } from 'react-cheminfo/core';
 
 import type { InputFormat, OutputFormat } from '../../../chemistry/types.ts';
 import { LIST_SAMPLES, PLAIN_SAMPLE } from '../../../data/samples/index.ts';
@@ -73,7 +74,7 @@ export default function ListInputPanel() {
         <div className="draw-header-actions">
           {read > 0 ? (
             <Tag minimal intent="success">
-              {read.toLocaleString()} indexed
+              {formatInteger(read)} indexed
             </Tag>
           ) : null}
           <Button

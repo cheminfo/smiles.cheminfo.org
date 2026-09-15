@@ -294,7 +294,10 @@ test('the share dialog builds a framed link', async ({ page }) => {
   await page.getByRole('button', { name: 'Share' }).click();
   await expect(page.getByText('Share or embed')).toBeVisible();
 
-  const link = await page.locator('.share-link .code-block pre').textContent();
+  const link = await page
+    .locator('.share-dialog .code-block pre')
+    .first()
+    .textContent();
   expect(link).toContain('embed=1');
   expect(link).toContain('/exercises/patterns');
 });
