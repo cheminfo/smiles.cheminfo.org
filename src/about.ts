@@ -7,12 +7,16 @@
  * `pages/about/AboutPage.tsx`.
  */
 
+import { BUILD_INFO } from 'react-cheminfo/build-info';
 import type { AboutContent, CitedWork } from 'react-cheminfo/core';
 import { PLATFORM_WORK } from 'react-cheminfo/core';
 
 /** The record the `/about` page is drawn from. */
 export const ABOUT: AboutContent = {
   siteId: 'smiles',
+  // Which release, built when, from which commit: the build says so,
+  // because a version written by hand is wrong by the next release.
+  build: BUILD_INFO,
   what: 'Draw a structure and read its SMILES, write a SMILES and see the structure — one molecule at a time, or ten thousand.',
   can: [
     'Convert a drawn structure to SMILES, and a SMILES back to a structure.',
