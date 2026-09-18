@@ -1,7 +1,7 @@
 import { Button, Card, H5 } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { StructureEditor } from 'react-cheminfo/structure';
 
-import StructureEditor from '../../../components/StructureEditor.tsx';
 import {
   setDrawn,
   setInput,
@@ -38,14 +38,21 @@ export default function DrawPanel() {
         </div>
       </div>
       <StructureEditor
+        className="structure-editor"
         // The editor owns the drawing while it is being made, so it is
         // replaced rather than driven: only a structure that came from
         // somewhere else bumps the revision.
-        key={view.editorRevision.value}
+        revision={view.editorRevision.value}
         mode={isReaction ? 'reaction' : 'molecule'}
         fragment={kind === 'query'}
-        initialIdCode={view.editorIdCode.value}
-        onChange={isReaction ? setReactionDrawn : setDrawn}
+        value={view.editorIdCode.value}
+        // Every stroke is written in the box at once, and a tab switch reads
+        // the box back into the canvas.
+        debounce={0}
+        onChange={(change) => {
+          if (change.mode === 'reaction') setReactionDrawn(change.smiles);
+          else setDrawn(change.idCode);
+        }}
         minHeight={380}
       />
     </Card>

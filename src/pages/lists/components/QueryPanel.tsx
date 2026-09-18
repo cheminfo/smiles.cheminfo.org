@@ -13,11 +13,11 @@ import {
 } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
+import { StructureEditor } from 'react-cheminfo/structure';
 
 import type { SearchMode } from '../../../chemistry/moleculesDatabase.ts';
 import { readInput } from '../../../chemistry/readInput.ts';
 import NotationError from '../../../components/NotationError.tsx';
-import StructureEditor from '../../../components/StructureEditor.tsx';
 import {
   clearQuery,
   preferences,
@@ -157,7 +157,14 @@ function DrawQueryDialog(props: { onClose: () => void }) {
           Drawn as a query fragment, so the atoms you leave open stay open — a
           carbon here means “a carbon with anything on it”, not “a methyl”.
         </p>
-        <StructureEditor fragment onChange={setIdCode} minHeight={340} />
+        <StructureEditor
+          fragment
+          // "Use this" reads the drawing at once, so it must hold the last
+          // stroke.
+          debounce={0}
+          onChange={(change) => setIdCode(change.idCode)}
+          minHeight={340}
+        />
       </DialogBody>
       <DialogFooter
         actions={

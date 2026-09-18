@@ -1,9 +1,9 @@
 import { Button, Callout, Card, H5, InputGroup, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { pluralize } from 'react-cheminfo/core';
+import { StructureEditor } from 'react-cheminfo/structure';
 import { CopyButton } from 'react-cheminfo/ui';
 
-import StructureEditor from '../../../components/StructureEditor.tsx';
 import type { Exercise } from '../../../exercises/types.ts';
 import { progressOf } from '../../../state/exerciseProgress.ts';
 import {
@@ -72,12 +72,17 @@ export default function AnswerPanel(props: { exercise: Exercise }) {
 
       {exercise.kind === 'draw' ? (
         <StructureEditor
-          // Remounted only when the exercise changes or the answer is thrown
+          className="structure-editor"
+          // Reloaded only when the exercise changes or the answer is thrown
           // away, so the canvas is never taken out from under a hand that is
           // still drawing.
-          key={`${exercise.id}:${view.editorRevision.value}`}
-          initialIdCode={progress.answer}
-          onChange={setAnswer}
+          key={exercise.id}
+          revision={view.editorRevision.value}
+          value={progress.answer}
+          // Submitting reads the answer at once, so it must hold the last
+          // stroke.
+          debounce={0}
+          onChange={(change) => setAnswer(change.idCode)}
           minHeight={340}
         />
       ) : (

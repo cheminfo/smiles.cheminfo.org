@@ -13,9 +13,10 @@ they are not allowed to send anywhere, and that is the point.
 ## Stack
 
 - **One page, no service.** React 19 + Vite, `@preact/signals-react` for global
-  state, BlueprintJS for the widgets, `react-ocl` for the editor and the
-  drawings, `react-mf` for every molecular formula on screen,
-  `react-cheminfo` for what the family shares.
+  state, BlueprintJS for the widgets, `react-cheminfo/structure`'s
+  `<StructureEditor>` for the editor, `react-ocl` for the drawings, `react-mf`
+  for every molecular formula on screen, `react-cheminfo` for what the family
+  shares.
 - **The chemistry** lives in `src/chemistry/`, imported by the pages that use
   it.
 - **Ports**: the page is served on `10606`, the Vite dev server on `10607`
@@ -222,10 +223,12 @@ openchemlib molecule costs while `MoleculesDB` holds it for searching.
   ring bonds are painted as well, because a bond between two ring atoms is not
   always a ring bond — biphenyl's middle one is the case the numbers alone
   cannot tell.
-- The canvas editor is uncontrolled and owns its drawing: it is **remounted with
-  a `key`** to replace what it holds, never driven by a prop. On the converter
-  only a structure that came from somewhere else bumps the revision — rebuilding
-  it under a hand that is still drawing throws the drawing away.
+- The canvas editor is uncontrolled and owns its drawing: its `value` is read
+  again only when its **`revision` is bumped**, never driven by a prop. On the
+  converter only a structure that came from somewhere else bumps the revision —
+  rebuilding it under a hand that is still drawing throws the drawing away.
+  Every editor here passes `debounce={0}`: the box, Submit and "Use this" read
+  the drawing the moment after the last stroke.
 - **An answer is handed in, never taken.** Typing and drawing only keep a draft;
   `submitAnswer` is the one thing that marks it, counts an attempt and moves the
   status. Marking every keystroke tells a student halfway through writing the

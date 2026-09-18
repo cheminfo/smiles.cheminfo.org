@@ -133,20 +133,9 @@ code {
 
 /* ── The editor ──────────────────────────────────────────────────────────── */
 
-/* The canvas editor measures its container in pixels, so it is positioned out
-   of the height computation: otherwise card and canvas grow each other. */
+/* The editor draws its own box; the card only gives it the height left over. */
 .structure-editor {
-  position: relative;
   flex: 1;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-  background: #fff;
-}
-
-.structure-editor-canvas {
-  position: absolute;
-  inset: 0;
 }
 
 .draw-card {
