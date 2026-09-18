@@ -36,9 +36,10 @@ test('the record resolves against the shared registries', () => {
   expect(about.repository).toBe(
     'https://github.com/cheminfo/smiles.cheminfo.org',
   );
-  expect(about.issues).toBe(
-    'https://github.com/cheminfo/smiles.cheminfo.org/issues',
-  );
+  // The sources are private, so the page asks for a report nowhere rather
+  // than pointing a visitor at a tracker that answers 404.
+  expect(about.publicRepository).toBe(false);
+  expect(about.issues).toBeUndefined();
   expect(about.credits.map((entry) => entry.name)).toStrictEqual([
     'OpenChemLib',
     'openchemlib-utils',
