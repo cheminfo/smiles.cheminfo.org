@@ -1,5 +1,6 @@
 import { Button, InputGroup, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { ClickToCopy } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 
 import GlossaryText from '../../../components/GlossaryText.tsx';
@@ -72,8 +73,13 @@ export default function StepPlayground(props: { step: TutorialStep }) {
                 </Tag>
               ) : (
                 <>
-                  <Tag minimal>
-                    <MF mf={result.structure.mf} />
+                  <Tag minimal multiline>
+                    <ClickToCopy
+                      value={result.structure.mf}
+                      label="molecular formula"
+                    >
+                      <MF mf={result.structure.mf} />
+                    </ClickToCopy>
                   </Tag>
                   <Tag
                     minimal
@@ -89,10 +95,17 @@ export default function StepPlayground(props: { step: TutorialStep }) {
               {result.structure.smiles === input ? null : (
                 <Tag
                   minimal
+                  multiline
                   intent="primary"
                   title="What this toolkit writes the same molecule as. Anything it does not keep — an atom class, an explicit [H] — is a thing SMILES records and a structure does not."
                 >
-                  written back as: {result.structure.smiles}
+                  written back as:{' '}
+                  <ClickToCopy
+                    value={result.structure.smiles}
+                    label="canonical SMILES"
+                  >
+                    {result.structure.smiles}
+                  </ClickToCopy>
                 </Tag>
               )}
             </div>

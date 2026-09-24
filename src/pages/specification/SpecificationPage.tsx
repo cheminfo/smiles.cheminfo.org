@@ -33,7 +33,10 @@ export default function SpecificationPage() {
   return (
     <div className="specification">
       {isHidden('list') ? null : <SpecificationContents />}
-      <div className="specification-body">
+      {/* The document people cite: its grammar, its examples and the
+          attribution above them are quoted out of the page, so this is one of
+          the regions that stays selectable. */}
+      <div className="specification-body text-selectable">
         <Card className="prose-card spec-intro no-print">
           <div className="card-header">
             <H4>OpenSMILES specification</H4>

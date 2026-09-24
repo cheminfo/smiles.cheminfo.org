@@ -26,6 +26,7 @@ import {
   view,
 } from '../../../state/lists.ts';
 import { isHidden } from '../../../state/shareConfig.ts';
+import { OUTPUT_FORMATS } from '../outputFormats.ts';
 
 const FROM: Array<{ value: InputFormat; label: string }> = [
   { value: 'auto', label: 'Work it out' },
@@ -33,15 +34,6 @@ const FROM: Array<{ value: InputFormat; label: string }> = [
   { value: 'smarts', label: 'SMARTS' },
   { value: 'molfile', label: 'Molfile' },
   { value: 'idcode', label: 'idCode' },
-];
-
-const TO: Array<{ value: OutputFormat; label: string }> = [
-  { value: 'smiles', label: 'Canonical SMILES' },
-  { value: 'kekule', label: 'Kekulé SMILES' },
-  { value: 'smarts', label: 'SMARTS' },
-  { value: 'idcode', label: 'idCode' },
-  { value: 'molfile', label: 'Molfile' },
-  { value: 'molfileV3', label: 'Molfile V3000' },
 ];
 
 /**
@@ -160,7 +152,7 @@ export default function ListInputPanel() {
                 (preferences.to.value = event.currentTarget
                   .value as OutputFormat)
               }
-              options={TO}
+              options={OUTPUT_FORMATS}
             />
           </FormGroup>
         </div>

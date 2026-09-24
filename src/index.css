@@ -183,27 +183,6 @@ textarea.notation-input {
   margin-top: 8px;
 }
 
-.notation-row-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.notation-row-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
-  cursor: help;
-}
-
-.notation-row-value {
-  display: block;
-  font-size: 12px;
-  overflow-wrap: anywhere;
-}
-
 /* ── Converter ───────────────────────────────────────────────────────────── */
 
 .converter,
@@ -304,14 +283,6 @@ textarea.notation-input {
   overflow-wrap: anywhere;
 }
 
-/* A reaction file is a hundred lines: it scrolls rather than pushing every
-   row under it off the screen. */
-.notation-row-value--block {
-  white-space: pre;
-  max-height: 160px;
-  overflow: auto;
-}
-
 .result-facts {
   margin: 0;
   display: grid;
@@ -410,14 +381,22 @@ textarea.notation-input {
   overflow-wrap: anywhere;
 }
 
+/* The formula and the mass are copied one at a time, so each leaves room for
+   the glyph it floats past its own right edge. */
+.list-row-body .muted .click-to-copy {
+  margin-right: 14px;
+}
+
 .list-row-error {
   color: #c23030;
 }
 
+/* The wider column gap leaves room for the copy glyph a field value floats
+   past its own right edge. */
 .list-row-fields {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 10px;
+  gap: 2px 20px;
   font-size: 11px;
 }
 
@@ -466,6 +445,11 @@ textarea.notation-input {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+/* A tag closes tight around its text, so the copy glyph needs the room. */
+.tutorial-facts .click-to-copy {
+  margin-right: 14px;
 }
 
 .tutorial-drawing {
@@ -668,6 +652,12 @@ textarea.notation-input {
 .reference-syntax {
   white-space: nowrap;
   width: 1%;
+}
+
+/* The row's own cell padding outweighs the one a copyable block carries, so
+   the room for the glyph is given back here. */
+.reference-row td.click-to-copy {
+  padding-right: 22px;
 }
 
 .reference-syntax code {

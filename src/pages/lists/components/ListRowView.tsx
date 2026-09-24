@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { CopyButton } from 'react-cheminfo/ui';
+import { ClickToCopy, CopyButton } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 import type { RowComponentProps } from 'react-window';
 
 import { writeMolecule } from '../../../chemistry/describe.ts';
 import type { OutputFormat } from '../../../chemistry/types.ts';
 import StructureView from '../../../components/StructureView.tsx';
+import { outputFormatLabel } from '../outputFormats.ts';
 import type { ShownRow } from '../shownRows.ts';
 
 export interface ListRowsProps {
@@ -62,13 +63,37 @@ export default function ListRowView(props: RowComponentProps<ListRowsProps>) {
           atomHighlight={matched}
         />
         <div className="list-row-body">
-          {row.label ? <b>{row.label}</b> : null}
-          <code className="list-row-output">{output}</code>
+          {row.label ? (
+            <b>
+              <ClickToCopy value={row.label} label="name">
+                {row.label}
+              </ClickToCopy>
+            </b>
+          ) : null}
+          <ClickToCopy
+            as="code"
+            className="list-row-output"
+            value={output}
+            label={outputFormatLabel(to)}
+            focusable={false}
+          >
+            {output}
+          </ClickToCopy>
           {row.mf === undefined ? (
             <span className="muted">a query, so no formula</span>
           ) : (
             <span className="muted">
-              <MF mf={row.mf} /> · {row.mw?.toFixed(2)} g/mol
+              <ClickToCopy value={row.mf} label="molecular formula">
+                <MF mf={row.mf} />
+              </ClickToCopy>{' '}
+              ·{' '}
+              <ClickToCopy
+                value={row.mw === undefined ? '' : row.mw.toFixed(2)}
+                label="average mass"
+                disabled={row.mw === undefined}
+              >
+                {row.mw?.toFixed(2)} g/mol
+              </ClickToCopy>
             </span>
           )}
           <RowFields fields={row.fields} />
@@ -92,7 +117,10 @@ function RowFields(props: { fields?: Record<string, string> }) {
     <span className="list-row-fields">
       {Object.entries(props.fields).map(([name, value]) => (
         <span key={name}>
-          <span className="list-row-field-name">{name}</span> {value}
+          <span className="list-row-field-name">{name}</span>{' '}
+          <ClickToCopy value={value} label={name}>
+            {value}
+          </ClickToCopy>
         </span>
       ))}
     </span>

@@ -8,8 +8,10 @@ test('a SMILES typed in the box is drawn and written every other way', async ({
   await page.getByPlaceholder('CC(=O)Oc1ccccc1C(=O)O').fill('CCO');
 
   // The drawing is an <svg> in the document, not a canvas, so it can be
-  // asserted on.
-  await expect(page.locator('.result-depiction svg')).toBeVisible();
+  // asserted on. The copy glyphs beside the facts are <svg data-icon> too.
+  await expect(
+    page.locator('.result-depiction svg:not([data-icon])'),
+  ).toBeVisible();
   await expect(page.getByText('C2H6O')).toBeVisible();
   await expect(page.getByText('46.0686', { exact: false })).toBeVisible();
   await expect(page.getByText('read as smiles')).toBeVisible();
@@ -97,7 +99,9 @@ test('a reaction is read, drawn and written back on its own tab', async ({
 
   await expect(page.getByText('read as reaction SMILES')).toBeVisible();
   // Two reactants, two products, each drawn on its own.
-  await expect(page.locator('.reaction-component svg')).toHaveCount(4);
+  await expect(
+    page.locator('.reaction-component svg:not([data-icon])'),
+  ).toHaveCount(4);
   await expect(page.getByText('CCO.CC(Cl)=O>>CCOC(C)=O.Cl')).toBeVisible();
 });
 
@@ -107,9 +111,9 @@ test('a link carrying a reaction opens on the reaction tab', async ({
   await page.goto('/?smiles=C%3DCC%3DC.C%3DC%3E%3EC1%3DCCCCC1');
 
   await expect(page.locator('.reaction-arrow-glyph')).toBeVisible();
-  await expect(page.locator('.notation-row-value').first()).toHaveText(
-    'C=C.C=CC=C>>C1CC=CCC1',
-  );
+  await expect(
+    page.locator('.notation-row .copyable-value__value').first(),
+  ).toHaveText('C=C.C=CC=C>>C1CC=CCC1');
 });
 
 test('an arrow typed on the molecule tab offers the reaction tab', async ({

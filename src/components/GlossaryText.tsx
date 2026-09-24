@@ -1,6 +1,7 @@
 import { PopoverNext } from '@blueprintjs/core';
 import { Fragment } from 'react';
 import { parseGlossaryMarkers } from 'react-cheminfo/core';
+import { ClickToCopy } from 'react-cheminfo/ui';
 
 import type { GlossaryEntry } from '../data/glossary.ts';
 import { GLOSSARY } from '../data/glossary.ts';
@@ -61,7 +62,13 @@ function GlossaryCard(props: { entry: GlossaryEntry }) {
         {entry.examples.map((example) => (
           <li key={example.smiles}>
             <div className="glossary-example">
-              <code>{example.smiles}</code>
+              <ClickToCopy
+                as="div"
+                value={example.smiles}
+                label="example SMILES"
+              >
+                <code>{example.smiles}</code>
+              </ClickToCopy>
               <SmilesThumb smiles={example.smiles} width={140} height={90} />
             </div>
             {example.note ? <i>{example.note}</i> : null}

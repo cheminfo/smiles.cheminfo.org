@@ -1,4 +1,5 @@
 import { H5, Icon, PopoverNext } from '@blueprintjs/core';
+import { ClickToCopy } from 'react-cheminfo/ui';
 
 import type {
   ReferenceEntry,
@@ -69,9 +70,7 @@ function Row(props: { entry: ReferenceEntry }) {
         hasDetail ? 'reference-row reference-row--rich' : 'reference-row'
       }
     >
-      <td className="reference-syntax">
-        <code>{entry.syntax}</code>
-      </td>
+      <SyntaxCell syntax={entry.syntax} rich={false} />
       <td>
         <NotationText text={entry.summary} />
       </td>
@@ -96,9 +95,7 @@ function Row(props: { entry: ReferenceEntry }) {
             hasDetail ? 'reference-row reference-row--rich' : 'reference-row'
           }
         >
-          <td className="reference-syntax">
-            <code>{entry.syntax}</code>
-          </td>
+          <SyntaxCell syntax={entry.syntax} rich />
           <td>
             <NotationText text={entry.summary} />
           </td>
@@ -106,6 +103,27 @@ function Row(props: { entry: ReferenceEntry }) {
       )}
       content={<SyntaxCard entry={entry} />}
     />
+  );
+}
+
+/**
+ * The construct itself, which is what a reader takes away from a sheet.
+ * @param props - The construct, and whether its row carries a hover card.
+ * @returns The cell.
+ */
+function SyntaxCell(props: { syntax: string; rich: boolean }) {
+  return (
+    <ClickToCopy
+      as="td"
+      className="reference-syntax"
+      value={props.syntax}
+      label="syntax"
+      // A rich row already explains itself in a card the hover opens, and a
+      // native tooltip would sit over it.
+      title={props.rich ? '' : undefined}
+    >
+      <code>{props.syntax}</code>
+    </ClickToCopy>
   );
 }
 
@@ -127,7 +145,9 @@ function SyntaxCard(props: { entry: ReferenceEntry }) {
       ) : null}
       {entry.exampleSmiles ? (
         <div className="syntax-card-example">
-          <code>{entry.exampleSmiles}</code>
+          <ClickToCopy as="div" value={entry.exampleSmiles} label="example">
+            <code>{entry.exampleSmiles}</code>
+          </ClickToCopy>
           <SmilesThumb smiles={entry.exampleSmiles} width={180} height={120} />
           {entry.exampleNote ? (
             <i>

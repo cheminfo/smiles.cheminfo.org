@@ -2,7 +2,7 @@ import { Button, Callout, Card, H5, InputGroup, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { pluralize } from 'react-cheminfo/core';
 import { StructureEditor } from 'react-cheminfo/structure';
-import { CopyButton } from 'react-cheminfo/ui';
+import { ClickToCopy, CopyButton } from 'react-cheminfo/ui';
 
 import type { Exercise } from '../../../exercises/types.ts';
 import { progressOf } from '../../../state/exerciseProgress.ts';
@@ -134,7 +134,14 @@ export default function AnswerPanel(props: { exercise: Exercise }) {
       {progress.showAnswer && exercise.kind !== 'smarts' ? (
         <Callout intent="warning" icon="key" compact className="answer-reveal">
           <div className="question-smiles">
-            <code>{exercise.smiles}</code>
+            <ClickToCopy
+              as="code"
+              value={exercise.smiles}
+              label="SMILES"
+              focusable={false}
+            >
+              {exercise.smiles}
+            </ClickToCopy>
             <CopyButton small content={exercise.smiles} />
           </div>
           <span className="muted">

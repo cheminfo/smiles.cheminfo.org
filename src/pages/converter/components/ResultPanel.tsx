@@ -1,13 +1,12 @@
 import { Button, Callout, Card, H5, Tag, Tooltip } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { ClickToCopy, CopyableValue } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 
 import type { Structure } from '../../../chemistry/types.ts';
 import StructureView from '../../../components/StructureView.tsx';
 import { preferences, structure } from '../../../state/converter.ts';
 import { isHidden } from '../../../state/shareConfig.ts';
-
-import NotationRow from './NotationRow.tsx';
 
 interface Row {
   key: keyof Structure;
@@ -111,12 +110,25 @@ export default function ResultPanel() {
             <>
               <dt>Formula</dt>
               <dd>
-                <MF mf={value.mf} />
+                <ClickToCopy value={value.mf} label="molecular formula">
+                  <MF mf={value.mf} />
+                </ClickToCopy>
               </dd>
               <dt>Average mass</dt>
-              <dd>{value.mw.toFixed(4)} g/mol</dd>
+              <dd>
+                <ClickToCopy value={value.mw.toFixed(4)} label="average mass">
+                  {value.mw.toFixed(4)} g/mol
+                </ClickToCopy>
+              </dd>
               <dt>Monoisotopic</dt>
-              <dd>{value.monoisotopicMass.toFixed(4)} g/mol</dd>
+              <dd>
+                <ClickToCopy
+                  value={value.monoisotopicMass.toFixed(4)}
+                  label="monoisotopic mass"
+                >
+                  {value.monoisotopicMass.toFixed(4)} g/mol
+                </ClickToCopy>
+              </dd>
             </>
           )}
           <dt>Atoms · bonds</dt>
@@ -127,11 +139,12 @@ export default function ResultPanel() {
       </div>
 
       {(isHidden('formats') ? ROWS.slice(0, 1) : ROWS).map((row) => (
-        <NotationRow
+        <CopyableValue
           key={row.key}
+          className="notation-row"
           label={row.label}
           hint={row.hint}
-          text={String(value[row.key])}
+          value={String(value[row.key])}
         />
       ))}
     </Card>

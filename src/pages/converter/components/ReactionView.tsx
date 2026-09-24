@@ -1,3 +1,4 @@
+import { ClickToCopy } from 'react-cheminfo/ui';
 import { MF } from 'react-mf';
 
 import type { DescribedComponent } from '../../../chemistry/readReactionInput.ts';
@@ -76,9 +77,13 @@ function Component(props: {
         {/* A query component has no implicit hydrogens, so its formula would
             be fiction — the pattern itself is what it has to say. */}
         {structure.isQuery ? (
-          <code>{structure.smarts}</code>
+          <ClickToCopy as="code" value={structure.smarts} label="SMARTS">
+            {structure.smarts}
+          </ClickToCopy>
         ) : (
-          <MF mf={structure.mf} />
+          <ClickToCopy value={structure.mf} label="molecular formula">
+            <MF mf={structure.mf} />
+          </ClickToCopy>
         )}
       </figcaption>
     </figure>

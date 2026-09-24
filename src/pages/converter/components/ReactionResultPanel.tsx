@@ -1,11 +1,11 @@
 import { Callout, Card, H5, Tag } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { CopyableValue } from 'react-cheminfo/ui';
 
 import type { ReactionStructure } from '../../../chemistry/types.ts';
 import { reaction } from '../../../state/converter.ts';
 import { isHidden } from '../../../state/shareConfig.ts';
 
-import NotationRow from './NotationRow.tsx';
 import ReactionView from './ReactionView.tsx';
 
 interface Row {
@@ -89,11 +89,12 @@ export default function ReactionResultPanel() {
       </dl>
 
       {(isHidden('formats') ? ROWS.slice(0, 1) : ROWS).map((row) => (
-        <NotationRow
+        <CopyableValue
           key={row.key}
+          className="notation-row"
           label={row.label}
           hint={row.hint}
-          text={value[row.key]}
+          value={value[row.key]}
           block={row.block}
         />
       ))}
