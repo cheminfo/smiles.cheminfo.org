@@ -9,7 +9,7 @@
 
 import { BUILD_INFO } from 'react-cheminfo/build-info';
 import type { AboutContent, CitedWork } from 'react-cheminfo/core';
-import { PLATFORM_WORK } from 'react-cheminfo/core';
+import { PLATFORM_WORK, TEACHING_WORK } from 'react-cheminfo/core';
 
 /** The record the `/about` page is drawn from. */
 export const ABOUT: AboutContent = {
@@ -48,13 +48,15 @@ export const ABOUT: AboutContent = {
 
 /**
  * The papers a reader publishing what this page produced owes: the platform the
- * site runs on, the notation itself, the algorithm that makes one SMILES
- * canonical, and the toolkit that reads and draws every structure here.
+ * site runs on, the teaching the tutorial and the exercises come out of, the
+ * notation itself, the algorithm that makes one SMILES canonical, and the
+ * toolkit that reads and draws every structure here.
  * @returns The works, in the order the page lists them.
  */
 function citedWorks(): CitedWork[] {
   return [
     PLATFORM_WORK,
+    TEACHING_WORK,
     {
       reference: {
         authors: [{ given: 'D.', family: 'Weininger' }],

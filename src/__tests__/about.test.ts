@@ -58,12 +58,14 @@ test('the notation, the canonical form and the toolkit are what it asks to be ci
 
   expect(dois).toStrictEqual([
     '10.2533/chimia.2025.66',
+    '10.2533/chimia.2023.683',
     '10.1021/ci00057a005',
     '10.1021/ci00062a008',
     '10.1021/ci800305f',
   ]);
   expect((ABOUT.cite ?? []).map((work) => work.what)).toStrictEqual([
     'Data processing in the browser',
+    'Teaching chemistry online',
     'The SMILES notation',
     'The canonical SMILES',
     'OpenChemLib',
