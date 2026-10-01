@@ -1,6 +1,6 @@
 {
   "name": "smiles",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Structure ⇄ SMILES conversion, search and exercises, in the browser",
   "type": "module",
   "private": true,
