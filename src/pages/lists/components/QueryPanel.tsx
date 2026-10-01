@@ -8,12 +8,12 @@ import {
   H5,
   HTMLSelect,
   InputGroup,
-  NumericInput,
   ProgressBar,
 } from '@blueprintjs/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useState } from 'react';
 import { StructureEditor } from 'react-cheminfo/structure';
+import { NumberInput } from 'react-cheminfo/ui';
 
 import type { SearchMode } from '../../../chemistry/moleculesDatabase.ts';
 import { readInput } from '../../../chemistry/readInput.ts';
@@ -104,14 +104,15 @@ export default function QueryPanel() {
             />
           </FormGroup>
           <FormGroup label="Most hits">
-            <NumericInput
+            <NumberInput
               min={1}
               max={5000}
-              stepSize={100}
-              majorStepSize={1000}
+              step={100}
+              integer
               value={preferences.limit.value}
-              onValueChange={(value) => {
-                if (Number.isFinite(value)) preferences.limit.value = value;
+              ariaLabel="Rows to return"
+              onChange={(value) => {
+                preferences.limit.value = value;
               }}
             />
           </FormGroup>
