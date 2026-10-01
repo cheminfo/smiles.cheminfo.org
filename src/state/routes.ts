@@ -62,7 +62,7 @@ const PAGE_META: Record<Page, Omit<RouteMeta, 'path'>> = {
   about: {
     title: 'About — what this SMILES tool is and what it runs on',
     description:
-      'What smiles.cheminfo.org is, what you can do with it, the work it runs on, the papers to cite when you publish what it made, and where to report a problem.',
+      'What smiles.cheminfo.org is, what you can do with it, the work it runs on, and the papers to cite when you publish what it made.',
   },
 };
 
