@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react';
 import { cheminfoBuildInfo, cheminfoPrerender } from 'react-cheminfo/vite';
 import { defineConfig } from 'vite';
 
+import { pageContent } from './src/state/content.ts';
 import { NOSCRIPT_ROUTES, PAGE_ROUTES } from './src/state/routes.ts';
 import { configuredSiteUrl } from './src/state/sitePath.ts';
 
@@ -29,6 +30,10 @@ export default defineConfig({
     cheminfoPrerender({
       site: 'smiles',
       routes: PAGE_ROUTES,
+      // What each address says for itself. Without it all 139 ship the same
+      // body — this site's menu — and a search engine has only the title to
+      // tell the tutorial steps and the exercises apart.
+      content: pageContent,
       // The published address, mount path included, so every canonical link,
       // `og:url`, card and sitemap entry starts where the site is served.
       origin: siteUrl,
